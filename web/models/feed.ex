@@ -1,9 +1,13 @@
 defmodule ExRss.Feed do
   use ExRss.Web, :model
 
+  alias ExRss.Entry
+
   schema "feeds" do
     field :title, :string
     field :url, :string
+
+    has_many :entries, Entry
 
     timestamps()
   end
