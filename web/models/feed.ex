@@ -6,6 +6,7 @@ defmodule ExRss.Feed do
   schema "feeds" do
     field :title, :string
     field :url, :string
+    field :next_update_at, :utc_datetime
 
     has_many :entries, Entry
 
