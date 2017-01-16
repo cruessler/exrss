@@ -19,7 +19,7 @@ defmodule ExRss.Mixfile do
   def application do
     [mod: {ExRss, []},
      applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext,
-                    :phoenix_ecto, :postgrex]]
+                    :phoenix_ecto, :postgrex, :tzdata, :httpoison]]
   end
 
   # Specifies which paths to compile per environment.
@@ -33,12 +33,16 @@ defmodule ExRss.Mixfile do
     [{:phoenix, "~> 1.2.0"},
      {:phoenix_pubsub, "~> 1.0"},
      {:phoenix_ecto, "~> 3.0"},
-     {:postgrex, ">= 0.0.0"},
+     {:ecto, "~> 2.1"},
+     {:postgrex, "~> 0.13.0"},
      {:phoenix_html, "~> 2.6"},
      {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:gettext, "~> 0.11"},
      {:cowboy, "~> 1.0"},
-     {:floki, "~> 0.11.0"}]
+     {:floki, "~> 0.11.0"},
+     {:feeder_ex, "~> 1.0.0"},
+     {:httpoison, "~> 0.10.0"},
+     {:timex, "~> 3.1"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
