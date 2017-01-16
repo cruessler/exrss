@@ -8,6 +8,5 @@ defmodule ExRss.Repo.Migrations.CreateFeed do
 
       timestamps()
     end
-
   end
 end
