@@ -1,6 +1,7 @@
 defmodule ExRss.Crawler.Queue do
   use GenServer
 
+  require Ecto.Query
   require Logger
 
   alias ExRss.Feed
@@ -14,7 +15,9 @@ defmodule ExRss.Crawler.Queue do
   end
 
   def init(:ok) do
-    feeds = Repo.all(Feed) |> Enum.shuffle
+    feeds =
+      Ecto.Query.from(Feed, order_by: [asc: :next_update_at])
+      |> Repo.all
 
     {:ok, {feeds, %{}}, 0}
   end
@@ -33,10 +36,10 @@ defmodule ExRss.Crawler.Queue do
 
   # Handle regular success and error cases: Add the feed back to the queue.
   def handle_info({ref, {:ok, feed}}, {feeds, refs}) do
-    {:noreply, {feeds ++ [feed], refs}, @timeout}
+    {:noreply, {insert(feeds, feed), refs}, @timeout}
   end
   def handle_info({ref, {:error, feed}}, {feeds, refs}) do
-    {:noreply, {feeds ++ [feed], refs}, @timeout}
+    {:noreply, {insert(feeds, feed), refs}, @timeout}
   end
   # Handle regular child exit. The feed has already been reinserted by one of
   # the upper function clauses, so only the reference to the worker has to be
@@ -52,10 +55,15 @@ defmodule ExRss.Crawler.Queue do
   def handle_info({:DOWN, ref, :process, _, _}, {feeds, refs}) do
     {feed, refs} = Map.pop(refs, ref)
 
-    {:noreply, {feeds ++ [feed], refs}, @timeout}
+    {:noreply, {insert(feeds, feed), refs}, @timeout}
   end
 
   def handle_info(_, state) do
     {:noreply, state, @timeout}
+  end
+
+  defp insert(queue, feed) do
+    queue ++ [feed]
+    |> Enum.sort(fn a, b -> Timex.compare(a, b) == -1 end)
   end
 end

@@ -19,7 +19,7 @@ defmodule ExRss.Mixfile do
   def application do
     [mod: {ExRss, []},
      applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext,
-                    :phoenix_ecto, :postgrex, :tzdata, :httpoison]]
+                    :phoenix_ecto, :postgrex, :tzdata, :httpoison, :timex]]
   end
 
   # Specifies which paths to compile per environment.
