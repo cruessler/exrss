@@ -24,7 +24,7 @@ defmodule ExRss.Entry do
   end
 
   def parse(entry) do
-    now = Ecto.DateTime.utc
+    now = DateTime.utc_now
     posted_at = parse_time(entry.updated)
 
     %{title: entry.title,

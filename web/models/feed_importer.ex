@@ -15,7 +15,7 @@ defmodule ExRss.FeedImporter do
   end
 
   def extract_feeds(html) do
-    now = Ecto.DateTime.utc
+    now = DateTime.utc_now
 
     html
     |> Floki.find("outline")
