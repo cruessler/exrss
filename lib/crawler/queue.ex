@@ -5,7 +5,6 @@ defmodule ExRss.Crawler.Queue do
   require Logger
 
   alias ExRss.Feed
-  alias ExRss.FeedUpdater
   alias ExRss.Repo
 
   @timeout 600_000
@@ -18,8 +17,12 @@ defmodule ExRss.Crawler.Queue do
     feeds =
       Ecto.Query.from(Feed, order_by: [asc: :next_update_at])
       |> Repo.all
+      |> Enum.map(fn
+        %{next_update_at: nil} = feed -> %{feed | next_update_at: DateTime.utc_now}
+        feed -> feed
+      end)
 
-    {:ok, {feeds, %{}}, 0}
+    {:ok, {feeds, %{}}, timeout(feeds)}
   end
 
   def handle_info(:timeout, {[first|rest], refs}) do
@@ -31,15 +34,19 @@ defmodule ExRss.Crawler.Queue do
     # reinserted into the queue, should the update fail.
     refs = Map.put(refs, ref, first)
 
-    {:noreply, {rest, refs}, @timeout}
+    {:noreply, {rest, refs}, timeout(rest)}
   end
 
   # Handle regular success and error cases: Add the feed back to the queue.
-  def handle_info({ref, {:ok, feed}}, {feeds, refs}) do
-    {:noreply, {insert(feeds, feed), refs}, @timeout}
+  def handle_info({_ref, {:ok, feed}}, {feeds, refs}) do
+    new_queue = insert(feeds, feed)
+
+    {:noreply, {new_queue, refs}, timeout(new_queue)}
   end
-  def handle_info({ref, {:error, feed}}, {feeds, refs}) do
-    {:noreply, {insert(feeds, feed), refs}, @timeout}
+  def handle_info({_ref, {:error, feed}}, {feeds, refs}) do
+    new_queue = insert(feeds, feed)
+
+    {:noreply, {new_queue, refs}, timeout(new_queue)}
   end
   # Handle regular child exit. The feed has already been reinserted by one of
   # the upper function clauses, so only the reference to the worker has to be
@@ -47,7 +54,7 @@ defmodule ExRss.Crawler.Queue do
   def handle_info({:DOWN, ref, :process, _, :normal}, {feeds, refs}) do
     {_, refs} = Map.pop(refs, ref)
 
-    {:noreply, {feeds, refs}, @timeout}
+    {:noreply, {feeds, refs}, timeout(feeds)}
   end
   # Whenever a child exits for a reason other than :normal, the reference to
   # that process is removed and the corresponding feed is reinserted into the
@@ -55,15 +62,37 @@ defmodule ExRss.Crawler.Queue do
   def handle_info({:DOWN, ref, :process, _, _}, {feeds, refs}) do
     {feed, refs} = Map.pop(refs, ref)
 
-    {:noreply, {insert(feeds, feed), refs}, @timeout}
+    {:noreply, {insert(feeds, feed), refs}, timeout(feeds)}
   end
 
-  def handle_info(_, state) do
-    {:noreply, state, @timeout}
+  def handle_info(_, {feeds, refs}) do
+    {:noreply, {feeds, refs}, timeout(feeds)}
   end
 
-  defp insert(queue, feed) do
-    queue ++ [feed]
-    |> Enum.sort(fn a, b -> Timex.compare(a, b) == -1 end)
+  def insert(queue, feed) do
+    next_update_at =
+      Timex.add(DateTime.utc_now, Timex.Duration.from_milliseconds(@timeout))
+
+    {:ok, new_feed} =
+      feed
+      |> Ecto.Changeset.change(%{next_update_at: next_update_at})
+      |> Repo.update
+
+    queue ++ [new_feed]
+    |> Enum.sort(fn a, b ->
+      Timex.compare(a.next_update_at, b.next_update_at) == -1
+    end)
+  end
+
+  def timeout([%{next_update_at: nil}|_]) do
+    0
+  end
+  def timeout([first|_]) do
+    first.next_update_at
+    |> Timex.diff(DateTime.utc_now, :milliseconds)
+    |> max(0)
+  end
+  def timeout([]) do
+    :infinity
   end
 end
