@@ -4,10 +4,9 @@ defmodule ExRss.Crawler.Queue do
   require Ecto.Query
   require Logger
 
+  alias Ecto.Changeset
   alias ExRss.Feed
   alias ExRss.Repo
-
-  @timeout 600_000
 
   def start_link(opts \\ []) do
     GenServer.start_link(__MODULE__, :ok, Keyword.put(opts, :name, __MODULE__))
@@ -39,12 +38,24 @@ defmodule ExRss.Crawler.Queue do
 
   # Handle regular success and error cases: Add the feed back to the queue.
   def handle_info({_ref, {:ok, feed}}, {feeds, refs}) do
-    new_queue = insert(feeds, feed)
+    new_feed =
+      feed
+      |> Changeset.change
+      |> Feed.schedule_update_on_success
+      |> Repo.update!
+
+    new_queue = insert(feeds, new_feed)
 
     {:noreply, {new_queue, refs}, timeout(new_queue)}
   end
   def handle_info({_ref, {:error, feed}}, {feeds, refs}) do
-    new_queue = insert(feeds, feed)
+    new_feed =
+      feed
+      |> Changeset.change
+      |> Feed.schedule_update_on_error
+      |> Repo.update!
+
+    new_queue = insert(feeds, new_feed)
 
     {:noreply, {new_queue, refs}, timeout(new_queue)}
   end
@@ -62,7 +73,15 @@ defmodule ExRss.Crawler.Queue do
   def handle_info({:DOWN, ref, :process, _, _}, {feeds, refs}) do
     {feed, refs} = Map.pop(refs, ref)
 
-    {:noreply, {insert(feeds, feed), refs}, timeout(feeds)}
+    new_feed =
+      feed
+      |> Changeset.change
+      |> Feed.schedule_update_on_error
+      |> Repo.update!
+
+    new_queue = insert(feeds, new_feed)
+
+    {:noreply, {new_queue, refs}, timeout(new_queue)}
   end
 
   def handle_info(_, {feeds, refs}) do
@@ -70,15 +89,7 @@ defmodule ExRss.Crawler.Queue do
   end
 
   def insert(queue, feed) do
-    next_update_at =
-      Timex.add(DateTime.utc_now, Timex.Duration.from_milliseconds(@timeout))
-
-    {:ok, new_feed} =
-      feed
-      |> Ecto.Changeset.change(%{next_update_at: next_update_at})
-      |> Repo.update
-
-    queue ++ [new_feed]
+    queue ++ [feed]
     |> Enum.sort(fn a, b ->
       Timex.compare(a.next_update_at, b.next_update_at) == -1
     end)

@@ -17,12 +17,4 @@ defmodule ExRss.Crawler.QueueTest do
     soon = DateTime.utc_now |> Timex.add(duration)
     assert_in_delta Queue.timeout([%{next_update_at: soon}]), 15_000, 100
   end
-
-  test "insert" do
-    {:ok, feed} = Repo.insert(%Feed{})
-
-    queue = Queue.insert([], feed)
-
-    assert_in_delta(Queue.timeout(queue), 600_000, 100)
-  end
 end
