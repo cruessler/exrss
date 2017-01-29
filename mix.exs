@@ -42,7 +42,8 @@ defmodule ExRss.Mixfile do
      {:floki, "~> 0.11.0"},
      {:feeder_ex, "~> 1.0.0"},
      {:httpoison, "~> 0.10.0"},
-     {:timex, "~> 3.1"}]
+     {:timex, "~> 3.1"},
+     {:comeonin, "~> 3.0"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
