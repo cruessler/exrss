@@ -3,6 +3,7 @@ defmodule ExRss.Feed do
 
   alias Ecto.Changeset
   alias ExRss.Entry
+  alias ExRss.User
   alias Timex.Duration
 
   @base_timeout Duration.from_minutes(15) |> Duration.to_milliseconds
@@ -13,6 +14,8 @@ defmodule ExRss.Feed do
     field :url, :string
     field :next_update_at, :utc_datetime
     field :retries, :integer
+
+    belongs_to :user, User
 
     has_many :entries, Entry
 
