@@ -1,0 +1,14 @@
+<%= form_for @conn,
+      session_path(@conn, :create),
+      [as: "session"],
+      fn f -> %>
+  <h2>Log in</h2>
+
+  <%= text_input f, :email, class: "form-control" %>
+  <%= error_tag f, :email %>
+
+  <%= password_input f, :password, class: "form-control" %>
+  <%= error_tag f, :password %>
+
+  <button type="submit">Sign in</button>
+<% end %>

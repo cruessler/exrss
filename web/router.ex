@@ -18,6 +18,11 @@ defmodule ExRss.Router do
 
     get "/", PageController, :index
 
+    resources "/session",
+      SessionController,
+      only: [ :create, :new, :delete ],
+      singleton: true
+
     resources "/users", UserController, only: [ :create, :new ]
   end
 
