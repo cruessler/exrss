@@ -4,7 +4,8 @@ use Mix.Config
 # you can enable the server option below.
 config :ex_rss, ExRss.Endpoint,
   http: [port: 4001],
-  server: false
+  server: false,
+  secret_key_base: String.duplicate("a", 64)
 
 # Print only warnings and errors during test
 config :logger, level: :warn
