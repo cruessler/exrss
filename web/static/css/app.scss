@@ -5,4 +5,5 @@
 /* Hide Phoenix flash messages. */
 .alert:empty { display: none; }
 
+@import "_session";
 @import "_user";

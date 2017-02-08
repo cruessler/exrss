@@ -1,14 +1,28 @@
 <%= form_for @conn,
       session_path(@conn, :create),
-      [as: "session"],
+      [as: "session", class: :"session-new"],
       fn f -> %>
   <h2>Log in</h2>
 
-  <%= text_input f, :email, class: "form-control" %>
-  <%= error_tag f, :email %>
+  <%= form_group f, :email, fn f -> %>
+    <label for="registration_email" class="col-md-3 col-form-label">Email</label>
+    <div class="col-md-9">
+      <%= email_input f, :email, class: "form-control" %>
+      <%= error_tag f, :email %>
+    </div>
+  <% end %>
 
-  <%= password_input f, :password, class: "form-control" %>
-  <%= error_tag f, :password %>
+  <%= form_group f, :password, fn f -> %>
+    <label for="registration_password" class="col-md-3 col-form-label">Password</label>
+    <div class="col-md-9">
+      <%= password_input f, :password, class: "form-control" %>
+      <%= error_tag f, :password %>
+    </div>
+  <% end %>
 
-  <button type="submit">Sign in</button>
+  <div class="form-group row">
+    <div class="col-md-12">
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+    </div>
+  </div>
 <% end %>
