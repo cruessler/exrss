@@ -8,6 +8,7 @@ use Mix.Config
 # with brunch.io to recompile .js and .css sources.
 config :ex_rss, ExRss.Endpoint,
   http: [port: 4000],
+  secret_key_base: String.duplicate("abcdefgh", 8),
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
