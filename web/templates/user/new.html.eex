@@ -1,18 +1,38 @@
-<%= form_for @changeset,
-      user_path(@conn, :create),
-      fn f -> %>
-  <h1>Register</h1>
+<div class="container">
+  <%= form_for @changeset,
+    user_path(@conn, :create),
+    [class: :"user-new"],
+    fn f -> %>
+    <h1>Register</h1>
 
-  <%= text_input f, :name %>
-  <%= error_tag f, :name %>
+    <%= form_group f, :email, fn f -> %>
+      <label for="registration_email" class="col-md-3 col-form-label">Email</label>
+      <div class="col-md-9">
+        <%= email_input f, :email, class: "form-control" %>
+        <%= error_tag f, :email %>
+      </div>
+    <% end %>
 
-  <%= email_input f, :email %>
-  <%= error_tag f, :email %>
+    <%= form_group f, :password, fn f -> %>
+      <label for="registration_password" class="col-md-3 col-form-label">Password</label>
+      <div class="col-md-9">
+        <%= password_input f, :password, class: "form-control" %>
+        <%= error_tag f, :password %>
+      </div>
+    <% end %>
 
-  <%= password_input f, :password %>
-  <%= error_tag f, :password %>
+    <%= form_group f, :password_confirmation, fn f -> %>
+      <label for="registration_password_confirmation" class="col-md-3 col-form-label">Confirmation</label>
+      <div class="col-md-9">
+        <%= password_input f, :password_confirmation, class: "form-control" %>
+        <%= error_tag f, :password_confirmation %>
+      </div>
+    <% end %>
 
-  <%= password_input f, :password_confirmation %>
-
-  <button type="submit">Register</button>
-<% end %>
+    <div class="form-group row">
+      <div class="col-md-12">
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
+      </div>
+    </div>
+  <% end %>
+</div>

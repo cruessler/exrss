@@ -52,6 +52,8 @@ defmodule ExRss.Web do
       import ExRss.Router.Helpers
       import ExRss.ErrorHelpers
       import ExRss.Gettext
+
+      import ExRss.AppView
     end
   end
 

@@ -1,0 +1,6 @@
+form.user-new {
+  @include make-col-ready();
+
+  @include make-col-offset(2);
+  @include make-col(8);
+}
