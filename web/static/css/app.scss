@@ -1,0 +1,6 @@
+/* This file is for your main application css. */
+
+@import "bootstrap";
+
+/* Hide Phoenix flash messages. */
+.alert:empty { display: none; }
