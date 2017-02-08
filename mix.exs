@@ -33,6 +33,7 @@ defmodule ExRss.Mixfile do
     [{:phoenix, "~> 1.2.0"},
      {:phoenix_pubsub, "~> 1.0"},
      {:phoenix_ecto, "~> 3.0"},
+     {:plug, "~> 1.3"},
      {:ecto, "~> 2.1"},
      {:postgrex, "~> 0.13.0"},
      {:phoenix_html, "~> 2.6"},
