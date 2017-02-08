@@ -1,0 +1,17 @@
+<h1>Welcome to ExRss!</h1>
+
+<p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
+<p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+
+<%= if @current_user do %>
+  <p>
+    Hello <%= @current_user.email %>!
+  </p>
+<% else %>
+  <p>
+    Right now, there is not much you can do. Maybe you want to
+    <a href="<%= user_path(@conn, :new) %>">register</a>?
+    If you are already registered you can of course
+    <a href="<%= session_path(@conn, :new) %>">log in</a>.
+  </p>
+<% end %>
