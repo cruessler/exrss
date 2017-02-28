@@ -13,7 +13,7 @@ defmodule ExRss.SessionController do
         conn
         |> put_session(:current_user, user)
         |> put_flash(:info, "You are now logged in.")
-        |> redirect(to: page_path(conn, :index))
+        |> redirect(to: feed_path(conn, :index))
 
       :error ->
         conn
