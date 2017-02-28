@@ -19,3 +19,20 @@ import "phoenix_html"
 // paths "./socket" or full ones "web/static/js/socket".
 
 // import socket from "./socket"
+
+class App {
+  static mountElmModules() {
+    const nodes = document.querySelectorAll("[data-elm-module]")
+
+    for(const node of nodes) {
+      const elmModule = Elm[node.dataset.elmModule]
+      const params    = JSON.parse(node.dataset.elmParams) || {}
+
+      if(elmModule != undefined) {
+        elmModule.embed(node, params)
+      }
+    }
+  }
+}
+
+App.mountElmModules()
