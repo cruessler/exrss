@@ -9,6 +9,8 @@ defmodule ExRss.Feed do
   @base_timeout Duration.from_minutes(15) |> Duration.to_milliseconds
   @max_timeout Duration.from_days(1) |> Duration.to_milliseconds
 
+  @derive {Poison.Encoder, only: [:id, :title, :url, :entries]}
+
   schema "feeds" do
     field :title, :string
     field :url, :string

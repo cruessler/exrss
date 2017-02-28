@@ -36,6 +36,8 @@ defmodule ExRss.Web do
 
       import ExRss.Router.Helpers
       import ExRss.Gettext
+
+      import ExRss.Session.Helpers
     end
   end
 

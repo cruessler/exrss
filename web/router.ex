@@ -15,6 +15,10 @@ defmodule ExRss.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :authenticated do
+    plug ExRss.Plug.Authentication, "/"
+  end
+
   scope "/", ExRss do
     pipe_through :browser # Use the default browser stack
 
@@ -26,6 +30,12 @@ defmodule ExRss.Router do
       singleton: true
 
     resources "/users", UserController, only: [ :create, :new ]
+
+    scope "/" do
+      pipe_through :authenticated
+
+      resources "/feeds", FeedController, only: [ :index ]
+    end
   end
 
   # Other scopes may use custom stacks.
