@@ -59,6 +59,8 @@ exports.config = {
       elmFolder: "web/static/elm",
       mainModules: ["App.elm"],
       outputFolder: "../vendor"
+      outputFolder: "../vendor",
+      outputFile: "elm.js"
     },
     sass: {
       options: {
