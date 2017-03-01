@@ -1,4 +1,4 @@
-module Feed exposing (Feed)
+module Model.Feed exposing (Feed)
 
 
 type alias Feed =

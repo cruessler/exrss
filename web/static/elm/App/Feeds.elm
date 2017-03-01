@@ -1,6 +1,6 @@
-module App exposing (..)
+module App.Feeds exposing (..)
 
-import Feed exposing (Feed)
+import Model.Feed exposing (Feed)
 import Html exposing (Html, ul, li, text)
 import Html.App as Html
 
