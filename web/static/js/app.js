@@ -25,8 +25,14 @@ class App {
     const nodes = document.querySelectorAll("[data-elm-module]")
 
     for(const node of nodes) {
-      const elmModule = Elm[node.dataset.elmModule]
-      const params    = JSON.parse(node.dataset.elmParams) || {}
+      // The module name may be `App` or `App.Feeds`. `modulePath` would be
+      // ["App"] or ["App", "Feeds"], then.
+      const modulePath = node.dataset.elmModule.split(".")
+      const elmModule  = modulePath.reduce(
+        (acc, part) => acc[part],
+        Elm)
+
+      const params = JSON.parse(node.dataset.elmParams) || {}
 
       if(elmModule != undefined) {
         elmModule.embed(node, params)
