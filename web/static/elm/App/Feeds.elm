@@ -3,6 +3,7 @@ module App.Feeds exposing (..)
 import Model.Feed exposing (Feed)
 import View.Feed
 import Html exposing (Html, ul, li, text)
+import Html.Attributes exposing (class)
 import Html.App as Html
 
 
@@ -39,7 +40,7 @@ update msg model =
 
 feed : Feed -> Html Msg
 feed feed =
-    li [] [ View.Feed.view feed ]
+    li [ class "feed" ] [ h1 [] [ text feed.title ], View.Feed.view feed ]
 
 
 view : Model -> Html Msg
@@ -48,4 +49,4 @@ view model =
         feeds =
             List.map feed model.feeds
     in
-        ul [] feeds
+        ul [ class "feeds" ] feeds

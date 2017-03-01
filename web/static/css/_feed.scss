@@ -1,0 +1,15 @@
+ul.feeds {
+  padding-left: 0px;
+  list-style-type: none;
+
+  ul.feed {
+    padding-left: 0px;
+    list-style-type: none;
+
+    li.entry {
+      padding: .3rem;
+      padding-left: .2rem;
+      border-bottom: 1px solid $gray-light;
+    }
+  }
+}

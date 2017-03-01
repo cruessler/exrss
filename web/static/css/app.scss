@@ -5,5 +5,10 @@
 /* Hide Phoenix flash messages. */
 .alert:empty { display: none; }
 
+html {
+  font-size: 14px;
+}
+
+@import "_feed";
 @import "_session";
 @import "_user";
