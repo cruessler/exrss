@@ -1,6 +1,7 @@
 module App.Feeds exposing (..)
 
 import Model.Feed exposing (Feed)
+import View.Feed
 import Html exposing (Html, ul, li, text)
 import Html.App as Html
 
@@ -36,10 +37,15 @@ update msg model =
     ( model, Cmd.none )
 
 
+feed : Feed -> Html Msg
+feed feed =
+    li [] [ View.Feed.view feed ]
+
+
 view : Model -> Html Msg
 view model =
     let
         feeds =
-            List.map (\f -> li [] [ text f.title ]) model.feeds
+            List.map feed model.feeds
     in
         ul [] feeds
