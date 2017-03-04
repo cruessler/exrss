@@ -2,6 +2,16 @@ ul.feeds {
   padding-left: 0px;
   list-style-type: none;
 
+  li.feed {
+    h1 {
+      border-bottom: 1px solid $black;
+
+      small {
+        display: block;
+      }
+    }
+  }
+
   ul.feed {
     padding-left: 0px;
     list-style-type: none;
