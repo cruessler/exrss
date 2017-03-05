@@ -13,7 +13,11 @@ defmodule ExRss.FeedUpdater do
 
     changeset =
       feed
-      |> Changeset.change(%{url: raw_feed.url, title: raw_feed.title, updated_at: DateTime.utc_now})
+      |> Changeset.change(
+        %{url: raw_feed.url,
+          title: raw_feed.title,
+          read: false,
+          updated_at: DateTime.utc_now})
 
     Multi.new
     |> Multi.insert_all(:insert_entries, Entry, new_entries, on_conflict: :nothing)

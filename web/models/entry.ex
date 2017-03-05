@@ -3,7 +3,7 @@ defmodule ExRss.Entry do
 
   alias ExRss.Feed
 
-  @derive {Poison.Encoder, only: [:id, :url, :title]}
+  @derive {Poison.Encoder, only: [:id, :url, :title, :read]}
 
   schema "entries" do
     belongs_to :feed, Feed
@@ -13,6 +13,8 @@ defmodule ExRss.Entry do
 
     field :raw_posted_at, :string
     field :posted_at, :utc_datetime
+
+    field :read, :boolean
 
     timestamps()
   end
