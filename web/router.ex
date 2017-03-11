@@ -13,6 +13,8 @@ defmodule ExRss.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+
+    plug ExRss.Plug.Api.Authorization, "user"
   end
 
   pipeline :authenticated do
@@ -35,6 +37,14 @@ defmodule ExRss.Router do
       pipe_through :authenticated
 
       resources "/feeds", FeedController, only: [ :index ]
+    end
+  end
+
+  scope "/api", ExRss.Api do
+    pipe_through :api
+
+    scope "/v1", V1 do
+      resources "/entries", EntryController, only: [ :update ]
     end
   end
 

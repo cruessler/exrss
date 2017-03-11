@@ -24,7 +24,7 @@ defmodule ExRss.Entry do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:url, :title])
+    |> cast(params, [:url, :title, :read])
     |> validate_required([:url, :title, :raw_posted_at])
   end
 

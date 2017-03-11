@@ -7,6 +7,7 @@ defmodule ExRss.User do
     field :email, :string
 
     has_many :feeds, Feed
+    has_many :entries, through: [:feeds, :entries]
 
     timestamps()
   end
