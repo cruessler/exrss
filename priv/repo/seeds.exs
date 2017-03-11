@@ -9,3 +9,17 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+alias ExRss.Entry
+alias ExRss.Feed
+alias ExRss.Repo
+alias ExRss.User
+
+Repo.insert!(%User{id: 1, email: "jane@doe.com"})
+Repo.insert!(%Feed{id: 1, user_id: 1, title: "Title", url: "http://example.com"})
+Repo.insert!(
+  %Entry{
+    id: 1, url: "http://example.com", title: "Title",
+    raw_posted_at: "Sun, 21 Dec 2014 16:08:00 +0100", read: false, feed_id: 1
+  }
+)
