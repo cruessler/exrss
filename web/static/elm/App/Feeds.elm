@@ -1,5 +1,6 @@
 module App.Feeds exposing (..)
 
+import Dict exposing (Dict)
 import Json.Decode
 import Model.Feed exposing (Feed)
 import View.Feed
@@ -23,7 +24,7 @@ type alias Flags =
 
 
 type alias Model =
-    { feeds : List Feed }
+    { feeds : Dict Int Feed }
 
 
 type Msg
@@ -36,16 +37,15 @@ init flags =
         feeds =
             Json.Decode.decodeValue Model.Feed.decodeFeeds flags
                 |> Result.withDefault []
+                |> List.map (\f -> ( f.id, f ))
+                |> Dict.fromList
     in
         ( { feeds = feeds }, Cmd.none )
 
 
-toggleFeed : Int -> Feed -> Feed
-toggleFeed id feed =
-    if feed.id == id then
-        { feed | open = (not feed.open) }
-    else
-        feed
+toggleFeed : Maybe Feed -> Maybe Feed
+toggleFeed =
+    Maybe.map (\f -> { f | open = (not f.open) })
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -54,7 +54,7 @@ update msg model =
         ToggleFeed id ->
             let
                 newFeeds =
-                    List.map (toggleFeed id) model.feeds
+                    Dict.update id toggleFeed model.feeds
             in
                 ( { model | feeds = newFeeds }, Cmd.none )
 
@@ -63,7 +63,7 @@ additionalInfo : Feed -> Html Msg
 additionalInfo feed =
     let
         length =
-            List.length feed.entries
+            Dict.size feed.entries
 
         infoText =
             if length == 1 then
@@ -96,6 +96,6 @@ view : Model -> Html Msg
 view model =
     let
         feeds =
-            List.map feed model.feeds
+            List.map feed (Dict.values model.feeds)
     in
         ul [ class "feeds" ] feeds

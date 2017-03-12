@@ -1,5 +1,6 @@
 module Model.Feed exposing (Feed, Entry, decodeFeeds)
 
+import Dict exposing (Dict)
 import Json.Decode exposing (..)
 
 
@@ -7,7 +8,7 @@ type alias Feed =
     { id : Int
     , url : String
     , title : String
-    , entries : List Entry
+    , entries : Dict Int Entry
     , open : Bool
     }
 
@@ -30,8 +31,19 @@ decodeFeed =
         ("id" := int)
         ("url" := string)
         ("title" := string)
-        ("entries" := list decodeEntry)
+        ("entries" := decodeEntries)
         (succeed False)
+
+
+decodeEntries : Json.Decode.Decoder (Dict Int Entry)
+decodeEntries =
+    let
+        toDict list =
+            List.map (\f -> ( f.id, f )) list
+                |> Dict.fromList
+    in
+        list decodeEntry
+            |> map toDict
 
 
 decodeEntry : Json.Decode.Decoder Entry

@@ -1,5 +1,6 @@
 module View.Feed exposing (view)
 
+import Dict
 import Model.Feed exposing (Feed, Entry)
 import Html exposing (Html, h2, div, ul, li, a, text)
 import Html.Attributes exposing (class, href)
@@ -14,6 +15,6 @@ view : Feed -> Html msg
 view feed =
     let
         children =
-            List.map entry feed.entries
+            List.map entry (Dict.values feed.entries)
     in
         ul [ class "feed" ] children
