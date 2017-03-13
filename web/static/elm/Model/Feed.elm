@@ -1,4 +1,4 @@
-module Model.Feed exposing (Feed, Entry, decodeFeeds)
+module Model.Feed exposing (Feed, Entry, Status(..), decodeFeeds)
 
 import Dict exposing (Dict)
 import Json.Decode exposing (..)
@@ -13,10 +13,17 @@ type alias Feed =
     }
 
 
+type Status
+    = NoChange
+    | UpdatePending
+
+
 type alias Entry =
     { id : Int
     , url : String
     , title : String
+    , read : Bool
+    , status : Status
     }
 
 
@@ -48,7 +55,9 @@ decodeEntries =
 
 decodeEntry : Json.Decode.Decoder Entry
 decodeEntry =
-    object3 Entry
+    object5 Entry
         ("id" := int)
         ("url" := string)
         ("title" := string)
+        ("read" := bool)
+        (succeed NoChange)

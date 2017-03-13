@@ -2,10 +2,10 @@ module App.Feeds exposing (..)
 
 import Dict exposing (Dict)
 import Json.Decode
-import Model.Feed exposing (Feed)
+import Model.Feed exposing (Feed, Entry, Status(..))
 import View.Feed
-import Html exposing (Html, h1, ul, li, small, text)
-import Html.Attributes exposing (class)
+import Html exposing (Html, h1, ul, li, small, a, text)
+import Html.Attributes exposing (class, classList, href, target)
 import Html.App as Html
 import Html.Events exposing (onClick)
 
@@ -29,6 +29,7 @@ type alias Model =
 
 type Msg
     = ToggleFeed Int
+    | MarkAsRead Int
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -48,6 +49,24 @@ toggleFeed =
     Maybe.map (\f -> { f | open = (not f.open) })
 
 
+markAsRead : Int -> Int -> Feed -> Feed
+markAsRead entryId _ feed =
+    let
+        updateEntry =
+            Maybe.map
+                (\e ->
+                    { e
+                        | status = UpdatePending
+                        , read = True
+                    }
+                )
+
+        newEntries =
+            Dict.update entryId updateEntry feed.entries
+    in
+        { feed | entries = newEntries }
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -55,6 +74,13 @@ update msg model =
             let
                 newFeeds =
                     Dict.update id toggleFeed model.feeds
+            in
+                ( { model | feeds = newFeeds }, Cmd.none )
+
+        MarkAsRead id ->
+            let
+                newFeeds =
+                    Dict.map (markAsRead id) model.feeds
             in
                 ( { model | feeds = newFeeds }, Cmd.none )
 
@@ -79,7 +105,7 @@ feed feed =
     let
         children =
             if feed.open then
-                [ View.Feed.view feed ]
+                [ View.Feed.view MarkAsRead feed ]
             else
                 []
     in
