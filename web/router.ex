@@ -1,6 +1,8 @@
 defmodule ExRss.Router do
   use ExRss.Web, :router
 
+  @api_token_salt "user"
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -9,12 +11,13 @@ defmodule ExRss.Router do
     plug :put_secure_browser_headers
 
     plug ExRss.Plug.AssignDefaults
+    plug ExRss.Plug.AssignApiToken, @api_token_salt
   end
 
   pipeline :api do
     plug :accepts, ["json"]
 
-    plug ExRss.Plug.Api.Authorization, "user"
+    plug ExRss.Plug.Api.Authorization, @api_token_salt
   end
 
   pipeline :authenticated do

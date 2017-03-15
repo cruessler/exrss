@@ -20,11 +20,15 @@ main =
 
 
 type alias Flags =
-    Json.Decode.Value
+    { apiToken : String
+    , feeds : Json.Decode.Value
+    }
 
 
 type alias Model =
-    { feeds : Dict Int Feed }
+    { apiToken : String
+    , feeds : Dict Int Feed
+    }
 
 
 type Msg
@@ -32,16 +36,26 @@ type Msg
     | MarkAsRead Int
 
 
+decodeFeeds : Json.Decode.Value -> Dict Int Feed
+decodeFeeds value =
+    value
+        |> Json.Decode.decodeValue Model.Feed.decodeFeeds
+        |> Result.withDefault []
+        |> List.map (\f -> ( f.id, f ))
+        |> Dict.fromList
+
+
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
         feeds =
-            Json.Decode.decodeValue Model.Feed.decodeFeeds flags
-                |> Result.withDefault []
-                |> List.map (\f -> ( f.id, f ))
-                |> Dict.fromList
+            decodeFeeds flags.feeds
     in
-        ( { feeds = feeds }, Cmd.none )
+        ( { apiToken = flags.apiToken
+          , feeds = feeds
+          }
+        , Cmd.none
+        )
 
 
 toggleFeed : Maybe Feed -> Maybe Feed
