@@ -39,7 +39,7 @@ type Msg
     = ToggleFeed Int
     | MarkAsRead Int
     | PostFail Http.Error
-    | PostSuccess (Api.Response () ())
+    | PostSuccess (Api.Response () Entry)
 
 
 decodeFeeds : Json.Decode.Value -> Dict Int Feed
@@ -93,7 +93,7 @@ patchEntry apiConfig entry =
             entry
                 |> Model.Feed.encodeEntry
                 |> Api.patch apiConfig (Paths.entry entry)
-                |> Api.fromJson (Json.Decode.succeed ()) (Json.Decode.succeed ())
+                |> Api.fromJson (Json.Decode.succeed ()) Model.Feed.decodeEntry
                 |> Task.perform PostFail PostSuccess
     in
         Maybe.map task entry
@@ -126,7 +126,22 @@ update msg model =
             in
                 ( { model | feeds = newFeeds }, cmd )
 
-        _ ->
+        PostSuccess response ->
+            case response of
+                Api.Success newEntry ->
+                    let
+                        newFeeds =
+                            updateEntry
+                                newEntry.id
+                                (Maybe.map (always newEntry))
+                                model.feeds
+                    in
+                        ( { model | feeds = newFeeds }, Cmd.none )
+
+                Api.Error _ ->
+                    ( model, Cmd.none )
+
+        PostFail error ->
             ( model, Cmd.none )
 
 
