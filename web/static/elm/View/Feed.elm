@@ -12,6 +12,7 @@ entry onMsg entry =
     li
         [ classList
             [ ( "entry", True )
+            , ( "read", entry.read )
             , ( "update-pending", entry.status == UpdatePending )
             ]
         ]

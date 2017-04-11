@@ -21,6 +21,10 @@ ul.feeds {
       padding-left: .2rem;
       border-bottom: 1px solid $gray-light;
 
+      &.read {
+        opacity: 0.5;
+      }
+
       &.update-pending {
         color: $gray-light;
       }
