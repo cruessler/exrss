@@ -24,17 +24,40 @@ type alias Config =
     { apiToken : String }
 
 
+type Method
+    = Post
+
+
 config : String -> Config
 config apiToken =
     Config apiToken
 
 
-{-| Create a task for sending a POST request to a url.
+toString : Method -> String
+toString method =
+    case method of
+        Post ->
+            "POST"
 
-The API token ist sent in an "Authorization" header.
+
+{-| Create a task for sending a POST request to a url.
 -}
 post : Config -> String -> Json.Encode.Value -> Task Http.RawError Http.Response
-post config url params =
+post =
+    send Post
+
+
+{-| Create a task for sending a request to a url.
+
+The API token is sent in an "Authorization" header.
+-}
+send :
+    Method
+    -> Config
+    -> String
+    -> Json.Encode.Value
+    -> Task Http.RawError Http.Response
+send method config url params =
     let
         body =
             params
@@ -42,7 +65,7 @@ post config url params =
                 |> Http.string
     in
         Http.send Http.defaultSettings
-            { verb = "POST"
+            { verb = toString method
             , headers =
                 [ ( "Content-Type", "application/json" )
                 , ( "Authorization", "Bearer " ++ config.apiToken )
