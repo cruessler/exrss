@@ -69,30 +69,21 @@ toggleFeed =
     Maybe.map (\f -> { f | open = (not f.open) })
 
 
-markAsRead : Int -> Int -> Feed -> Feed
-markAsRead entryId _ feed =
-    let
-        updateEntry =
-            Maybe.map
-                (\e ->
-                    { e
-                        | status = UpdatePending
-                        , read = True
-                    }
-                )
-
-        newEntries =
-            Dict.update entryId updateEntry feed.entries
-    in
-        { feed | entries = newEntries }
-
-
 getEntry : Int -> Dict Int Feed -> Maybe Entry
 getEntry id feeds =
     feeds
         |> Dict.values
         |> List.map (.entries >> Dict.get id)
         |> Maybe.oneOf
+
+
+updateEntry : Int -> (Maybe Entry -> Maybe Entry) -> Dict Int Feed -> Dict Int Feed
+updateEntry id f feeds =
+    let
+        updateEntry' _ feed =
+            { feed | entries = (Dict.update id f feed.entries) }
+    in
+        Dict.map updateEntry' feeds
 
 
 patchEntry : Api.Config -> Maybe Entry -> Cmd Msg
@@ -122,7 +113,11 @@ update msg model =
         MarkAsRead id ->
             let
                 newFeeds =
-                    Dict.map (markAsRead id) model.feeds
+                    updateEntry id
+                        (Maybe.map
+                            (\e -> { e | read = True, status = UpdatePending })
+                        )
+                        model.feeds
 
                 cmd =
                     newFeeds
