@@ -6,7 +6,7 @@ defmodule ExRss.Api.V1.EntryController do
 
   def update(conn, %{"id" => id, "entry" => entry_params}) do
     changeset =
-      current_user(conn)
+      conn.assigns.current_user
       |> assoc(:entries)
       |> Repo.get(id)
       |> Entry.changeset(entry_params)

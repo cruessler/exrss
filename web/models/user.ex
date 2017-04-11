@@ -5,6 +5,7 @@ defmodule ExRss.User do
 
   schema "users" do
     field :email, :string
+    field :hashed_password, :string
 
     has_many :feeds, Feed
     has_many :entries, through: [:feeds, :entries]

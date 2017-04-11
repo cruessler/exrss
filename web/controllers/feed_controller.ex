@@ -5,7 +5,7 @@ defmodule ExRss.FeedController do
 
   def index(conn, _params) do
     feeds =
-      current_user(conn)
+      conn.assigns.current_user
       |> assoc(:feeds)
       |> Repo.all
       |> Repo.preload(:entries)
