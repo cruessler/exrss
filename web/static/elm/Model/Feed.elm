@@ -1,7 +1,8 @@
-module Model.Feed exposing (Feed, Entry, Status(..), decodeFeeds)
+module Model.Feed exposing (Feed, Entry, Status(..), decodeFeeds, encodeEntry)
 
 import Dict exposing (Dict)
 import Json.Decode exposing (..)
+import Json.Encode as Encode
 
 
 type alias Feed =
@@ -51,6 +52,15 @@ decodeEntries =
     in
         list decodeEntry
             |> map toDict
+
+
+encodeEntry : Entry -> Encode.Value
+encodeEntry entry =
+    Encode.object
+        [ ( "entry"
+          , Encode.object [ ( "read", Encode.bool entry.read ) ]
+          )
+        ]
 
 
 decodeEntry : Json.Decode.Decoder Entry
