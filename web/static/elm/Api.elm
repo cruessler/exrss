@@ -1,4 +1,4 @@
-module Api exposing (Response(..), fromJson, Config, config, post)
+module Api exposing (Response(..), fromJson, Config, config, post, patch)
 
 {-|
 
@@ -26,6 +26,7 @@ type alias Config =
 
 type Method
     = Post
+    | Patch
 
 
 config : String -> Config
@@ -39,12 +40,22 @@ toString method =
         Post ->
             "POST"
 
+        Patch ->
+            "PATCH"
+
 
 {-| Create a task for sending a POST request to a url.
 -}
 post : Config -> String -> Json.Encode.Value -> Task Http.RawError Http.Response
 post =
     send Post
+
+
+{-| Create a task for sending a PATCH request to a url.
+-}
+patch : Config -> String -> Json.Encode.Value -> Task Http.RawError Http.Response
+patch =
+    send Patch
 
 
 {-| Create a task for sending a request to a url.
