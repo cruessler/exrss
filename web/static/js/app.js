@@ -41,4 +41,4 @@ class App {
   }
 }
 
-App.mountElmModules()
+document.addEventListener("DOMContentLoaded", () => App.mountElmModules())
