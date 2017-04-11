@@ -1,5 +1,6 @@
 module App.Feeds exposing (..)
 
+import Api
 import Dict exposing (Dict)
 import Json.Decode
 import Model.Feed exposing (Feed, Entry, Status(..))
@@ -8,6 +9,9 @@ import Html exposing (Html, h1, ul, li, small, a, text)
 import Html.Attributes exposing (class, classList, href, target)
 import Html.App as Html
 import Html.Events exposing (onClick)
+import Http
+import Paths
+import Task exposing (Task)
 
 
 main =
@@ -26,7 +30,7 @@ type alias Flags =
 
 
 type alias Model =
-    { apiToken : String
+    { apiConfig : Api.Config
     , feeds : Dict Int Feed
     }
 
@@ -34,6 +38,8 @@ type alias Model =
 type Msg
     = ToggleFeed Int
     | MarkAsRead Int
+    | PostFail Http.Error
+    | PostSuccess (Api.Response () ())
 
 
 decodeFeeds : Json.Decode.Value -> Dict Int Feed
@@ -51,7 +57,7 @@ init flags =
         feeds =
             decodeFeeds flags.feeds
     in
-        ( { apiToken = flags.apiToken
+        ( { apiConfig = Api.config flags.apiToken
           , feeds = feeds
           }
         , Cmd.none
@@ -81,6 +87,28 @@ markAsRead entryId _ feed =
         { feed | entries = newEntries }
 
 
+getEntry : Int -> Dict Int Feed -> Maybe Entry
+getEntry id feeds =
+    feeds
+        |> Dict.values
+        |> List.map (.entries >> Dict.get id)
+        |> Maybe.oneOf
+
+
+patchEntry : Api.Config -> Maybe Entry -> Cmd Msg
+patchEntry apiConfig entry =
+    let
+        task entry =
+            entry
+                |> Model.Feed.encodeEntry
+                |> Api.patch apiConfig (Paths.entry entry)
+                |> Api.fromJson (Json.Decode.succeed ()) (Json.Decode.succeed ())
+                |> Task.perform PostFail PostSuccess
+    in
+        Maybe.map task entry
+            |> Maybe.withDefault Cmd.none
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -95,8 +123,16 @@ update msg model =
             let
                 newFeeds =
                     Dict.map (markAsRead id) model.feeds
+
+                cmd =
+                    newFeeds
+                        |> getEntry id
+                        |> patchEntry model.apiConfig
             in
-                ( { model | feeds = newFeeds }, Cmd.none )
+                ( { model | feeds = newFeeds }, cmd )
+
+        _ ->
+            ( model, Cmd.none )
 
 
 additionalInfo : Feed -> Html Msg
