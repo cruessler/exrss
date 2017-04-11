@@ -4,7 +4,7 @@ defmodule ExRss.SessionControllerTest do
   alias ExRss.User.Registration
 
   @password "password"
-  @email "jane@doe.com"
+  @email "john@doe.com"
 
   test "GET /session/new", %{conn: conn} do
     conn = get conn, "/session/new"

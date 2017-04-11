@@ -5,7 +5,7 @@ defmodule ExRss.SessionTest do
   alias ExRss.User.Registration
 
   @password "password"
-  @email "jane@doe.com"
+  @email "john@doe.com"
 
   test "login" do
     params = %{email: @email, password: @password, password_confirmation: @password}
