@@ -1,4 +1,12 @@
-module Model.Feed exposing (Feed, Entry, Status(..), decodeFeeds, encodeEntry)
+module Model.Feed
+    exposing
+        ( Feed
+        , Entry
+        , Status(..)
+        , decodeFeeds
+        , decodeEntry
+        , encodeEntry
+        )
 
 import Dict exposing (Dict)
 import Json.Decode exposing (..)
