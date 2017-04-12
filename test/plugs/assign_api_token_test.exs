@@ -2,10 +2,12 @@ defmodule ExRss.AssignApiToken do
   use ExUnit.Case, async: true
   use Plug.Test
 
+  alias ExRss.User
+  alias ExRss.User.Account
   alias ExRss.Plug.AssignApiToken
 
   @salt "user"
-  @user %{id: 1}
+  @user %User{id: 1}
 
   @plug AssignApiToken.init(@salt)
 
@@ -23,6 +25,7 @@ defmodule ExRss.AssignApiToken do
       |> assign(:current_user, @user)
       |> AssignApiToken.call(@plug)
 
-    assert Phoenix.Token.verify(ExRss.Endpoint, @salt, conn.assigns.api_token)
+    assert {:ok, %Account{id: 1}} =
+      Phoenix.Token.verify(ExRss.Endpoint, @salt, conn.assigns.api_token)
   end
 end

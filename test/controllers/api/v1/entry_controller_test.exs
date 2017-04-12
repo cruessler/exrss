@@ -2,21 +2,21 @@ defmodule ExRss.Api.V1.EntryControllerTest do
   use ExRss.ConnCase
 
   alias ExRss.Entry
-  alias ExRss.User
+  alias ExRss.User.Account
 
   @salt "user"
 
   setup do
-    user = Repo.get!(User, 1)
+    account = Repo.get!(Account, 1)
     entry = Repo.get!(Entry, 1)
 
-    {:ok, %{user: user, entry: entry}}
+    {:ok, %{account: account, entry: entry}}
   end
 
-  test "PUT /entries/1", %{user: user, entry: %{id: id}} do
+  test "PUT /entries/1", %{account: account, entry: %{id: id}} do
     conn = build_conn()
 
-    token = Phoenix.Token.sign(ExRss.Endpoint, @salt, user)
+    token = Phoenix.Token.sign(ExRss.Endpoint, @salt, account)
 
     conn =
       conn

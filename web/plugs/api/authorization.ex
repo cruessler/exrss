@@ -10,8 +10,8 @@ defmodule ExRss.Plug.Api.Authorization do
   def call(conn, salt) do
     headers = get_req_header(conn, "authorization")
 
-    with {:ok, user} <- verify_token(headers, salt) do
-      assign(conn, :current_user, user)
+    with {:ok, account} <- verify_token(headers, salt) do
+      assign(conn, :current_account, account)
     else
       _ ->
         conn

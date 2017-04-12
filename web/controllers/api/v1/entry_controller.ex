@@ -3,10 +3,11 @@ defmodule ExRss.Api.V1.EntryController do
 
   alias ExRss.Entry
   alias ExRss.Repo
+  alias ExRss.User
 
   def update(conn, %{"id" => id, "entry" => entry_params}) do
     changeset =
-      conn.assigns.current_user
+      Repo.get!(User, conn.assigns.current_account.id)
       |> assoc(:entries)
       |> Repo.get(id)
       |> Entry.changeset(entry_params)
