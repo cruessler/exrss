@@ -6,7 +6,7 @@ import Json.Decode
 import Model.Feed exposing (Feed, Entry, Status(..))
 import View.Feed
 import Html exposing (Html, h1, ul, li, small, a, text)
-import Html.Attributes exposing (class, classList, href, target)
+import Html.Attributes exposing (class, classList, href, target, type')
 import Html.App as Html
 import Html.Events exposing (onClick)
 import Http
@@ -31,12 +31,14 @@ type alias Flags =
 
 type alias Model =
     { apiConfig : Api.Config
+    , hideReadEntries : Bool
     , feeds : Dict Int Feed
     }
 
 
 type Msg
-    = ToggleFeed Int
+    = ToggleVisibility
+    | ToggleFeed Int
     | MarkAsRead Int
     | PostFail Http.Error
     | PostSuccess (Api.Response () Entry)
@@ -58,6 +60,7 @@ init flags =
             decodeFeeds flags.feeds
     in
         ( { apiConfig = Api.config flags.apiToken
+          , hideReadEntries = False
           , feeds = feeds
           }
         , Cmd.none
@@ -103,6 +106,9 @@ patchEntry apiConfig entry =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        ToggleVisibility ->
+            ( { model | hideReadEntries = not model.hideReadEntries }, Cmd.none )
+
         ToggleFeed id ->
             let
                 newFeeds =
@@ -160,12 +166,18 @@ additionalInfo feed =
         small [ class "text-muted" ] [ text infoText ]
 
 
-feed : Feed -> Html Msg
-feed feed =
+feed : Bool -> Feed -> Html Msg
+feed hideReadEntries feed =
     let
+        entries =
+            if hideReadEntries then
+                List.filter (not << .read) <| Dict.values feed.entries
+            else
+                Dict.values feed.entries
+
         children =
             if feed.open then
-                [ View.Feed.view MarkAsRead feed ]
+                [ View.Feed.view MarkAsRead entries ]
             else
                 []
     in
@@ -178,10 +190,25 @@ feed feed =
             )
 
 
+header : Model -> Html Msg
+header model =
+    Html.div []
+        [ Html.button
+            [ type' "button"
+            , class "btn btn-primary btn-sm"
+            , onClick ToggleVisibility
+            ]
+            [ text "Toggle read entries" ]
+        ]
+
+
 view : Model -> Html Msg
 view model =
     let
         feeds =
-            List.map feed (Dict.values model.feeds)
+            List.map (feed model.hideReadEntries) <| Dict.values model.feeds
     in
-        ul [ class "feeds" ] feeds
+        Html.div []
+            [ header model
+            , ul [ class "feeds" ] feeds
+            ]

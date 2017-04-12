@@ -22,10 +22,10 @@ entry onMsg entry =
         ]
 
 
-view : (Int -> msg) -> Feed -> Html msg
-view onMsg feed =
+view : (Int -> msg) -> List Entry -> Html msg
+view onMsg entries =
     let
         children =
-            List.map (entry onMsg) (Dict.values feed.entries)
+            List.map (entry onMsg) entries
     in
         ul [ class "feed" ] children
