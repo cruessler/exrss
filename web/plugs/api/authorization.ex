@@ -15,7 +15,7 @@ defmodule ExRss.Plug.Api.Authorization do
     else
       _ ->
         conn
-        |> put_status(:unauthorized)
+        |> resp(:unauthorized, "")
         |> halt
     end
   end

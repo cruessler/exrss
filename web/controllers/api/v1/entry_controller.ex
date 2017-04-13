@@ -24,7 +24,7 @@ defmodule ExRss.Api.V1.EntryController do
   end
   def update(conn, _) do
     conn
-    |> put_status(:bad_request)
+    |> resp(:bad_request, "")
     |> halt
   end
 end
