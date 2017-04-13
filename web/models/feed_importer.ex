@@ -18,17 +18,14 @@ defmodule ExRss.FeedImporter do
     now = DateTime.utc_now
 
     html
-    |> Floki.find("outline")
+    |> Floki.find("outline[type=rss]")
     |> Enum.map(fn feed ->
-      case feed do
-        {"outline",
-          [{"type", "rss"},
-           {"text", title},
-           {"xmlurl", url}|_],
-          []} ->
-          %{title: title, url: url, inserted_at: now, updated_at: now}
-
-        _ -> nil
+      with [title] <- Floki.attribute(feed, "text"),
+           [url] <- Floki.attribute(feed, "xmlurl")
+      do
+        %{title: title, url: url, inserted_at: now, updated_at: now}
+      else
+        [] -> nil
       end
     end)
     |> Enum.reject(&(is_nil(&1)))
