@@ -48,6 +48,8 @@ defmodule ExRss.Router do
 
     scope "/v1", V1 do
       resources "/entries", EntryController, only: [ :update ]
+
+      get "/feeds/discover", FeedController, :discover
     end
   end
 
