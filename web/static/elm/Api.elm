@@ -1,4 +1,13 @@
-module Api exposing (Response(..), fromJson, Config, config, post, patch)
+module Api
+    exposing
+        ( Response(..)
+        , fromJson
+        , Config
+        , config
+        , get
+        , post
+        , patch
+        )
 
 {-|
 
@@ -25,7 +34,8 @@ type alias Config =
 
 
 type Method
-    = Post
+    = Get
+    | Post
     | Patch
 
 
@@ -37,11 +47,21 @@ config apiToken =
 toString : Method -> String
 toString method =
     case method of
+        Get ->
+            "GET"
+
         Post ->
             "POST"
 
         Patch ->
             "PATCH"
+
+
+{-| Create a task for sending a GET request to a url.
+-}
+get : Config -> String -> Json.Encode.Value -> Task Http.RawError Http.Response
+get =
+    send Get
 
 
 {-| Create a task for sending a POST request to a url.
