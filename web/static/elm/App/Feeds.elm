@@ -38,11 +38,13 @@ type alias Model =
     { apiConfig : Api.Config
     , visibility : Visibility
     , feeds : Dict Int Feed
+    , showOptions : Bool
     }
 
 
 type Msg
     = SetVisibility Visibility
+    | ToggleOptions
     | ToggleFeed Int
     | MarkAsRead Int
     | PostFail Http.Error
@@ -67,6 +69,7 @@ init flags =
         ( { apiConfig = Api.config flags.apiToken
           , visibility = ShowAllEntries
           , feeds = feeds
+          , showOptions = True
           }
         , Cmd.none
         )
@@ -113,6 +116,9 @@ update msg model =
     case msg of
         SetVisibility visibility ->
             ( { model | visibility = visibility }, Cmd.none )
+
+        ToggleOptions ->
+            ( { model | showOptions = not model.showOptions }, Cmd.none )
 
         ToggleFeed id ->
             let
@@ -212,12 +218,46 @@ radio currentVisibility visibility text' =
         ]
 
 
+collapsible : Bool -> List (Html Msg) -> Html Msg
+collapsible show children =
+    Html.div
+        [ classList
+            [ ( "collapse", True )
+            , ( "show", show )
+            ]
+        ]
+        [ Html.div [ class "card card-block" ] children ]
+
+
+visibilityFieldset : Visibility -> Html Msg
+visibilityFieldset visibility =
+    Html.fieldset [ class "form-group" ]
+        [ Html.legend [] [ text "Visibility" ]
+        , radio visibility ShowAllEntries "Show all entries"
+        , radio visibility HideReadEntries "Hide read entries"
+        ]
+
+
 header : Model -> Html Msg
 header model =
-    Html.div []
-        [ radio model.visibility ShowAllEntries "Show all entries"
-        , radio model.visibility HideReadEntries "Hide read entries"
-        ]
+    let
+        buttonText =
+            if model.showOptions then
+                "Hide options"
+            else
+                "Show options"
+    in
+        Html.div []
+            [ Html.button
+                [ type' "button"
+                , class "btn btn-primary btn-sm"
+                , onClick ToggleOptions
+                ]
+                [ text buttonText ]
+            , collapsible
+                model.showOptions
+                [ visibilityFieldset model.visibility ]
+            ]
 
 
 view : Model -> Html Msg
