@@ -6,7 +6,7 @@ import Json.Decode
 import Model.Feed exposing (Feed, Entry, Status(..))
 import View.Feed
 import Html exposing (Html, h1, ul, li, small, a, text)
-import Html.Attributes exposing (class, classList, href, target, type')
+import Html.Attributes exposing (class, classList, href, target, type', checked)
 import Html.App as Html
 import Html.Events exposing (onClick)
 import Http
@@ -29,15 +29,20 @@ type alias Flags =
     }
 
 
+type Visibility
+    = ShowAllEntries
+    | HideReadEntries
+
+
 type alias Model =
     { apiConfig : Api.Config
-    , hideReadEntries : Bool
+    , visibility : Visibility
     , feeds : Dict Int Feed
     }
 
 
 type Msg
-    = ToggleVisibility
+    = SetVisibility Visibility
     | ToggleFeed Int
     | MarkAsRead Int
     | PostFail Http.Error
@@ -60,7 +65,7 @@ init flags =
             decodeFeeds flags.feeds
     in
         ( { apiConfig = Api.config flags.apiToken
-          , hideReadEntries = False
+          , visibility = ShowAllEntries
           , feeds = feeds
           }
         , Cmd.none
@@ -106,8 +111,8 @@ patchEntry apiConfig entry =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        ToggleVisibility ->
-            ( { model | hideReadEntries = not model.hideReadEntries }, Cmd.none )
+        SetVisibility visibility ->
+            ( { model | visibility = visibility }, Cmd.none )
 
         ToggleFeed id ->
             let
@@ -166,11 +171,11 @@ additionalInfo feed =
         small [ class "text-muted" ] [ text infoText ]
 
 
-feed : Bool -> Feed -> Html Msg
-feed hideReadEntries feed =
+feed : Visibility -> Feed -> Html Msg
+feed visibility feed =
     let
         entries =
-            if hideReadEntries then
+            if visibility == HideReadEntries then
                 List.filter (not << .read) <| Dict.values feed.entries
             else
                 Dict.values feed.entries
@@ -190,15 +195,28 @@ feed hideReadEntries feed =
             )
 
 
+radio : Visibility -> Visibility -> String -> Html Msg
+radio currentVisibility visibility text' =
+    Html.div [ class "form-check" ]
+        [ Html.label
+            [ class "form-check-label" ]
+            [ Html.input
+                [ type' "radio"
+                , class "form-check-input"
+                , checked (visibility == currentVisibility)
+                , onClick (SetVisibility visibility)
+                ]
+                []
+            , text text'
+            ]
+        ]
+
+
 header : Model -> Html Msg
 header model =
     Html.div []
-        [ Html.button
-            [ type' "button"
-            , class "btn btn-primary btn-sm"
-            , onClick ToggleVisibility
-            ]
-            [ text "Toggle read entries" ]
+        [ radio model.visibility ShowAllEntries "Show all entries"
+        , radio model.visibility HideReadEntries "Hide read entries"
         ]
 
 
@@ -206,7 +224,7 @@ view : Model -> Html Msg
 view model =
     let
         feeds =
-            List.map (feed model.hideReadEntries) <| Dict.values model.feeds
+            List.map (feed model.visibility) <| Dict.values model.feeds
     in
         Html.div []
             [ header model
