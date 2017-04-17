@@ -1,4 +1,4 @@
-module Model.Feed
+module Types.Feed
     exposing
         ( Feed
         , Entry

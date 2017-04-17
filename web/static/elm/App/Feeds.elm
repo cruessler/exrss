@@ -1,60 +1,36 @@
-module App.Feeds exposing (..)
+module App.Feeds exposing (main)
 
 import Api
 import Dict exposing (Dict)
-import Json.Decode
-import Model.Feed exposing (Feed, Entry, Status(..))
-import View.Feed
-import Html exposing (Html, h1, ul, li, small, a, text)
-import Html.Attributes exposing (class, classList, href, target, type', checked)
+import Feeds.Model exposing (..)
+import Feeds.Msg exposing (..)
+import Feeds.View as View
+import Json.Decode as Decode
 import Html.App as Html
-import Html.Events exposing (onClick)
-import Http
 import Paths
 import Task exposing (Task)
+import Types.Feed exposing (..)
 
 
 main =
     Html.programWithFlags
         { init = init
         , update = update
-        , view = view
+        , view = View.view
         , subscriptions = (\_ -> Sub.none)
         }
 
 
 type alias Flags =
     { apiToken : String
-    , feeds : Json.Decode.Value
+    , feeds : Decode.Value
     }
 
 
-type Visibility
-    = ShowAllEntries
-    | HideReadEntries
-
-
-type alias Model =
-    { apiConfig : Api.Config
-    , visibility : Visibility
-    , feeds : Dict Int Feed
-    , showOptions : Bool
-    }
-
-
-type Msg
-    = SetVisibility Visibility
-    | ToggleOptions
-    | ToggleFeed Int
-    | MarkAsRead Int
-    | PostFail Http.Error
-    | PostSuccess (Api.Response () Entry)
-
-
-decodeFeeds : Json.Decode.Value -> Dict Int Feed
+decodeFeeds : Decode.Value -> Dict Int Feed
 decodeFeeds value =
     value
-        |> Json.Decode.decodeValue Model.Feed.decodeFeeds
+        |> Decode.decodeValue Types.Feed.decodeFeeds
         |> Result.withDefault []
         |> List.map (\f -> ( f.id, f ))
         |> Dict.fromList
@@ -102,9 +78,9 @@ patchEntry apiConfig entry =
     let
         task entry =
             entry
-                |> Model.Feed.encodeEntry
+                |> Types.Feed.encodeEntry
                 |> Api.patch apiConfig (Paths.entry entry)
-                |> Api.fromJson (Json.Decode.succeed ()) Model.Feed.decodeEntry
+                |> Api.fromJson (Decode.succeed ()) Types.Feed.decodeEntry
                 |> Task.perform PostFail PostSuccess
     in
         Maybe.map task entry
@@ -160,113 +136,3 @@ update msg model =
 
         PostFail error ->
             ( model, Cmd.none )
-
-
-additionalInfo : Feed -> Html Msg
-additionalInfo feed =
-    let
-        length =
-            Dict.size feed.entries
-
-        infoText =
-            if length == 1 then
-                "1 entry"
-            else
-                toString (length) ++ " entries"
-    in
-        small [ class "text-muted" ] [ text infoText ]
-
-
-feed : Visibility -> Feed -> Html Msg
-feed visibility feed =
-    let
-        entries =
-            if visibility == HideReadEntries then
-                List.filter (not << .read) <| Dict.values feed.entries
-            else
-                Dict.values feed.entries
-
-        children =
-            if feed.open then
-                [ View.Feed.view MarkAsRead entries ]
-            else
-                []
-    in
-        li
-            [ class "feed" ]
-            (h1
-                [ onClick (ToggleFeed feed.id) ]
-                [ text feed.title, additionalInfo feed ]
-                :: children
-            )
-
-
-radio : Visibility -> Visibility -> String -> Html Msg
-radio currentVisibility visibility text' =
-    Html.div [ class "form-check" ]
-        [ Html.label
-            [ class "form-check-label" ]
-            [ Html.input
-                [ type' "radio"
-                , class "form-check-input"
-                , checked (visibility == currentVisibility)
-                , onClick (SetVisibility visibility)
-                ]
-                []
-            , text text'
-            ]
-        ]
-
-
-collapsible : Bool -> List (Html Msg) -> Html Msg
-collapsible show children =
-    Html.div
-        [ classList
-            [ ( "collapse", True )
-            , ( "show", show )
-            ]
-        ]
-        [ Html.div [ class "card card-block" ] children ]
-
-
-visibilityFieldset : Visibility -> Html Msg
-visibilityFieldset visibility =
-    Html.fieldset [ class "form-group" ]
-        [ Html.legend [] [ text "Visibility" ]
-        , radio visibility ShowAllEntries "Show all entries"
-        , radio visibility HideReadEntries "Hide read entries"
-        ]
-
-
-header : Model -> Html Msg
-header model =
-    let
-        buttonText =
-            if model.showOptions then
-                "Hide options"
-            else
-                "Show options"
-    in
-        Html.div []
-            [ Html.button
-                [ type' "button"
-                , class "btn btn-primary btn-sm"
-                , onClick ToggleOptions
-                ]
-                [ text buttonText ]
-            , collapsible
-                model.showOptions
-                [ visibilityFieldset model.visibility ]
-            ]
-
-
-view : Model -> Html Msg
-view model =
-    let
-        feeds =
-            List.map (feed model.visibility) <| Dict.values model.feeds
-    in
-        Html.div []
-            [ header model
-            , ul [ class "feeds" ] feeds
-            ]

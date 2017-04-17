@@ -1,6 +1,6 @@
 module Paths exposing (entry)
 
-import Model.Feed exposing (Entry)
+import Types.Feed exposing (Entry)
 
 
 entry : Entry -> String
