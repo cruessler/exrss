@@ -2,12 +2,16 @@ module App.Feeds exposing (main)
 
 import Api
 import Dict exposing (Dict)
+import Feeds.Discovery as Discovery
 import Feeds.Model exposing (..)
 import Feeds.Msg exposing (..)
 import Feeds.View as View
 import Json.Decode as Decode
+import Json.Encode as Encode
 import Html.App as Html
 import Paths
+import Request exposing (..)
+import String
 import Task exposing (Task)
 import Types.Feed exposing (..)
 
@@ -46,6 +50,8 @@ init flags =
           , visibility = ShowAllEntries
           , feeds = feeds
           , showOptions = True
+          , discoveryUrl = ""
+          , discoveryRequests = Dict.empty
           }
         , Cmd.none
         )
@@ -96,6 +102,28 @@ update msg model =
         ToggleOptions ->
             ( { model | showOptions = not model.showOptions }, Cmd.none )
 
+        SetDiscoveryUrl url ->
+            ( { model | discoveryUrl = url }, Cmd.none )
+
+        DiscoverFeeds ->
+            if String.isEmpty model.discoveryUrl then
+                ( model, Cmd.none )
+            else
+                let
+                    url =
+                        model.discoveryUrl
+
+                    newRequests =
+                        Dict.insert
+                            url
+                            (Request.InProgress url)
+                            model.discoveryRequests
+                in
+                    ( { model | discoveryRequests = newRequests }
+                    , Discovery.get model.apiConfig url
+                        |> Discovery.perform Discovery
+                    )
+
         ToggleFeed id ->
             let
                 newFeeds =
@@ -136,3 +164,21 @@ update msg model =
 
         PostFail error ->
             ( model, Cmd.none )
+
+        Discovery result ->
+            let
+                url =
+                    case result of
+                        Ok success ->
+                            success.url
+
+                        Err error ->
+                            error.url
+
+                newRequests =
+                    Dict.insert
+                        url
+                        (Done result)
+                        model.discoveryRequests
+            in
+                ( { model | discoveryRequests = newRequests }, Cmd.none )

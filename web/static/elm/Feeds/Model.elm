@@ -2,6 +2,7 @@ module Feeds.Model exposing (Model, Visibility(..))
 
 import Api
 import Dict exposing (Dict)
+import Feeds.Discovery exposing (Discovery)
 import Types.Feed exposing (..)
 
 
@@ -15,4 +16,6 @@ type alias Model =
     , visibility : Visibility
     , feeds : Dict Int Feed
     , showOptions : Bool
+    , discoveryUrl : String
+    , discoveryRequests : Dict String Discovery
     }
