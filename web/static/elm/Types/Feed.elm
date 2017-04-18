@@ -3,8 +3,10 @@ module Types.Feed
         ( Feed
         , Entry
         , Status(..)
+        , Candidate
         , decodeFeeds
         , decodeEntry
+        , decodeCandidates
         , encodeEntry
         )
 
@@ -36,6 +38,13 @@ type alias Entry =
     }
 
 
+type alias Candidate =
+    { url : String
+    , title : String
+    , href : String
+    }
+
+
 decodeFeeds : Json.Decode.Decoder (List Feed)
 decodeFeeds =
     list decodeFeed
@@ -60,6 +69,19 @@ decodeEntries =
     in
         list decodeEntry
             |> map toDict
+
+
+decodeCandidates : Json.Decode.Decoder (List Candidate)
+decodeCandidates =
+    list decodeCandidate
+
+
+decodeCandidate : Json.Decode.Decoder Candidate
+decodeCandidate =
+    object3 Candidate
+        ("url" := string)
+        ("title" := string)
+        ("href" := string)
 
 
 encodeEntry : Entry -> Encode.Value
