@@ -30,7 +30,8 @@ defmodule ExRss.Feed do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:title, :url])
-    |> validate_required([:title, :url])
+    |> validate_required([:user_id, :title, :url])
+    |> assoc_constraint(:user)
   end
 
   def schedule_update_on_error(changeset) do

@@ -9,7 +9,7 @@ defmodule ExRss.FeedTest do
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do
-    changeset = Feed.changeset(%Feed{}, @valid_attrs)
+    changeset = Feed.changeset(%Feed{user_id: 1}, @valid_attrs)
     assert changeset.valid?
   end
 
