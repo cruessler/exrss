@@ -26,6 +26,7 @@ defmodule ExRss.ConnCase do
       import Ecto.Query
 
       import ExRss.Router.Helpers
+      import ExRss.Api.Helpers
 
       # The default endpoint for testing
       @endpoint ExRss.Endpoint
