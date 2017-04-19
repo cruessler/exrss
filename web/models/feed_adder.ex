@@ -1,12 +1,24 @@
 defmodule ExRss.FeedAdder do
   def discover_feeds(url) do
-    with {:ok, response} <- HTTPoison.get(url, [], follow_redirect: true),
+    with uri = URI.parse(url),
+         %URI{authority: authority} when not is_nil(authority) <- uri,
+         {:ok, response} <- HTTPoison.get(uri, [], follow_redirect: true),
          200 <- response.status_code,
          html <- Floki.parse(response.body)
     do
-      {:ok, extract_feeds(html)}
+      feeds =
+        for f <- extract_feeds(html) do
+          Map.put(f, :url, URI.merge(uri, f.href) |> to_string)
+        end
+
+      {:ok, feeds}
     else
-      i when is_integer(i) -> {:error, :wrong_status_code}
+      i when is_integer(i) ->
+        {:error, :wrong_status_code}
+
+      %URI{} ->
+        {:error, :uri_not_absolute}
+
       x -> x
     end
   end

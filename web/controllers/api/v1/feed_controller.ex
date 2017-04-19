@@ -4,16 +4,10 @@ defmodule ExRss.Api.V1.FeedController do
   alias ExRss.FeedAdder
 
   def discover(conn, %{"url" => url}) do
-    with uri = URI.parse(url),
-         %URI{authority: authority} when not is_nil(authority) <- uri,
-         {:ok, feeds} <- FeedAdder.discover_feeds(url)
-    do
-      feeds = Enum.map(feeds, fn f ->
-        Map.put(f, :url, URI.merge(uri, f.href) |> to_string)
-      end)
+    case FeedAdder.discover_feeds(url) do
+      {:ok, feeds} ->
+        json(conn, feeds)
 
-      json(conn, feeds)
-    else
       _ ->
         conn
         |> resp(:bad_request, "")

@@ -29,4 +29,9 @@ defmodule ExRss.FeedAdderTest do
       %{title: "RSS", href: "/feed/rss.xml"},
       %{title: "Atom", href: "/feed/atom.xml"}] = feeds
   end
+
+  test "fails when URI not absolute" do
+    assert {:error, :uri_not_absolute} =
+      FeedAdder.discover_feeds("example.com")
+  end
 end
