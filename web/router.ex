@@ -50,6 +50,8 @@ defmodule ExRss.Router do
       resources "/entries", EntryController, only: [ :update ]
 
       get "/feeds/discover", FeedController, :discover
+
+      resources "/feeds", FeedController, only: [ :create ]
     end
   end
 
