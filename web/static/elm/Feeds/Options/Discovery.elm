@@ -74,14 +74,24 @@ addableFeed candidate =
 
 successFieldset : Discovery.Success -> Html Msg
 successFieldset success =
-    let
-        children =
-            List.map addableFeed success.candidates
-    in
+    if List.isEmpty success.candidates then
         H.fieldset [ A.class "form-group" ]
-            [ H.legend [] [ H.text "These feeds can be added" ]
-            , H.ul [] children
+            [ H.legend [] [ H.text "No feeds found" ]
+            , H.p []
+                [ H.text "The page at "
+                , H.code [] [ H.text success.url ]
+                , H.text " does not contain any feed."
+                ]
             ]
+    else
+        let
+            children =
+                List.map addableFeed success.candidates
+        in
+            H.fieldset [ A.class "form-group" ]
+                [ H.legend [] [ H.text "These feeds can be added" ]
+                , H.ul [] children
+                ]
 
 
 errorFieldset : Discovery.Error -> Html Msg
