@@ -5,6 +5,7 @@ import Feeds.Discovery as Discovery exposing (Discovery)
 import Feeds.Model exposing (..)
 import Feeds.Msg exposing (..)
 import Feeds.Options.Addition
+import Feeds.Options.Discovery
 import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
@@ -49,111 +50,6 @@ visibilityFieldset visibility =
         ]
 
 
-newFeedFieldset : Html Msg
-newFeedFieldset =
-    H.fieldset [ A.class "form-group" ]
-        [ H.legend [] [ H.text "Discover feeds on a site" ]
-        , H.label
-            [ A.for "feed-url"
-            , A.class "form-control-label"
-            ]
-            [ H.text "Address to discover feeds on" ]
-        , H.input
-            [ A.id "feed-url"
-            , A.type' "url"
-            , A.class "form-control"
-            , E.onInput SetDiscoveryUrl
-            ]
-            []
-        , H.button
-            [ A.class "btn btn-primary btn-sm"
-            , E.onClick DiscoverFeeds
-            ]
-            [ H.text "Discover" ]
-        , H.p
-            [ A.class "form-text text-muted" ]
-            [ H.text "Enter the address of a site that contains one or more feeds. "
-            , H.text "Make sure it starts with "
-            , H.code [] [ H.text "http://" ]
-            , H.text " or "
-            , H.code [] [ H.text "https://" ]
-            , H.text "."
-            ]
-        ]
-
-
-inProgressFieldset : String -> Html Msg
-inProgressFieldset url =
-    H.fieldset [ A.class "form-group" ]
-        [ H.legend [] [ H.text "This url is being looked up" ]
-        , H.p []
-            [ H.text "Waiting for answer for "
-            , H.code [] [ H.text url ]
-            , H.text "."
-            ]
-        ]
-
-
-addableFeed : Candidate -> Html Msg
-addableFeed candidate =
-    H.li
-        []
-        [ H.text candidate.title
-        , H.p [] [ H.code [] [ H.text candidate.url ] ]
-        , H.button
-            [ A.type' "button"
-            , A.class "btn btn-primary btn-sm"
-            , E.onClick <| AddFeed candidate
-            ]
-            [ H.text "Add" ]
-        ]
-
-
-successFieldset : Discovery.Success -> Html Msg
-successFieldset success =
-    let
-        children =
-            List.map addableFeed success.candidates
-    in
-        H.fieldset [ A.class "form-group" ]
-            [ H.legend [] [ H.text "These feeds can be added" ]
-            , H.ul [] children
-            ]
-
-
-errorFieldset : Discovery.Error -> Html Msg
-errorFieldset error =
-    H.fieldset [ A.class "form-group" ]
-        [ H.legend [] [ H.text "The lookup for a url failed" ]
-        , H.p []
-            [ H.text "It was not possible to discover feeds on "
-            , H.code [] [ H.text error.url ]
-            , H.text "."
-            ]
-        ]
-
-
-requestFieldset : Discovery -> Html Msg
-requestFieldset request =
-    case request of
-        InProgress url ->
-            inProgressFieldset url
-
-        Done (Ok success) ->
-            successFieldset success
-
-        Done (Err error) ->
-            errorFieldset error
-
-
-discoveryFieldsets : Dict String Discovery -> Html Msg
-discoveryFieldsets requests =
-    if Dict.isEmpty requests then
-        H.text ""
-    else
-        H.div [] <| List.map requestFieldset <| Dict.values requests
-
-
 view : Model -> Html Msg
 view model =
     let
@@ -173,8 +69,7 @@ view model =
             , collapsible
                 model.showOptions
                 [ visibilityFieldset model.visibility
-                , newFeedFieldset
-                , discoveryFieldsets model.discoveryRequests
+                , Feeds.Options.Discovery.view model.discoveryRequests
                 , Feeds.Options.Addition.view model.additionRequests
                 ]
             ]
