@@ -66,8 +66,8 @@ feed visibility feed =
                 [ E.onClick (ToggleFeed feed.id) ]
                 [ Html.text feed.title
                 , additionalInfo feed
-                , feed'
                 ]
+            , feed'
             ]
 
 
