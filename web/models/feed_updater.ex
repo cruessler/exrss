@@ -8,15 +8,17 @@ defmodule ExRss.FeedUpdater do
 
   def update(feed, raw_feed) do
     new_entries =
-      raw_feed.entries
-      |> Enum.map(fn entry -> Map.put(Entry.parse(entry), :feed_id, feed.id) end)
+      for entry <- raw_feed.entries do
+        entry
+        |> Entry.parse
+        |> Map.put(:feed_id, feed.id)
+      end
 
     changeset =
       feed
       |> Changeset.change(
         %{url: raw_feed.url,
           title: raw_feed.title,
-          read: false,
           updated_at: DateTime.utc_now})
 
     Multi.new

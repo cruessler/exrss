@@ -42,6 +42,7 @@ defmodule ExRss.Entry do
       url: entry.link,
       raw_posted_at: entry.updated,
       posted_at: posted_at,
+      read: false,
       inserted_at: now,
       updated_at: now}
   end
