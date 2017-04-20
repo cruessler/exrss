@@ -7,8 +7,21 @@ import Feeds.Msg exposing (..)
 import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
+import Json.Decode as Decode
 import Request exposing (..)
 import Types.Feed exposing (..)
+
+
+onEnter : Msg -> H.Attribute Msg
+onEnter msg =
+    let
+        isEnter key =
+            if key == 13 then
+                Decode.succeed msg
+            else
+                Decode.fail "keyCode != 13"
+    in
+        E.on "keydown" <| Decode.andThen E.keyCode isEnter
 
 
 newFeedFieldset : String -> Html Msg
@@ -26,6 +39,7 @@ newFeedFieldset discoveryUrl =
             , A.class "form-control"
             , A.value discoveryUrl
             , E.onInput SetDiscoveryUrl
+            , onEnter DiscoverFeeds
             ]
             []
         , H.button
