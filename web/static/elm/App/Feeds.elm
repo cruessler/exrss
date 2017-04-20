@@ -2,6 +2,7 @@ module App.Feeds exposing (main)
 
 import Api
 import Dict exposing (Dict)
+import Feeds.Addition as Addition
 import Feeds.Discovery as Discovery
 import Feeds.Model exposing (..)
 import Feeds.Msg exposing (..)
@@ -52,6 +53,7 @@ init flags =
           , showOptions = True
           , discoveryUrl = ""
           , discoveryRequests = Dict.empty
+          , additionRequests = Dict.empty
           }
         , Cmd.none
         )
@@ -124,6 +126,19 @@ update msg model =
                         |> Discovery.perform Discovery
                     )
 
+        AddFeed candidate ->
+            let
+                newRequests =
+                    Dict.insert
+                        candidate.url
+                        (Request.InProgress candidate)
+                        model.additionRequests
+            in
+                ( { model | additionRequests = newRequests }
+                , Addition.post model.apiConfig candidate
+                    |> Addition.perform Addition
+                )
+
         ToggleFeed id ->
             let
                 newFeeds =
@@ -182,3 +197,21 @@ update msg model =
                         model.discoveryRequests
             in
                 ( { model | discoveryRequests = newRequests }, Cmd.none )
+
+        Addition result ->
+            let
+                url =
+                    case result of
+                        Ok success ->
+                            success.candidate.url
+
+                        Err error ->
+                            error.candidate.url
+
+                newRequests =
+                    Dict.insert
+                        url
+                        (Done result)
+                        model.additionRequests
+            in
+                ( { model | additionRequests = newRequests }, Cmd.none )

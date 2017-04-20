@@ -7,6 +7,7 @@ module Types.Feed
         , decodeFeeds
         , decodeEntry
         , decodeCandidates
+        , encodeCandidate
         , encodeEntry
         )
 
@@ -82,6 +83,18 @@ decodeCandidate =
         ("url" := string)
         ("title" := string)
         ("href" := string)
+
+
+encodeCandidate : Candidate -> Encode.Value
+encodeCandidate candidate =
+    Encode.object
+        [ ( "feed"
+          , Encode.object
+                [ ( "title", Encode.string candidate.title )
+                , ( "url", Encode.string candidate.url )
+                ]
+          )
+        ]
 
 
 encodeEntry : Entry -> Encode.Value

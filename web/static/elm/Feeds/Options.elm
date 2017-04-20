@@ -4,6 +4,7 @@ import Dict exposing (Dict)
 import Feeds.Discovery as Discovery exposing (Discovery)
 import Feeds.Model exposing (..)
 import Feeds.Msg exposing (..)
+import Feeds.Options.Addition
 import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
@@ -99,6 +100,12 @@ addableFeed candidate =
         []
         [ H.text candidate.title
         , H.p [] [ H.code [] [ H.text candidate.url ] ]
+        , H.button
+            [ A.type' "button"
+            , A.class "btn btn-primary btn-sm"
+            , E.onClick <| AddFeed candidate
+            ]
+            [ H.text "Add" ]
         ]
 
 
@@ -168,5 +175,6 @@ view model =
                 [ visibilityFieldset model.visibility
                 , newFeedFieldset
                 , discoveryFieldsets model.discoveryRequests
+                , Feeds.Options.Addition.view model.additionRequests
                 ]
             ]
