@@ -27,6 +27,7 @@ defmodule ExRss.Entry do
     |> cast(params, [:url, :title, :read])
     |> validate_required([:feed_id, :url, :title, :raw_posted_at])
     |> assoc_constraint(:feed)
+    |> unique_constraint(:url, name: :entries_feed_id_url_index)
   end
 
   def parse(entry) do

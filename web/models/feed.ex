@@ -32,6 +32,7 @@ defmodule ExRss.Feed do
     |> cast(params, [:title, :url])
     |> validate_required([:user_id, :title, :url])
     |> assoc_constraint(:user)
+    |> unique_constraint(:url)
   end
 
   def schedule_update_on_error(changeset) do
