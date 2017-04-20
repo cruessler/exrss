@@ -11,8 +11,8 @@ import Request exposing (..)
 import Types.Feed exposing (..)
 
 
-newFeedFieldset : Html Msg
-newFeedFieldset =
+newFeedFieldset : String -> Html Msg
+newFeedFieldset discoveryUrl =
     H.fieldset [ A.class "form-group" ]
         [ H.legend [] [ H.text "Discover feeds on a site" ]
         , H.label
@@ -24,6 +24,7 @@ newFeedFieldset =
             [ A.id "feed-url"
             , A.type' "url"
             , A.class "form-control"
+            , A.value discoveryUrl
             , E.onInput SetDiscoveryUrl
             ]
             []
@@ -108,13 +109,13 @@ requestFieldset request =
             errorFieldset error
 
 
-view : Dict String Discovery -> Html Msg
-view requests =
+view : String -> Dict String Discovery -> Html Msg
+view discoveryUrl requests =
     let
         requestFieldsets =
             List.map requestFieldset <| Dict.values requests
     in
         if Dict.isEmpty requests then
-            newFeedFieldset
+            newFeedFieldset discoveryUrl
         else
-            H.div [] <| newFeedFieldset :: requestFieldsets
+            H.div [] <| (newFeedFieldset discoveryUrl) :: requestFieldsets

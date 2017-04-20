@@ -69,7 +69,9 @@ view model =
             , collapsible
                 model.showOptions
                 [ visibilityFieldset model.visibility
-                , Feeds.Options.Discovery.view model.discoveryRequests
+                , Feeds.Options.Discovery.view
+                    model.discoveryUrl
+                    model.discoveryRequests
                 , Feeds.Options.Addition.view model.additionRequests
                 ]
             ]
