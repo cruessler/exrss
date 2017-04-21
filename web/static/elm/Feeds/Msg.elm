@@ -14,6 +14,7 @@ type Msg
     | SetDiscoveryUrl String
     | DiscoverFeeds String
     | AddFeed Candidate
+    | RemoveResponse String
     | ToggleFeed Int
     | MarkAsRead Int
     | PostFail Http.Error

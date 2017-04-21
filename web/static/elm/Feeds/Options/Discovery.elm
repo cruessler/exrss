@@ -12,6 +12,16 @@ import Request exposing (..)
 import Types.Feed exposing (..)
 
 
+close : String -> Html Msg
+close url =
+    H.button
+        [ A.type' "button"
+        , A.class "close"
+        , E.onClick <| RemoveResponse url
+        ]
+        [ H.text "×" ]
+
+
 onEnter : Msg -> H.Attribute Msg
 onEnter msg =
     let
@@ -96,6 +106,7 @@ successFieldset success =
                 , H.code [] [ H.text success.url ]
                 , H.text " does not contain any feed."
                 ]
+            , close success.url
             ]
     else
         let
@@ -105,6 +116,7 @@ successFieldset success =
             H.fieldset [ A.class "form-group" ]
                 [ H.legend [] [ H.text "These feeds can be added" ]
                 , H.ul [] children
+                , close success.url
                 ]
 
 
@@ -117,6 +129,7 @@ errorFieldset error =
             , H.code [] [ H.text error.url ]
             , H.text "."
             ]
+        , close error.url
         , H.button
             [ A.class "btn btn-primary btn-sm"
             , E.onClick <| DiscoverFeeds error.url

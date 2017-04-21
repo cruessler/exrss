@@ -11,6 +11,16 @@ import Request exposing (..)
 import Types.Feed exposing (..)
 
 
+close : String -> Html Msg
+close url =
+    H.button
+        [ A.type' "button"
+        , A.class "close"
+        , E.onClick <| RemoveResponse url
+        ]
+        [ H.text "×" ]
+
+
 inProgressFieldset : Candidate -> Html Msg
 inProgressFieldset candidate =
     H.fieldset [ A.class "form-group" ]
@@ -28,6 +38,7 @@ successFieldset success =
     H.fieldset [ A.class "form-group" ]
         [ H.legend [] [ H.text "This feed has been added" ]
         , H.code [] [ H.text success.candidate.url ]
+        , close success.candidate.url
         ]
 
 
@@ -40,6 +51,7 @@ errorFieldset error =
             , H.code [] [ H.text error.candidate.url ]
             , H.text "."
             ]
+        , close error.candidate.url
         , H.button
             [ A.class "btn btn-primary btn-sm"
             , E.onClick <| AddFeed error.candidate

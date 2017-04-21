@@ -136,6 +136,21 @@ update msg model =
                     |> Addition.perform Addition
                 )
 
+        RemoveResponse url ->
+            let
+                newAdditionRequests =
+                    Dict.remove url model.additionRequests
+
+                newDiscoveryRequests =
+                    Dict.remove url model.discoveryRequests
+            in
+                ( { model
+                    | additionRequests = newAdditionRequests
+                    , discoveryRequests = newDiscoveryRequests
+                  }
+                , Cmd.none
+                )
+
         ToggleFeed id ->
             let
                 newFeeds =
