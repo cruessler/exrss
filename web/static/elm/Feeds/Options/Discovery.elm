@@ -39,12 +39,12 @@ newFeedFieldset discoveryUrl =
             , A.class "form-control"
             , A.value discoveryUrl
             , E.onInput SetDiscoveryUrl
-            , onEnter DiscoverFeeds
+            , onEnter <| DiscoverFeeds discoveryUrl
             ]
             []
         , H.button
             [ A.class "btn btn-primary btn-sm"
-            , E.onClick DiscoverFeeds
+            , E.onClick <| DiscoverFeeds discoveryUrl
             ]
             [ H.text "Discover" ]
         , H.p
@@ -117,6 +117,11 @@ errorFieldset error =
             , H.code [] [ H.text error.url ]
             , H.text "."
             ]
+        , H.button
+            [ A.class "btn btn-primary btn-sm"
+            , E.onClick <| DiscoverFeeds error.url
+            ]
+            [ H.text "Retry" ]
         ]
 
 

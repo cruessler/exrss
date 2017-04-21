@@ -40,6 +40,11 @@ errorFieldset error =
             , H.code [] [ H.text error.candidate.url ]
             , H.text "."
             ]
+        , H.button
+            [ A.class "btn btn-primary btn-sm"
+            , E.onClick <| AddFeed error.candidate
+            ]
+            [ H.text "Retry" ]
         ]
 
 

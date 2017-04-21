@@ -12,7 +12,7 @@ type Msg
     = SetVisibility Visibility
     | ToggleOptions
     | SetDiscoveryUrl String
-    | DiscoverFeeds
+    | DiscoverFeeds String
     | AddFeed Candidate
     | ToggleFeed Int
     | MarkAsRead Int

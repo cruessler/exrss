@@ -107,14 +107,11 @@ update msg model =
         SetDiscoveryUrl url ->
             ( { model | discoveryUrl = url }, Cmd.none )
 
-        DiscoverFeeds ->
-            if String.isEmpty model.discoveryUrl then
+        DiscoverFeeds url ->
+            if String.isEmpty url then
                 ( model, Cmd.none )
             else
                 let
-                    url =
-                        model.discoveryUrl
-
                     newRequests =
                         Dict.insert
                             url
