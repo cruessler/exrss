@@ -56,13 +56,12 @@ defmodule ExRss.Feed do
       :math.pow(1.5, retries) * @base_timeout
       |> round
       |> min(@max_timeout)
-      |> Duration.from_milliseconds
 
     next_update_at =
       changeset
       |> Changeset.get_field(:next_update_at)
       |> later(DateTime.utc_now)
-      |> Timex.add(new_timeout)
+      |> Timex.shift(milliseconds: new_timeout)
 
     changeset
     |> Changeset.put_change(:next_update_at, next_update_at)
