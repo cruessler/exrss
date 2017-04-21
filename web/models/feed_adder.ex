@@ -1,4 +1,27 @@
 defmodule ExRss.FeedAdder do
+  import Ecto
+  import Ecto.Changeset
+
+  alias Ecto.Multi
+  alias ExRss.Feed
+
+  def add_feed(user, feed_params) do
+    changeset =
+      user
+      |> build_assoc(:feeds)
+      |> Feed.changeset(feed_params)
+      |> put_change(:next_update_at, DateTime.utc_now)
+
+    Multi.new
+    |> Multi.insert(:feed, changeset)
+    |> Multi.run(:notify_queue, fn
+      %{feed: feed} ->
+        GenServer.cast(ExRss.Crawler.Queue, {:add_feed, feed})
+
+        {:ok, nil}
+      end)
+  end
+
   def discover_feeds(url) do
     with uri = URI.parse(url),
          %URI{authority: authority} when not is_nil(authority) <- uri,

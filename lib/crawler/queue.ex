@@ -88,8 +88,14 @@ defmodule ExRss.Crawler.Queue do
     {:noreply, {feeds, refs}, timeout(feeds)}
   end
 
+  def handle_cast({:add_feed, feed}, {feeds, refs}) do
+    new_queue = insert(feeds, feed)
+
+    {:noreply, {new_queue, refs}, timeout(new_queue)}
+  end
+
   def insert(queue, feed) do
-    queue ++ [feed]
+    [feed|queue]
     |> Enum.sort(fn a, b ->
       Timex.compare(a.next_update_at, b.next_update_at) == -1
     end)

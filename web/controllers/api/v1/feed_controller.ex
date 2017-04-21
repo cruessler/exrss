@@ -18,19 +18,23 @@ defmodule ExRss.Api.V1.FeedController do
   end
 
   def create(conn, %{"feed" => feed_params}) do
-    changeset =
+    multi =
       Repo.get!(User, conn.assigns.current_account.id)
-      |> build_assoc(:feeds)
-      |> Feed.changeset(feed_params)
+      |> FeedAdder.add_feed(feed_params)
 
-    case Repo.insert(changeset) do
-      {:ok, feed} ->
+    case Repo.transaction(multi) do
+      {:ok, %{feed: feed}} ->
         json(conn, Map.take(feed, [:id, :url, :title]))
 
-      {:error, changeset} ->
+      {:error, :feed, changeset, _} ->
         conn
         |> put_status(:bad_request)
         |> render(ExRss.ChangesetView, "error.json", changeset: changeset)
+
+      _ ->
+        conn
+        |> resp(:bad_request, "")
+        |> halt()
     end
   end
 end
