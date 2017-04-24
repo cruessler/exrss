@@ -11,9 +11,11 @@ module Types.Feed
         , encodeEntry
         )
 
+import Date
 import Dict exposing (Dict)
-import Json.Decode exposing (..)
+import Json.Decode as Decode exposing (..)
 import Json.Encode as Encode
+import Time exposing (Time)
 
 
 type alias Feed =
@@ -35,6 +37,7 @@ type alias Entry =
     , url : String
     , title : String
     , read : Bool
+    , postedAt : Maybe Time
     , status : Status
     }
 
@@ -46,12 +49,12 @@ type alias Candidate =
     }
 
 
-decodeFeeds : Json.Decode.Decoder (List Feed)
+decodeFeeds : Decode.Decoder (List Feed)
 decodeFeeds =
     list decodeFeed
 
 
-decodeFeed : Json.Decode.Decoder Feed
+decodeFeed : Decode.Decoder Feed
 decodeFeed =
     object5 Feed
         ("id" := int)
@@ -61,7 +64,7 @@ decodeFeed =
         (succeed False)
 
 
-decodeEntries : Json.Decode.Decoder (Dict Int Entry)
+decodeEntries : Decode.Decoder (Dict Int Entry)
 decodeEntries =
     let
         toDict list =
@@ -72,12 +75,12 @@ decodeEntries =
             |> map toDict
 
 
-decodeCandidates : Json.Decode.Decoder (List Candidate)
+decodeCandidates : Decode.Decoder (List Candidate)
 decodeCandidates =
     list decodeCandidate
 
 
-decodeCandidate : Json.Decode.Decoder Candidate
+decodeCandidate : Decode.Decoder Candidate
 decodeCandidate =
     object3 Candidate
         ("url" := string)
@@ -106,11 +109,26 @@ encodeEntry entry =
         ]
 
 
-decodeEntry : Json.Decode.Decoder Entry
+decodePostedAt : Decode.Decoder (Maybe Time)
+decodePostedAt =
+    let
+        parseDate =
+            Date.fromString
+                >> (Result.map Date.toTime)
+                >> Result.toMaybe
+
+        date =
+            string |> Decode.map parseDate
+    in
+        "posted_at" := oneOf [ null Nothing, date ]
+
+
+decodeEntry : Decode.Decoder Entry
 decodeEntry =
-    object5 Entry
+    object6 Entry
         ("id" := int)
         ("url" := string)
         ("title" := string)
         ("read" := bool)
+        decodePostedAt
         (succeed NoChange)
