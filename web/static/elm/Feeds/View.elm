@@ -1,6 +1,8 @@
 module Feeds.View exposing (view)
 
 import Dict
+import Date
+import Date.Format
 import Feeds.Model exposing (..)
 import Feeds.Msg exposing (..)
 import Feeds.Options as Options
@@ -12,20 +14,30 @@ import Types.Feed exposing (..)
 
 entry : Entry -> Html Msg
 entry entry =
-    H.li
-        [ A.classList
-            [ ( "entry", True )
-            , ( "read", entry.read )
-            , ( "update-pending", entry.status == UpdatePending )
+    let
+        postedAt =
+            entry.postedAt
+                |> Maybe.map
+                    (Date.fromTime
+                        >> Date.Format.format "%B %e, %Y, %I:%M:%S %P"
+                    )
+                |> Maybe.withDefault "unknown"
+    in
+        H.li
+            [ A.classList
+                [ ( "entry", True )
+                , ( "read", entry.read )
+                , ( "update-pending", entry.status == UpdatePending )
+                ]
             ]
-        ]
-        [ H.a
-            [ A.href entry.url
-            , A.target "_blank"
-            , E.onClick (MarkAsRead entry.id)
+            [ H.a
+                [ A.href entry.url
+                , A.target "_blank"
+                , E.onClick (MarkAsRead entry.id)
+                ]
+                [ H.text entry.title ]
+            , H.p [] [ H.text postedAt ]
             ]
-            [ H.text entry.title ]
-        ]
 
 
 additionalInfo : Feed -> Html Msg
