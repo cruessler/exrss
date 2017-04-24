@@ -4,7 +4,7 @@ import Dict
 import Feeds.Model exposing (..)
 import Feeds.Msg exposing (..)
 import Feeds.Options as Options
-import Html exposing (Html)
+import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
 import Types.Feed exposing (..)
@@ -12,19 +12,19 @@ import Types.Feed exposing (..)
 
 entry : Entry -> Html Msg
 entry entry =
-    Html.li
+    H.li
         [ A.classList
             [ ( "entry", True )
             , ( "read", entry.read )
             , ( "update-pending", entry.status == UpdatePending )
             ]
         ]
-        [ Html.a
+        [ H.a
             [ A.href entry.url
             , A.target "_blank"
             , E.onClick (MarkAsRead entry.id)
             ]
-            [ Html.text entry.title ]
+            [ H.text entry.title ]
         ]
 
 
@@ -40,9 +40,9 @@ additionalInfo feed =
             else
                 toString (length) ++ " entries"
     in
-        Html.small
+        H.small
             [ A.class "text-muted" ]
-            [ Html.text infoText ]
+            [ H.text infoText ]
 
 
 feed : Visibility -> Feed -> Html Msg
@@ -56,15 +56,15 @@ feed visibility feed =
 
         feed' =
             if feed.open then
-                Html.ul [ A.class "feed" ] (List.map entry entries)
+                H.ul [ A.class "feed" ] (List.map entry entries)
             else
-                Html.text ""
+                H.text ""
     in
-        Html.li
+        H.li
             [ A.class "feed" ]
-            [ Html.h1
+            [ H.h1
                 [ E.onClick (ToggleFeed feed.id) ]
-                [ Html.text feed.title
+                [ H.text feed.title
                 , additionalInfo feed
                 ]
             , feed'
@@ -77,7 +77,7 @@ view model =
         feeds =
             List.map (feed model.visibility) <| Dict.values model.feeds
     in
-        Html.div []
+        H.div []
             [ Options.view model
-            , Html.ul [ A.class "feeds" ] feeds
+            , H.ul [ A.class "feeds" ] feeds
             ]
