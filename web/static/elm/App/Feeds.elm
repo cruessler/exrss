@@ -60,11 +60,6 @@ init flags =
         )
 
 
-toggleFeed : Maybe Feed -> Maybe Feed
-toggleFeed =
-    Maybe.map (\f -> { f | open = (not f.open) })
-
-
 updateEntry : Int -> (Entry -> Entry) -> Dict Int Feed -> Dict Int Feed
 updateEntry id f =
     let
@@ -147,10 +142,12 @@ update msg model =
                 , Cmd.none
                 )
 
-        ToggleFeed id ->
+        ToggleFeed feed ->
             let
                 newFeeds =
-                    Dict.update id toggleFeed model.feeds
+                    Dict.insert feed.id
+                        { feed | open = not feed.open }
+                        model.feeds
             in
                 ( { model | feeds = newFeeds }, Cmd.none )
 

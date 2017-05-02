@@ -75,7 +75,7 @@ feed visibility feed =
         H.li
             [ A.class "feed" ]
             [ H.h1
-                [ E.onClick (ToggleFeed feed.id) ]
+                [ E.onClick (ToggleFeed feed) ]
                 [ H.text feed.title
                 , additionalInfo feed
                 ]

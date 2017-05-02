@@ -15,7 +15,7 @@ type Msg
     | DiscoverFeeds String
     | AddFeed Candidate
     | RemoveResponse String
-    | ToggleFeed Int
+    | ToggleFeed Feed
     | MarkAsRead Entry
     | PatchEntry (Result Http.Error Entry)
     | Discovery (Result Discovery.Error Discovery.Success)
