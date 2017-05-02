@@ -1,6 +1,7 @@
-module Feeds.Addition exposing (Addition, Error, Success, post, perform)
+module Feeds.Addition exposing (Addition, Error, Success, post)
 
 import Api
+import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Paths
@@ -24,31 +25,20 @@ type alias Success =
     }
 
 
-transformApiError :
-    Api.Response a b
-    -> Task (Result a c) (Result d b)
-transformApiError response =
-    case response of
-        Api.Success success ->
-            Task.succeed <| Ok success
-
-        Api.Error error ->
-            Task.fail <| Err error
-
-
 fromApi :
     Error
-    -> Task a (Api.Response Error b)
-    -> Task (Result Error c) (Result d b)
-fromApi error task =
-    (task `Task.onError` (always <| Task.fail <| Err error))
-        `Task.andThen` transformApiError
+    -> Http.Request Success
+    -> Task Error Success
+fromApi error request =
+    request
+        |> Http.toTask
+        |> Task.mapError (always error)
 
 
 post :
     Api.Config
     -> Candidate
-    -> Task (Result Error a) (Result b Success)
+    -> Task Error Success
 post apiConfig candidate =
     let
         message =
@@ -59,13 +49,9 @@ post apiConfig candidate =
         error =
             Error candidate message
     in
-        Api.post apiConfig Paths.createFeed (Types.Feed.encodeCandidate candidate)
-            |> Api.fromJson
-                (Decode.succeed error)
-                (Decode.succeed <| Success candidate)
+        Api.post apiConfig
+            { url = Paths.createFeed
+            , params = Types.Feed.encodeCandidate candidate
+            , decoder = Decode.succeed <| Success candidate
+            }
             |> fromApi error
-
-
-perform : (a -> b) -> Task a a -> Cmd b
-perform onMsg task =
-    Task.perform onMsg onMsg task

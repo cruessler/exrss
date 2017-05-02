@@ -1,4 +1,4 @@
-module Feeds.Discovery exposing (Discovery, Error, Success, get, perform)
+module Feeds.Discovery exposing (Discovery, Error, Success, get)
 
 import Api
 import Json.Decode as Decode
@@ -26,30 +26,19 @@ type alias Success =
     }
 
 
-transformApiError :
-    Api.Response a b
-    -> Task (Result a c) (Result d b)
-transformApiError response =
-    case response of
-        Api.Success success ->
-            Task.succeed <| Ok success
-
-        Api.Error error ->
-            Task.fail <| Err error
-
-
 fromApi :
     Error
-    -> Task a (Api.Response Error b)
-    -> Task (Result Error c) (Result d b)
-fromApi error task =
-    (task `Task.onError` (always <| Task.fail <| Err error))
-        `Task.andThen` transformApiError
+    -> Http.Request Success
+    -> Task Error Success
+fromApi error request =
+    request
+        |> Http.toTask
+        |> Task.mapError (always error)
 
 
 successDecoder : String -> Decode.Decoder Success
 successDecoder url =
-    Decode.object2 Success
+    Decode.map2 Success
         (Decode.succeed url)
         Types.Feed.decodeCandidates
 
@@ -57,7 +46,7 @@ successDecoder url =
 get :
     Api.Config
     -> String
-    -> Task (Result Error a) (Result b Success)
+    -> Task Error Success
 get apiConfig url =
     let
         message =
@@ -68,11 +57,10 @@ get apiConfig url =
         error =
             Error url message
     in
-        Api.get apiConfig (Paths.candidates url) Encode.null
-            |> Api.fromJson (Decode.succeed error) (successDecoder url)
+        Api.get
+            apiConfig
+            { url = Paths.candidates url
+            , params = Encode.null
+            , decoder = successDecoder url
+            }
             |> fromApi error
-
-
-perform : (a -> b) -> Task a a -> Cmd b
-perform onMsg task =
-    Task.perform onMsg onMsg task

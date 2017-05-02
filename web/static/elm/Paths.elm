@@ -6,7 +6,7 @@ import Types.Feed exposing (..)
 
 candidates : String -> String
 candidates url =
-    "/api/v1/feeds/discover?url=" ++ (Http.uriEncode url)
+    "/api/v1/feeds/discover?url=" ++ (Http.encodeUri url)
 
 
 createFeed : String

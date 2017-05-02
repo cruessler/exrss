@@ -56,11 +56,11 @@ decodeFeeds =
 
 decodeFeed : Decode.Decoder Feed
 decodeFeed =
-    object5 Feed
-        ("id" := int)
-        ("url" := string)
-        ("title" := string)
-        ("entries" := decodeEntries)
+    map5 Feed
+        (field "id" int)
+        (field "url" string)
+        (field "title" string)
+        (field "entries" decodeEntries)
         (succeed False)
 
 
@@ -82,10 +82,10 @@ decodeCandidates =
 
 decodeCandidate : Decode.Decoder Candidate
 decodeCandidate =
-    object3 Candidate
-        ("url" := string)
-        ("title" := string)
-        ("href" := string)
+    map3 Candidate
+        (field "url" string)
+        (field "title" string)
+        (field "href" string)
 
 
 encodeCandidate : Candidate -> Encode.Value
@@ -120,15 +120,15 @@ decodePostedAt =
         date =
             string |> Decode.map parseDate
     in
-        "posted_at" := oneOf [ null Nothing, date ]
+        field "posted_at" <| oneOf [ null Nothing, date ]
 
 
 decodeEntry : Decode.Decoder Entry
 decodeEntry =
-    object6 Entry
-        ("id" := int)
-        ("url" := string)
-        ("title" := string)
-        ("read" := bool)
+    map6 Entry
+        (field "id" int)
+        (field "url" string)
+        (field "title" string)
+        (field "read" bool)
         decodePostedAt
         (succeed NoChange)

@@ -9,7 +9,8 @@ import Feeds.Msg exposing (..)
 import Feeds.View as View
 import Json.Decode as Decode
 import Json.Encode as Encode
-import Html.App as Html
+import Html
+import Http
 import Paths
 import Request exposing (..)
 import String
@@ -66,30 +67,45 @@ toggleFeed =
 
 getEntry : Int -> Dict Int Feed -> Maybe Entry
 getEntry id feeds =
-    feeds
-        |> Dict.values
-        |> List.map (.entries >> Dict.get id)
-        |> Maybe.oneOf
+    let
+        oneOf : List (Maybe a) -> Maybe a
+        oneOf list =
+            case list of
+                [] ->
+                    Nothing
+
+                Nothing :: rest ->
+                    oneOf rest
+
+                a :: rest ->
+                    a
+    in
+        feeds
+            |> Dict.values
+            |> List.map (.entries >> Dict.get id)
+            |> oneOf
 
 
 updateEntry : Int -> (Maybe Entry -> Maybe Entry) -> Dict Int Feed -> Dict Int Feed
 updateEntry id f feeds =
     let
-        updateEntry' _ feed =
+        updateEntry_ _ feed =
             { feed | entries = (Dict.update id f feed.entries) }
     in
-        Dict.map updateEntry' feeds
+        Dict.map updateEntry_ feeds
 
 
 patchEntry : Api.Config -> Maybe Entry -> Cmd Msg
 patchEntry apiConfig entry =
     let
         task entry =
-            entry
-                |> Types.Feed.encodeEntry
-                |> Api.patch apiConfig (Paths.entry entry)
-                |> Api.fromJson (Decode.succeed ()) Types.Feed.decodeEntry
-                |> Task.perform PostFail PostSuccess
+            Api.patch
+                apiConfig
+                { url = Paths.entry entry
+                , params = Types.Feed.encodeEntry entry
+                , decoder = Types.Feed.decodeEntry
+                }
+                |> Http.send PatchEntry
     in
         Maybe.map task entry
             |> Maybe.withDefault Cmd.none
@@ -120,7 +136,7 @@ update msg model =
                 in
                     ( { model | discoveryRequests = newRequests }
                     , Discovery.get model.apiConfig url
-                        |> Discovery.perform Discovery
+                        |> Task.attempt Discovery
                     )
 
         AddFeed candidate ->
@@ -133,7 +149,7 @@ update msg model =
             in
                 ( { model | additionRequests = newRequests }
                 , Addition.post model.apiConfig candidate
-                    |> Addition.perform Addition
+                    |> Task.attempt Addition
                 )
 
         RemoveResponse url ->
@@ -174,22 +190,17 @@ update msg model =
             in
                 ( { model | feeds = newFeeds }, cmd )
 
-        PostSuccess response ->
-            case response of
-                Api.Success newEntry ->
-                    let
-                        newFeeds =
-                            updateEntry
-                                newEntry.id
-                                (Maybe.map (always newEntry))
-                                model.feeds
-                    in
-                        ( { model | feeds = newFeeds }, Cmd.none )
+        PatchEntry (Ok newEntry) ->
+            let
+                newFeeds =
+                    updateEntry
+                        newEntry.id
+                        (Maybe.map (always newEntry))
+                        model.feeds
+            in
+                ( { model | feeds = newFeeds }, Cmd.none )
 
-                Api.Error _ ->
-                    ( model, Cmd.none )
-
-        PostFail error ->
+        PatchEntry (Err _) ->
             ( model, Cmd.none )
 
         Discovery result ->

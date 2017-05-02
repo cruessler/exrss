@@ -14,7 +14,7 @@ import Types.Feed exposing (..)
 close : String -> Html Msg
 close url =
     H.button
-        [ A.type' "button"
+        [ A.type_ "button"
         , A.class "close"
         , E.onClick <| RemoveResponse url
         ]

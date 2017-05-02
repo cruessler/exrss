@@ -14,18 +14,18 @@ import Types.Feed exposing (..)
 
 
 radio : Visibility -> Visibility -> String -> Html Msg
-radio currentVisibility visibility text' =
+radio currentVisibility visibility text_ =
     H.div [ A.class "form-check" ]
         [ H.label
             [ A.class "form-check-label" ]
             [ H.input
-                [ A.type' "radio"
+                [ A.type_ "radio"
                 , A.class "form-check-input"
                 , A.checked (visibility == currentVisibility)
                 , E.onClick (SetVisibility visibility)
                 ]
                 []
-            , H.text text'
+            , H.text text_
             ]
         ]
 
@@ -61,7 +61,7 @@ view model =
     in
         H.div []
             [ H.button
-                [ A.type' "button"
+                [ A.type_ "button"
                 , A.class "btn btn-primary btn-sm"
                 , E.onClick ToggleOptions
                 ]

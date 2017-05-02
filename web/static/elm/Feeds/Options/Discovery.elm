@@ -15,7 +15,7 @@ import Types.Feed exposing (..)
 close : String -> Html Msg
 close url =
     H.button
-        [ A.type' "button"
+        [ A.type_ "button"
         , A.class "close"
         , E.onClick <| RemoveResponse url
         ]
@@ -31,7 +31,7 @@ onEnter msg =
             else
                 Decode.fail "keyCode != 13"
     in
-        E.on "keydown" <| Decode.andThen E.keyCode isEnter
+        E.on "keydown" <| Decode.andThen isEnter E.keyCode
 
 
 newFeedFieldset : String -> Html Msg
@@ -45,7 +45,7 @@ newFeedFieldset discoveryUrl =
             [ H.text "Address to discover feeds on" ]
         , H.input
             [ A.id "feed-url"
-            , A.type' "url"
+            , A.type_ "url"
             , A.class "form-control"
             , A.value discoveryUrl
             , E.onInput SetDiscoveryUrl
@@ -88,7 +88,7 @@ addableFeed candidate =
         [ H.text candidate.title
         , H.p [] [ H.code [] [ H.text candidate.url ] ]
         , H.button
-            [ A.type' "button"
+            [ A.type_ "button"
             , A.class "btn btn-primary btn-sm"
             , E.onClick <| AddFeed candidate
             ]

@@ -66,7 +66,7 @@ feed visibility feed =
             else
                 Dict.values feed.entries
 
-        feed' =
+        feed_ =
             if feed.open then
                 H.ul [ A.class "feed" ] (List.map entry entries)
             else
@@ -79,7 +79,7 @@ feed visibility feed =
                 [ H.text feed.title
                 , additionalInfo feed
                 ]
-            , feed'
+            , feed_
             ]
 
 

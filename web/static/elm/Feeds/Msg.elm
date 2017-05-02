@@ -17,7 +17,6 @@ type Msg
     | RemoveResponse String
     | ToggleFeed Int
     | MarkAsRead Int
-    | PostFail Http.Error
-    | PostSuccess (Api.Response () Entry)
+    | PatchEntry (Result Http.Error Entry)
     | Discovery (Result Discovery.Error Discovery.Success)
     | Addition (Result Addition.Error Addition.Success)
