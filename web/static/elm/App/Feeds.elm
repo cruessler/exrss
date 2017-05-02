@@ -86,13 +86,19 @@ getEntry id feeds =
             |> oneOf
 
 
-updateEntry : Int -> (Maybe Entry -> Maybe Entry) -> Dict Int Feed -> Dict Int Feed
-updateEntry id f feeds =
+updateEntry : Int -> (Entry -> Entry) -> Dict Int Feed -> Dict Int Feed
+updateEntry id f =
     let
         updateEntry_ _ feed =
-            { feed | entries = (Dict.update id f feed.entries) }
+            { feed
+                | entries =
+                    Dict.update
+                        id
+                        (Maybe.map f)
+                        feed.entries
+            }
     in
-        Dict.map updateEntry_ feeds
+        Dict.map updateEntry_
 
 
 patchEntry : Api.Config -> Maybe Entry -> Cmd Msg
@@ -178,9 +184,7 @@ update msg model =
             let
                 newFeeds =
                     updateEntry id
-                        (Maybe.map
-                            (\e -> { e | read = True, status = UpdatePending })
-                        )
+                        (\e -> { e | read = True, status = UpdatePending })
                         model.feeds
 
                 cmd =
@@ -195,7 +199,7 @@ update msg model =
                 newFeeds =
                     updateEntry
                         newEntry.id
-                        (Maybe.map (always newEntry))
+                        (always newEntry)
                         model.feeds
             in
                 ( { model | feeds = newFeeds }, Cmd.none )
