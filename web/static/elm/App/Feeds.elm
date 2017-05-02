@@ -65,27 +65,6 @@ toggleFeed =
     Maybe.map (\f -> { f | open = (not f.open) })
 
 
-getEntry : Int -> Dict Int Feed -> Maybe Entry
-getEntry id feeds =
-    let
-        oneOf : List (Maybe a) -> Maybe a
-        oneOf list =
-            case list of
-                [] ->
-                    Nothing
-
-                Nothing :: rest ->
-                    oneOf rest
-
-                a :: rest ->
-                    a
-    in
-        feeds
-            |> Dict.values
-            |> List.map (.entries >> Dict.get id)
-            |> oneOf
-
-
 updateEntry : Int -> (Entry -> Entry) -> Dict Int Feed -> Dict Int Feed
 updateEntry id f =
     let
@@ -101,20 +80,15 @@ updateEntry id f =
         Dict.map updateEntry_
 
 
-patchEntry : Api.Config -> Maybe Entry -> Cmd Msg
+patchEntry : Api.Config -> Entry -> Cmd Msg
 patchEntry apiConfig entry =
-    let
-        task entry =
-            Api.patch
-                apiConfig
-                { url = Paths.entry entry
-                , params = Types.Feed.encodeEntry entry
-                , decoder = Types.Feed.decodeEntry
-                }
-                |> Http.send PatchEntry
-    in
-        Maybe.map task entry
-            |> Maybe.withDefault Cmd.none
+    Api.patch
+        apiConfig
+        { url = Paths.entry entry
+        , params = Types.Feed.encodeEntry entry
+        , decoder = Types.Feed.decodeEntry
+        }
+        |> Http.send PatchEntry
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -180,16 +154,18 @@ update msg model =
             in
                 ( { model | feeds = newFeeds }, Cmd.none )
 
-        MarkAsRead id ->
+        MarkAsRead entry ->
             let
+                newEntry =
+                    { entry | read = True, status = UpdatePending }
+
                 newFeeds =
-                    updateEntry id
-                        (\e -> { e | read = True, status = UpdatePending })
+                    updateEntry entry.id
+                        (always newEntry)
                         model.feeds
 
                 cmd =
-                    newFeeds
-                        |> getEntry id
+                    newEntry
                         |> patchEntry model.apiConfig
             in
                 ( { model | feeds = newFeeds }, cmd )

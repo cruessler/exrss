@@ -33,7 +33,7 @@ entry entry =
             [ H.a
                 [ A.href entry.url
                 , A.target "_blank"
-                , E.onClick (MarkAsRead entry.id)
+                , E.onClick (MarkAsRead entry)
                 ]
                 [ H.text entry.title ]
             , H.p [] [ H.text postedAt ]
