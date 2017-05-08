@@ -8,36 +8,47 @@ defmodule ExRss.Crawler.Queue do
   alias ExRss.Feed
   alias ExRss.Repo
 
+  @store ExRss.Crawler.Store
+  @updater ExRss.Crawler.Updater
+
   def start_link(opts \\ []) do
-    GenServer.start_link(__MODULE__, :ok, Keyword.put(opts, :name, __MODULE__))
+    opts =
+      opts
+      |> Keyword.put_new(:store, @store)
+      |> Keyword.put_new(:updater, @updater)
+
+    state =
+      %{opts: opts,
+        feeds: [],
+        refs: %{}}
+
+    GenServer.start_link(__MODULE__, state)
   end
 
-  def init(:ok) do
-    feeds =
-      Ecto.Query.from(Feed, order_by: [asc: :next_update_at])
-      |> Repo.all
-      |> Enum.map(fn
-        %{next_update_at: nil} = feed -> %{feed | next_update_at: DateTime.utc_now}
-        feed -> feed
-      end)
+  def init(%{opts: opts} = state) do
+    feeds = opts[:store].load()
 
-    {:ok, {feeds, %{}}, timeout(feeds)}
+    state =
+      state
+      |> Map.put(:feeds, feeds)
+
+    {:ok, state, timeout(feeds)}
   end
 
-  def handle_info(:timeout, {[first|rest], refs}) do
+  def handle_info(:timeout, %{feeds: [first|rest], refs: refs, opts: opts} = state) do
     Logger.debug "Handling feed #{first.title}"
 
-    %{ref: ref} = Task.async(ExRss.Crawler.Updater, :update, [first])
+    %{ref: ref} = Task.async(opts[:updater], :update, [first])
 
     # The reference to the worker is saved so the corresponding feed can be
     # reinserted into the queue, should the update fail.
     refs = Map.put(refs, ref, first)
 
-    {:noreply, {rest, refs}, timeout(rest)}
+    {:noreply, %{state | feeds: rest, refs: refs}, timeout(rest)}
   end
 
   # Handle regular success and error cases: Add the feed back to the queue.
-  def handle_info({_ref, {:ok, feed}}, {feeds, refs}) do
+  def handle_info({_ref, {:ok, feed}}, %{feeds: feeds} = state) do
     new_feed =
       feed
       |> Changeset.change
@@ -46,9 +57,9 @@ defmodule ExRss.Crawler.Queue do
 
     new_queue = insert(feeds, new_feed)
 
-    {:noreply, {new_queue, refs}, timeout(new_queue)}
+    {:noreply, %{state | feeds: new_queue}, timeout(new_queue)}
   end
-  def handle_info({_ref, {:error, feed}}, {feeds, refs}) do
+  def handle_info({_ref, {:error, feed}}, %{feeds: feeds} = state) do
     new_feed =
       feed
       |> Changeset.change
@@ -57,20 +68,20 @@ defmodule ExRss.Crawler.Queue do
 
     new_queue = insert(feeds, new_feed)
 
-    {:noreply, {new_queue, refs}, timeout(new_queue)}
+    {:noreply, %{state | feeds: new_queue}, timeout(new_queue)}
   end
   # Handle regular child exit. The feed has already been reinserted by one of
   # the upper function clauses, so only the reference to the worker has to be
   # removed.
-  def handle_info({:DOWN, ref, :process, _, :normal}, {feeds, refs}) do
+  def handle_info({:DOWN, ref, :process, _, :normal}, %{refs: refs} = state) do
     {_, refs} = Map.pop(refs, ref)
 
-    {:noreply, {feeds, refs}, timeout(feeds)}
+    {:noreply, %{state | refs: refs}, timeout(state[:feeds])}
   end
   # Whenever a child exits for a reason other than :normal, the reference to
   # that process is removed and the corresponding feed is reinserted into the
   # queue.
-  def handle_info({:DOWN, ref, :process, _, _}, {feeds, refs}) do
+  def handle_info({:DOWN, ref, :process, _, _}, %{feeds: feeds, refs: refs} = state) do
     {feed, refs} = Map.pop(refs, ref)
 
     new_feed =
@@ -81,17 +92,17 @@ defmodule ExRss.Crawler.Queue do
 
     new_queue = insert(feeds, new_feed)
 
-    {:noreply, {new_queue, refs}, timeout(new_queue)}
+    {:noreply, %{state | feeds: new_queue, refs: refs}, timeout(new_queue)}
   end
 
-  def handle_info(_, {feeds, refs}) do
-    {:noreply, {feeds, refs}, timeout(feeds)}
+  def handle_info(_, state) do
+    {:noreply, state, timeout(state[:feeds])}
   end
 
-  def handle_cast({:add_feed, feed}, {feeds, refs}) do
+  def handle_cast({:add_feed, feed}, %{feeds: feeds} = state) do
     new_queue = insert(feeds, feed)
 
-    {:noreply, {new_queue, refs}, timeout(new_queue)}
+    {:noreply, %{state | feeds: new_queue}, timeout(new_queue)}
   end
 
   def insert(queue, feed) do
