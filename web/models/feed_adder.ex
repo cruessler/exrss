@@ -10,6 +10,7 @@ defmodule ExRss.FeedAdder do
       user
       |> build_assoc(:feeds)
       |> Feed.changeset(feed_params)
+      |> put_change(:retries, 0)
       |> put_change(:next_update_at, DateTime.utc_now)
 
     Multi.new
