@@ -24,8 +24,8 @@ defmodule ExRss.Entry do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:url, :title, :read])
-    |> validate_required([:feed_id, :url, :title, :raw_posted_at])
+    |> cast(params, [:url, :title, :read, :raw_posted_at])
+    |> validate_required([:url, :title])
     |> assoc_constraint(:feed)
     |> unique_constraint(:url, name: :entries_feed_id_url_index)
   end
