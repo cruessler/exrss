@@ -22,7 +22,7 @@ defmodule ExRss.Crawler.Queue do
         feeds: [],
         refs: %{}}
 
-    GenServer.start_link(__MODULE__, state)
+    GenServer.start_link(__MODULE__, state, name: __MODULE__)
   end
 
   def init(%{opts: opts} = state) do
