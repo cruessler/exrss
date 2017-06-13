@@ -36,7 +36,7 @@ defmodule ExRss.Crawler.Queue do
   end
 
   def handle_info(:timeout, %{feeds: [first|rest], refs: refs, opts: opts} = state) do
-    Logger.debug "Handling feed #{first.title}"
+    Logger.info "Handling feed #{first.title} (#{first.url})"
 
     %{ref: ref} = Task.async(opts[:updater], :update, [first])
 
@@ -49,6 +49,8 @@ defmodule ExRss.Crawler.Queue do
 
   # Handle regular success and error cases: Add the feed back to the queue.
   def handle_info({_ref, {:ok, feed}}, %{feeds: feeds} = state) do
+    Logger.info "Updated feed #{feed.title}"
+
     new_feed =
       feed
       |> Changeset.change
@@ -60,6 +62,8 @@ defmodule ExRss.Crawler.Queue do
     {:noreply, %{state | feeds: new_queue}, timeout(new_queue)}
   end
   def handle_info({_ref, {:error, feed}}, %{feeds: feeds} = state) do
+    Logger.info "Error while updating #{feed.title}"
+
     new_feed =
       feed
       |> Changeset.change
@@ -84,6 +88,8 @@ defmodule ExRss.Crawler.Queue do
   def handle_info({:DOWN, ref, :process, _, _}, %{feeds: feeds, refs: refs} = state) do
     {feed, refs} = Map.pop(refs, ref)
 
+    Logger.info "Uncaught error while updating #{feed.title}"
+
     new_feed =
       feed
       |> Changeset.change
@@ -100,6 +106,8 @@ defmodule ExRss.Crawler.Queue do
   end
 
   def handle_cast({:add_feed, feed}, %{feeds: feeds} = state) do
+    Logger.info "Adding feed #{feed.title} (#{feed.url})"
+
     new_queue = insert(feeds, feed)
 
     {:noreply, %{state | feeds: new_queue}, timeout(new_queue)}

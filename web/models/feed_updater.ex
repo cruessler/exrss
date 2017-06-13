@@ -1,7 +1,4 @@
 defmodule ExRss.FeedUpdater do
-  require Ecto.Query
-  require Logger
-
   alias Ecto.Multi
   alias ExRss.Entry
   alias ExRss.Feed

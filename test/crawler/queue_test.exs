@@ -37,7 +37,11 @@ defmodule ExRss.Crawler.QueueTest do
     {:ok, pid} =
       Queue.start_link(store: TestStore, updater: TestUpdater)
 
-    feed = %{title: "Test feed", next_update_at: nil, pid: self()}
+    feed =
+      %{title: "Test feed",
+        url: "http://example.com",
+        next_update_at: nil,
+        pid: self()}
 
     GenServer.cast pid, {:add_feed, feed}
 
@@ -50,7 +54,11 @@ defmodule ExRss.Crawler.QueueTest do
 
     next_update_at = Timex.shift(DateTime.utc_now, milliseconds: 200)
 
-    feed = %{title: "Test feed", next_update_at: next_update_at, pid: self()}
+    feed =
+      %{title: "Test feed",
+        url: "http://example.com",
+        next_update_at: next_update_at,
+        pid: self()}
 
     GenServer.cast pid, {:add_feed, feed}
 
