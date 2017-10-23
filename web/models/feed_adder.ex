@@ -3,6 +3,7 @@ defmodule ExRss.FeedAdder do
   import Ecto.Changeset
 
   alias Ecto.Multi
+  alias ExRss.Entry
   alias ExRss.Feed
 
   def add_feed(user, feed_params) do
@@ -60,5 +61,34 @@ defmodule ExRss.FeedAdder do
       end
     end)
     |> Enum.reject(&is_nil(&1))
+  end
+
+  @doc """
+  Calculates the frequency of posts for a given feed. Returns the number of
+  posts that have been published as well as the number of seconds between the
+  publication of the first and the last post.
+
+    iex> FeedAdder.extraxt_frequency_info(feed)
+    %{posts: 3, seconds: 97362}
+  """
+  def extract_frequency_info(raw_feed) do
+    entries =
+      raw_feed.entries
+      |> Enum.flat_map(fn(e) ->
+        case Entry.parse_time(e.updated) do
+          {:ok, posted_at} -> [posted_at]
+
+          _ -> []
+        end
+      end)
+
+    try do
+      {min_date, max_date} = Enum.min_max(entries)
+
+      %{posts: Enum.count(entries),
+        seconds: Timex.diff(max_date, min_date, :seconds)}
+    rescue
+      Enum.EmptyError -> nil
+    end
   end
 end
