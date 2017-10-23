@@ -5,6 +5,7 @@ defmodule ExRss.FeedAdder do
   alias Ecto.Multi
   alias ExRss.Entry
   alias ExRss.Feed
+  alias HTTPoison.Response
 
   def add_feed(user, feed_params) do
     changeset =
@@ -34,6 +35,7 @@ defmodule ExRss.FeedAdder do
       feeds =
         for f <- extract_feeds(html) do
           Map.put(f, :url, URI.merge(uri, f.href) |> to_string)
+          |> add_frequency_info
         end
 
       {:ok, feeds}
@@ -61,6 +63,14 @@ defmodule ExRss.FeedAdder do
       end
     end)
     |> Enum.reject(&is_nil(&1))
+  end
+
+  def add_frequency_info(feed) do
+    with {:ok, %Response{body: body}} <- HTTPoison.get(feed.url),
+         {:ok, raw_feed, _} <- FeederEx.parse(body)
+    do
+      Map.put(feed, :frequency, extract_frequency_info(raw_feed))
+    end
   end
 
   @doc """
