@@ -81,11 +81,34 @@ inProgressFieldset url =
         ]
 
 
+frequencyInfo : Frequency -> Html Msg
+frequencyInfo frequency =
+    let
+        formatDuration seconds =
+            if seconds < 2 * 86400 then
+                (toString <| round <| (toFloat seconds) / 3600.0)
+                    ++ " hours"
+            else
+                (toString <| round <| (toFloat seconds) / 86400.0)
+                    ++ " days"
+    in
+        H.text <|
+            (toString frequency.posts)
+                ++ " posts in "
+                ++ (formatDuration frequency.seconds)
+
+
 addableFeed : Candidate -> Html Msg
 addableFeed candidate =
     H.li
         []
         [ H.text candidate.title
+        , H.small [ A.class "frequency-info" ]
+            [ candidate.frequency
+                |> Maybe.map frequencyInfo
+                |> Maybe.withDefault
+                    (H.text "no information on the frequency of new posts available")
+            ]
         , H.p [] [ H.code [] [ H.text candidate.url ] ]
         , H.button
             [ A.type_ "button"
