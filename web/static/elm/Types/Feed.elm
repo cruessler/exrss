@@ -4,6 +4,7 @@ module Types.Feed
         , Entry
         , Status(..)
         , Candidate
+        , Frequency
         , decodeFeeds
         , decodeEntry
         , decodeCandidates
@@ -42,10 +43,17 @@ type alias Entry =
     }
 
 
+type alias Frequency =
+    { posts : Int
+    , seconds : Int
+    }
+
+
 type alias Candidate =
     { url : String
     , title : String
     , href : String
+    , frequency : Maybe Frequency
     }
 
 
@@ -82,10 +90,16 @@ decodeCandidates =
 
 decodeCandidate : Decode.Decoder Candidate
 decodeCandidate =
-    map3 Candidate
+    map4 Candidate
         (field "url" string)
         (field "title" string)
         (field "href" string)
+        (field "frequency" <| nullable decodeFrequency)
+
+
+decodeFrequency : Decode.Decoder Frequency
+decodeFrequency =
+    map2 Frequency (field "posts" int) (field "seconds" int)
 
 
 encodeCandidate : Candidate -> Encode.Value
