@@ -32,6 +32,7 @@ defmodule ExRss.User.Registration do
     |> delete_change(:password)
     |> put_change(:hashed_password, hashed_password)
   end
+
   def encrypt_password(changeset) do
     changeset
   end

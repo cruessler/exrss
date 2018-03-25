@@ -6,8 +6,8 @@ defmodule ExRss.Feed do
   alias ExRss.User
   alias Timex.Duration
 
-  @base_timeout Duration.from_minutes(15) |> Duration.to_milliseconds
-  @max_timeout Duration.from_days(1) |> Duration.to_milliseconds |> round
+  @base_timeout Duration.from_minutes(15) |> Duration.to_milliseconds()
+  @max_timeout Duration.from_days(1) |> Duration.to_milliseconds() |> round
 
   @derive {Poison.Encoder, only: [:id, :title, :url, :entries]}
 
@@ -53,14 +53,14 @@ defmodule ExRss.Feed do
     retries = Changeset.get_field(changeset, :retries)
 
     new_timeout =
-      :math.pow(1.5, retries) * @base_timeout
+      (:math.pow(1.5, retries) * @base_timeout)
       |> round
       |> min(@max_timeout)
 
     next_update_at =
       changeset
       |> Changeset.get_field(:next_update_at)
-      |> later(DateTime.utc_now)
+      |> later(DateTime.utc_now())
       |> Timex.shift(milliseconds: new_timeout)
 
     changeset

@@ -6,7 +6,7 @@ defmodule ExRss.UserController do
   def new(conn, _params) do
     changeset = Registration.changeset(%Registration{})
 
-    render conn, "new.html", changeset: changeset
+    render(conn, "new.html", changeset: changeset)
   end
 
   def create(conn, %{"registration" => registration_params}) do

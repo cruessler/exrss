@@ -13,16 +13,15 @@ defmodule ExRss.FeedAdder do
       |> build_assoc(:feeds)
       |> Feed.changeset(feed_params)
       |> put_change(:retries, 0)
-      |> put_change(:next_update_at, DateTime.utc_now)
+      |> put_change(:next_update_at, DateTime.utc_now())
 
-    Multi.new
+    Multi.new()
     |> Multi.insert(:feed, changeset)
-    |> Multi.run(:notify_queue, fn
-      %{feed: feed} ->
-        GenServer.cast(ExRss.Crawler.Queue, {:add_feed, feed})
+    |> Multi.run(:notify_queue, fn %{feed: feed} ->
+      GenServer.cast(ExRss.Crawler.Queue, {:add_feed, feed})
 
-        {:ok, nil}
-      end)
+      {:ok, nil}
+    end)
   end
 
   def discover_feeds(url) do
@@ -30,8 +29,7 @@ defmodule ExRss.FeedAdder do
          %URI{authority: authority} when not is_nil(authority) <- uri,
          {:ok, response} <- HTTPoison.get(uri, [], follow_redirect: true),
          200 <- response.status_code,
-         html <- Floki.parse(response.body)
-    do
+         html <- Floki.parse(response.body) do
       feeds =
         for f <- extract_feeds(html) do
           Map.put(f, :url, URI.merge(uri, f.href) |> to_string)
@@ -46,7 +44,8 @@ defmodule ExRss.FeedAdder do
       %URI{} ->
         {:error, :uri_not_absolute}
 
-      x -> x
+      x ->
+        x
     end
   end
 
@@ -55,8 +54,7 @@ defmodule ExRss.FeedAdder do
     |> Floki.find("link[rel=alternate][type='application/rss+xml']")
     |> Enum.map(fn feed ->
       with [title] <- Floki.attribute(feed, "title"),
-           [href] <- Floki.attribute(feed, "href")
-      do
+           [href] <- Floki.attribute(feed, "href") do
         %{title: title, href: href}
       else
         [] -> nil
@@ -67,8 +65,7 @@ defmodule ExRss.FeedAdder do
 
   def add_frequency_info(feed) do
     with {:ok, %Response{body: body}} <- HTTPoison.get(feed.url),
-         {:ok, raw_feed, _} <- FeederEx.parse(body)
-    do
+         {:ok, raw_feed, _} <- FeederEx.parse(body) do
       Map.put(feed, :frequency, extract_frequency_info(raw_feed))
     end
   end
@@ -84,10 +81,9 @@ defmodule ExRss.FeedAdder do
   def extract_frequency_info(raw_feed) do
     entries =
       raw_feed.entries
-      |> Enum.flat_map(fn(e) ->
+      |> Enum.flat_map(fn e ->
         case Entry.parse_time(e.updated) do
           {:ok, posted_at} -> [posted_at]
-
           _ -> []
         end
       end)
@@ -95,8 +91,7 @@ defmodule ExRss.FeedAdder do
     try do
       {min_date, max_date} = Enum.min_max(entries)
 
-      %{posts: Enum.count(entries),
-        seconds: Timex.diff(max_date, min_date, :seconds)}
+      %{posts: Enum.count(entries), seconds: Timex.diff(max_date, min_date, :seconds)}
     rescue
       Enum.EmptyError -> nil
     end

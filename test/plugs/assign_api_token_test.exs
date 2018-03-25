@@ -12,11 +12,11 @@ defmodule ExRss.AssignApiToken do
   @plug AssignApiToken.init(@salt)
 
   @session Plug.Session.init(
-    store: :cookie,
-    key: "_app",
-    encryption_salt: "yadayada",
-    signing_salt: "yadayada"
-  )
+             store: :cookie,
+             key: "_app",
+             encryption_salt: "yadayada",
+             signing_salt: "yadayada"
+           )
 
   test "Plug.AssignApiToken" do
     conn =
@@ -26,6 +26,6 @@ defmodule ExRss.AssignApiToken do
       |> AssignApiToken.call(@plug)
 
     assert {:ok, %Account{id: 1}} =
-      Phoenix.Token.verify(ExRss.Endpoint, @salt, conn.assigns.api_token)
+             Phoenix.Token.verify(ExRss.Endpoint, @salt, conn.assigns.api_token)
   end
 end

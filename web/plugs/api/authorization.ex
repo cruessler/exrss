@@ -23,6 +23,7 @@ defmodule ExRss.Plug.Api.Authorization do
   defp verify_token(["Bearer " <> token], salt) do
     Phoenix.Token.verify(@context, salt, token)
   end
+
   defp verify_token(_, _) do
     {:error, :no_token}
   end

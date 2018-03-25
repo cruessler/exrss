@@ -22,6 +22,7 @@ defmodule ExRss.Api.V1.EntryController do
         |> render(ExRss.ChangesetView, "error.json", changeset: changeset)
     end
   end
+
   def update(conn, _) do
     conn
     |> resp(:bad_request, "")

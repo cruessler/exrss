@@ -7,11 +7,11 @@ defmodule ExRss.AssignDefaultsTest do
   @plug AssignDefaults.init([])
 
   @session Plug.Session.init(
-    store: :cookie,
-    key: "_app",
-    encryption_salt: "yadayada",
-    signing_salt: "yadayada"
-  )
+             store: :cookie,
+             key: "_app",
+             encryption_salt: "yadayada",
+             signing_salt: "yadayada"
+           )
 
   test "Plug.AssignDefaults" do
     conn =

@@ -86,14 +86,12 @@ defmodule ExRss.FeedAdderTest do
   test "extracts feeds" do
     feeds = FeedAdder.extract_feeds(@html)
 
-    assert [
-      %{title: "RSS", href: "/feed/rss.xml"},
-      %{title: "Atom", href: "/feed/atom.xml"}] = feeds
+    assert [%{title: "RSS", href: "/feed/rss.xml"}, %{title: "Atom", href: "/feed/atom.xml"}] =
+             feeds
   end
 
   test "fails when URI not absolute" do
-    assert {:error, :uri_not_absolute} =
-      FeedAdder.discover_feeds("example.com")
+    assert {:error, :uri_not_absolute} = FeedAdder.discover_feeds("example.com")
   end
 
   test "extracts frequency info" do
@@ -101,7 +99,7 @@ defmodule ExRss.FeedAdderTest do
 
     frequency_info = FeedAdder.extract_frequency_info(raw_feed)
 
-    assert %{posts: 3, seconds: 29736240} = frequency_info
+    assert %{posts: 3, seconds: 29_736_240} = frequency_info
   end
 
   test "doesn’t extract frequency info when no publication dates are given" do

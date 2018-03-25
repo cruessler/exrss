@@ -38,8 +38,9 @@ defmodule ExRss.FeedImporterTest do
     feeds = FeedImporter.extract_feeds(@opml)
 
     assert [
-      %{title: "Planet Elm", url: _},
-      %{title: "Phoenix", url: _},
-      %{title: "Elixir Lang", url: _}] = feeds
+             %{title: "Planet Elm", url: _},
+             %{title: "Phoenix", url: _},
+             %{title: "Elixir Lang", url: _}
+           ] = feeds
   end
 end

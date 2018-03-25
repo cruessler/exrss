@@ -10,8 +10,7 @@ defmodule ExRss.Api.AuthorizationTest do
   @account %Account{id: 1}
 
   test "sets current_user when a valid token is supplied" do
-    conn =
-      conn(:get, "/")
+    conn = conn(:get, "/")
 
     token = Phoenix.Token.sign(ExRss.Endpoint, @salt, @account)
 

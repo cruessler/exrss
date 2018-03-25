@@ -7,7 +7,7 @@ defmodule ExRss.SessionControllerTest do
   @email "john@doe.com"
 
   test "GET /session/new", %{conn: conn} do
-    conn = get conn, "/session/new"
+    conn = get(conn, "/session/new")
 
     assert html_response(conn, 200) =~ "Log in"
   end
@@ -17,17 +17,17 @@ defmodule ExRss.SessionControllerTest do
 
     {:ok, _} =
       Registration.changeset(%Registration{}, params)
-      |> Repo.insert
+      |> Repo.insert()
 
     params = %{session: %{email: @email, password: @password}}
 
-    conn = post conn, "/session", params
+    conn = post(conn, "/session", params)
 
     assert html_response(conn, 302)
   end
 
   test "DELETE /session", %{conn: conn} do
-    conn = delete conn, "/session"
+    conn = delete(conn, "/session")
 
     assert html_response(conn, 302)
   end

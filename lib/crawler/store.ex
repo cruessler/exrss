@@ -6,9 +6,9 @@ defmodule ExRss.Crawler.Store do
 
   def load() do
     from(Feed, order_by: [asc: :next_update_at])
-    |> Repo.all
+    |> Repo.all()
     |> Enum.map(fn
-      %{next_update_at: nil} = feed -> %{feed | next_update_at: DateTime.utc_now}
+      %{next_update_at: nil} = feed -> %{feed | next_update_at: DateTime.utc_now()}
       feed -> feed
     end)
   end

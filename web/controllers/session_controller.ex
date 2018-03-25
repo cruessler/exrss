@@ -4,7 +4,7 @@ defmodule ExRss.SessionController do
   alias ExRss.Session
 
   def new(conn, _params) do
-    render conn, "new.html"
+    render(conn, "new.html")
   end
 
   def create(conn, %{"session" => session_params}) do

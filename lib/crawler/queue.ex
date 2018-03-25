@@ -17,10 +17,7 @@ defmodule ExRss.Crawler.Queue do
       |> Keyword.put_new(:store, @store)
       |> Keyword.put_new(:updater, @updater)
 
-    state =
-      %{opts: opts,
-        feeds: [],
-        refs: %{}}
+    state = %{opts: opts, feeds: [], refs: %{}}
 
     GenServer.start_link(__MODULE__, state, name: __MODULE__)
   end
@@ -35,8 +32,8 @@ defmodule ExRss.Crawler.Queue do
     {:ok, state, timeout(feeds)}
   end
 
-  def handle_info(:timeout, %{feeds: [first|rest], refs: refs, opts: opts} = state) do
-    Logger.info "Handling feed #{first.title} (#{first.url})"
+  def handle_info(:timeout, %{feeds: [first | rest], refs: refs, opts: opts} = state) do
+    Logger.info("Handling feed #{first.title} (#{first.url})")
 
     %{ref: ref} = Task.async(opts[:updater], :update, [first])
 
@@ -49,31 +46,33 @@ defmodule ExRss.Crawler.Queue do
 
   # Handle regular success and error cases: Add the feed back to the queue.
   def handle_info({_ref, {:ok, feed}}, %{feeds: feeds} = state) do
-    Logger.info "Updated feed #{feed.title}"
+    Logger.info("Updated feed #{feed.title}")
 
     new_feed =
       feed
-      |> Changeset.change
-      |> Feed.schedule_update_on_success
-      |> Repo.update!
+      |> Changeset.change()
+      |> Feed.schedule_update_on_success()
+      |> Repo.update!()
 
     new_queue = insert(feeds, new_feed)
 
     {:noreply, %{state | feeds: new_queue}, timeout(new_queue)}
   end
+
   def handle_info({_ref, {:error, feed}}, %{feeds: feeds} = state) do
-    Logger.info "Error while updating #{feed.title}"
+    Logger.info("Error while updating #{feed.title}")
 
     new_feed =
       feed
-      |> Changeset.change
-      |> Feed.schedule_update_on_error
-      |> Repo.update!
+      |> Changeset.change()
+      |> Feed.schedule_update_on_error()
+      |> Repo.update!()
 
     new_queue = insert(feeds, new_feed)
 
     {:noreply, %{state | feeds: new_queue}, timeout(new_queue)}
   end
+
   # Handle regular child exit. The feed has already been reinserted by one of
   # the upper function clauses, so only the reference to the worker has to be
   # removed.
@@ -82,19 +81,20 @@ defmodule ExRss.Crawler.Queue do
 
     {:noreply, %{state | refs: refs}, timeout(state[:feeds])}
   end
+
   # Whenever a child exits for a reason other than :normal, the reference to
   # that process is removed and the corresponding feed is reinserted into the
   # queue.
   def handle_info({:DOWN, ref, :process, _, _}, %{feeds: feeds, refs: refs} = state) do
     {feed, refs} = Map.pop(refs, ref)
 
-    Logger.info "Uncaught error while updating #{feed.title}"
+    Logger.info("Uncaught error while updating #{feed.title}")
 
     new_feed =
       feed
-      |> Changeset.change
-      |> Feed.schedule_update_on_error
-      |> Repo.update!
+      |> Changeset.change()
+      |> Feed.schedule_update_on_error()
+      |> Repo.update!()
 
     new_queue = insert(feeds, new_feed)
 
@@ -106,7 +106,7 @@ defmodule ExRss.Crawler.Queue do
   end
 
   def handle_cast({:add_feed, feed}, %{feeds: feeds} = state) do
-    Logger.info "Adding feed #{feed.title} (#{feed.url})"
+    Logger.info("Adding feed #{feed.title} (#{feed.url})")
 
     new_queue = insert(feeds, feed)
 
@@ -114,20 +114,22 @@ defmodule ExRss.Crawler.Queue do
   end
 
   def insert(queue, feed) do
-    [feed|queue]
+    [feed | queue]
     |> Enum.sort(fn a, b ->
       Timex.compare(a.next_update_at, b.next_update_at) == -1
     end)
   end
 
-  def timeout([%{next_update_at: nil}|_]) do
+  def timeout([%{next_update_at: nil} | _]) do
     0
   end
-  def timeout([first|_]) do
+
+  def timeout([first | _]) do
     first.next_update_at
-    |> Timex.diff(DateTime.utc_now, :milliseconds)
+    |> Timex.diff(DateTime.utc_now(), :milliseconds)
     |> max(0)
   end
+
   def timeout([]) do
     :infinity
   end

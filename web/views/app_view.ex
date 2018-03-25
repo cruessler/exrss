@@ -9,14 +9,16 @@ defmodule ExRss.AppView do
         "form-group row"
       end
 
-    content_tag :div, fun.(form), class: class
+    content_tag(:div, fun.(form), class: class)
   end
 
   def elm_module(module, params \\ %{}, attrs \\ []) do
     {tag, attrs} = Keyword.pop(attrs, :tag, :div)
-    data_attributes =
-      [ "data-elm-module": module,
-        "data-elm-params": html_escape(Poison.encode!(params)) ]
+
+    data_attributes = [
+      "data-elm-module": module,
+      "data-elm-params": html_escape(Poison.encode!(params))
+    ]
 
     content_tag(tag, "", Dict.merge(attrs, data_attributes))
   end

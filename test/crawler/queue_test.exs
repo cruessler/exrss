@@ -10,7 +10,7 @@ defmodule ExRss.Crawler.QueueTest do
 
   defmodule TestUpdater do
     def update(feed) do
-      send feed.pid, :update
+      send(feed.pid, :update)
     end
   end
 
@@ -29,38 +29,33 @@ defmodule ExRss.Crawler.QueueTest do
     assert Queue.timeout([%{next_update_at: nil}]) == 0
 
     duration = Timex.Duration.from_milliseconds(15_000)
-    soon = DateTime.utc_now |> Timex.add(duration)
+    soon = DateTime.utc_now() |> Timex.add(duration)
     assert_in_delta Queue.timeout([%{next_update_at: soon}]), 15_000, 100
   end
 
   test "sends message without next_update_at to updater immediately" do
-    {:ok, pid} =
-      Queue.start_link(store: TestStore, updater: TestUpdater)
+    {:ok, pid} = Queue.start_link(store: TestStore, updater: TestUpdater)
 
-    feed =
-      %{title: "Test feed",
-        url: "http://example.com",
-        next_update_at: nil,
-        pid: self()}
+    feed = %{title: "Test feed", url: "http://example.com", next_update_at: nil, pid: self()}
 
-    GenServer.cast pid, {:add_feed, feed}
+    GenServer.cast(pid, {:add_feed, feed})
 
     assert_receive :update
   end
 
   test "sends message to updater with delay" do
-    {:ok, pid} =
-      Queue.start_link(store: TestStore, updater: TestUpdater)
+    {:ok, pid} = Queue.start_link(store: TestStore, updater: TestUpdater)
 
-    next_update_at = Timex.shift(DateTime.utc_now, milliseconds: 200)
+    next_update_at = Timex.shift(DateTime.utc_now(), milliseconds: 200)
 
-    feed =
-      %{title: "Test feed",
-        url: "http://example.com",
-        next_update_at: next_update_at,
-        pid: self()}
+    feed = %{
+      title: "Test feed",
+      url: "http://example.com",
+      next_update_at: next_update_at,
+      pid: self()
+    }
 
-    GenServer.cast pid, {:add_feed, feed}
+    GenServer.cast(pid, {:add_feed, feed})
 
     assert_receive :update, 200
   end

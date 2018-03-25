@@ -31,20 +31,23 @@ defmodule ExRss.Entry do
   end
 
   def parse(entry) do
-    now = DateTime.utc_now
+    now = DateTime.utc_now()
+
     posted_at =
       case parse_time(entry.updated) do
         {:ok, parsed_time} -> parsed_time
         {:error, _} -> nil
       end
 
-    %{title: entry.title,
+    %{
+      title: entry.title,
       url: entry.link,
       raw_posted_at: entry.updated,
       posted_at: posted_at,
       read: false,
       inserted_at: now,
-      updated_at: now}
+      updated_at: now
+    }
   end
 
   def parse_time(time) do
