@@ -50,14 +50,30 @@ defmodule ExRss.Entry do
     }
   end
 
-  def parse_time(time) do
+  @time_formats [
     # Tue, 03 Jan 2017 14:55:00 +0100
-    case Timex.parse(time, "%a, %d %b %Y %H:%M:%S %z", :strftime) do
-      {:ok, posted_at} ->
-        {:ok, posted_at |> Timex.Timezone.convert("Etc/UTC")}
+    "%a, %d %b %Y %H:%M:%S %z",
+    # Sun, 13 Nov 2016 21:00:00 GMT
+    "%a, %d %b %Y %H:%M:%S %Z"
+  ]
 
-      {:error, _} = error ->
-        error
+  def parse_time(time) do
+    parse_time(time, @time_formats)
+  end
+
+  def parse_time(time, formats) do
+    case formats do
+      [] ->
+        {:error, :no_format_found}
+
+      [head | tail] ->
+        case Timex.parse(time, head, :strftime) do
+          {:ok, posted_at} ->
+            {:ok, posted_at |> Timex.Timezone.convert("Etc/UTC")}
+
+          {:error, _} ->
+            parse_time(time, tail)
+        end
     end
   end
 end
