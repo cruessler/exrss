@@ -60,7 +60,8 @@ defmodule ExRss.Mixfile do
       {:feeder_ex, "~> 1.0.0"},
       {:httpoison, "~> 0.10.0"},
       {:timex, "~> 3.1"},
-      {:comeonin, "~> 3.0"}
+      {:comeonin, "~> 3.0"},
+      {:mix_test_watch, "~> 0.6", only: :dev, runtime: false}
     ]
   end
 
