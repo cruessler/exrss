@@ -1,6 +1,14 @@
 defmodule ExRss.Api.V1.FeedControllerTest do
   use ExRss.ConnCase
 
+  alias ExRss.User
+
+  setup do
+    Repo.insert!(%User{id: 1, email: "jane@doe.com"})
+
+    :ok
+  end
+
   test "POST /feeds return new feed on success", %{conn: conn} do
     conn =
       conn
