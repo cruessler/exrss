@@ -50,17 +50,28 @@ defmodule ExRss.FeedAdder do
   end
 
   def extract_feeds(html) do
+    (rss_feeds(html) ++ atom_feeds(html))
+    |> Enum.map(&extract_feed/1)
+    |> Enum.reject(&is_nil/1)
+  end
+
+  def extract_feed(feed) do
+    with [title] <- Floki.attribute(feed, "title"),
+         [href] <- Floki.attribute(feed, "href") do
+      %{title: title, href: href}
+    else
+      [] -> nil
+    end
+  end
+
+  def rss_feeds(html) do
     html
     |> Floki.find("link[rel=alternate][type='application/rss+xml']")
-    |> Enum.map(fn feed ->
-      with [title] <- Floki.attribute(feed, "title"),
-           [href] <- Floki.attribute(feed, "href") do
-        %{title: title, href: href}
-      else
-        [] -> nil
-      end
-    end)
-    |> Enum.reject(&is_nil(&1))
+  end
+
+  def atom_feeds(html) do
+    html
+    |> Floki.find("link[rel=alternate][type='application/atom+xml']")
   end
 
   def add_frequency_info(feed) do

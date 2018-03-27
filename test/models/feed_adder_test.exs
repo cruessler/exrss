@@ -14,7 +14,7 @@ defmodule ExRss.FeedAdderTest do
         href="/feed/rss.xml" />
       <link
         rel="alternate"
-        type="application/rss+xml"
+        type="application/atom+xml"
         title="Atom"
         href="/feed/atom.xml" />
     </head>
