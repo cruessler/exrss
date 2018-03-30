@@ -1,9 +1,8 @@
 defmodule ExRss.Api.V1.FeedController do
   use ExRss.Web, :controller
 
-  alias ExRss.Feed
+  alias ExRss.{Entry, Feed, User}
   alias ExRss.FeedAdder
-  alias ExRss.User
 
   def discover(conn, %{"url" => url}) do
     case FeedAdder.discover_feeds(url) do
@@ -36,5 +35,15 @@ defmodule ExRss.Api.V1.FeedController do
         |> resp(:bad_request, "")
         |> halt()
     end
+  end
+
+  def delete(conn, %{"id" => feed_id}) do
+    User
+    |> Repo.get!(conn.assigns.current_account.id)
+    |> Ecto.assoc(:feeds)
+    |> Repo.get!(feed_id)
+    |> Repo.delete!()
+
+    json(conn, nil)
   end
 end
