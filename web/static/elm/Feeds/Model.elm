@@ -1,4 +1,9 @@
-module Feeds.Model exposing (Model, Visibility(..))
+module Feeds.Model
+    exposing
+        ( Model
+        , Visibility(..)
+        , Request(..)
+        )
 
 import Api
 import Dict exposing (Dict)
@@ -12,12 +17,16 @@ type Visibility
     | HideReadEntries
 
 
+type Request
+    = Discovery Discovery
+    | Addition Addition
+
+
 type alias Model =
     { apiConfig : Api.Config
     , visibility : Visibility
     , feeds : Dict Int Feed
     , showOptions : Bool
     , discoveryUrl : String
-    , discoveryRequests : Dict String Discovery
-    , additionRequests : Dict String Addition
+    , requests : Dict String Request
     }

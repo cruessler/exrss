@@ -1,4 +1,8 @@
-module Feeds.Options.Discovery exposing (view)
+module Feeds.Options.Discovery
+    exposing
+        ( newFeedFieldset
+        , requestFieldset
+        )
 
 import Dict exposing (Dict)
 import Feeds.Discovery as Discovery exposing (Discovery)
@@ -163,15 +167,3 @@ requestFieldset request =
 
         Done (Err error) ->
             errorFieldset error
-
-
-view : String -> Dict String Discovery -> Html Msg
-view discoveryUrl requests =
-    let
-        requestFieldsets =
-            List.map requestFieldset <| Dict.values requests
-    in
-        if Dict.isEmpty requests then
-            newFeedFieldset discoveryUrl
-        else
-            H.div [] <| (newFeedFieldset discoveryUrl) :: requestFieldsets

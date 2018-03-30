@@ -1,11 +1,10 @@
 module Feeds.Options exposing (view)
 
 import Dict exposing (Dict)
-import Feeds.Discovery as Discovery exposing (Discovery)
-import Feeds.Model exposing (..)
+import Feeds.Model as Model exposing (..)
 import Feeds.Msg exposing (..)
-import Feeds.Options.Addition
-import Feeds.Options.Discovery
+import Feeds.Options.Addition as Addition
+import Feeds.Options.Discovery as Discovery
 import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
@@ -46,6 +45,21 @@ visibilityFieldset visibility =
         ]
 
 
+requests : Dict String Model.Request -> Html Msg
+requests =
+    Dict.map
+        (\_ r ->
+            case r of
+                Model.Discovery d ->
+                    Discovery.requestFieldset d
+
+                Model.Addition a ->
+                    Addition.requestFieldset a
+        )
+        >> Dict.values
+        >> H.div []
+
+
 view : Model -> Html Msg
 view model =
     let
@@ -64,9 +78,7 @@ view model =
             , collapsible
                 model.showOptions
                 [ visibilityFieldset model.visibility
-                , Feeds.Options.Discovery.view
-                    model.discoveryUrl
-                    model.discoveryRequests
-                , Feeds.Options.Addition.view model.additionRequests
+                , Discovery.newFeedFieldset model.discoveryUrl
+                , requests model.requests
                 ]
             ]

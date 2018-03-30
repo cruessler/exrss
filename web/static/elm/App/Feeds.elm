@@ -4,8 +4,8 @@ import Api
 import Dict exposing (Dict)
 import Feeds.Addition as Addition
 import Feeds.Discovery as Discovery
-import Feeds.Model exposing (..)
-import Feeds.Msg exposing (..)
+import Feeds.Model as Model exposing (..)
+import Feeds.Msg as Msg exposing (..)
 import Feeds.View as View
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -53,8 +53,7 @@ init flags =
           , feeds = feeds
           , showOptions = True
           , discoveryUrl = ""
-          , discoveryRequests = Dict.empty
-          , additionRequests = Dict.empty
+          , requests = Dict.empty
           }
         , Cmd.none
         )
@@ -106,12 +105,12 @@ update msg model =
                     newRequests =
                         Dict.insert
                             url
-                            (Request.InProgress url)
-                            model.discoveryRequests
+                            (Model.Discovery <| Request.InProgress url)
+                            model.requests
                 in
-                    ( { model | discoveryRequests = newRequests }
+                    ( { model | requests = newRequests }
                     , Discovery.get model.apiConfig url
-                        |> Task.attempt Discovery
+                        |> Task.attempt Msg.Discovery
                     )
 
         AddFeed candidate ->
@@ -119,25 +118,21 @@ update msg model =
                 newRequests =
                     Dict.insert
                         candidate.url
-                        (Request.InProgress candidate)
-                        model.additionRequests
+                        (Model.Addition <| Request.InProgress candidate)
+                        model.requests
             in
-                ( { model | additionRequests = newRequests }
+                ( { model | requests = newRequests }
                 , Addition.post model.apiConfig candidate
-                    |> Task.attempt Addition
+                    |> Task.attempt Msg.Addition
                 )
 
         RemoveResponse url ->
             let
-                newAdditionRequests =
-                    Dict.remove url model.additionRequests
-
-                newDiscoveryRequests =
-                    Dict.remove url model.discoveryRequests
+                newRequests =
+                    Dict.remove url model.requests
             in
                 ( { model
-                    | additionRequests = newAdditionRequests
-                    , discoveryRequests = newDiscoveryRequests
+                    | requests = newRequests
                   }
                 , Cmd.none
                 )
@@ -180,7 +175,7 @@ update msg model =
         PatchEntry (Err _) ->
             ( model, Cmd.none )
 
-        Discovery result ->
+        Msg.Discovery result ->
             let
                 url =
                     case result of
@@ -193,12 +188,12 @@ update msg model =
                 newRequests =
                     Dict.insert
                         url
-                        (Done result)
-                        model.discoveryRequests
+                        (Model.Discovery <| Done result)
+                        model.requests
             in
-                ( { model | discoveryRequests = newRequests }, Cmd.none )
+                ( { model | requests = newRequests }, Cmd.none )
 
-        Addition result ->
+        Msg.Addition result ->
             let
                 url =
                     case result of
@@ -211,7 +206,7 @@ update msg model =
                 newRequests =
                     Dict.insert
                         url
-                        (Done result)
-                        model.additionRequests
+                        (Model.Addition <| Done result)
+                        model.requests
             in
-                ( { model | additionRequests = newRequests }, Cmd.none )
+                ( { model | requests = newRequests }, Cmd.none )

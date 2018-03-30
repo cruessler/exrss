@@ -1,4 +1,4 @@
-module Feeds.Options.Addition exposing (view)
+module Feeds.Options.Addition exposing (requestFieldset)
 
 import Dict exposing (Dict)
 import Feeds.Addition as Addition exposing (Addition)
@@ -68,11 +68,3 @@ requestFieldset request =
 
         Done (Err error) ->
             errorFieldset error
-
-
-view : Dict String Addition -> Html Msg
-view requests =
-    if Dict.isEmpty requests then
-        H.text ""
-    else
-        H.div [] <| List.map requestFieldset <| Dict.values requests
