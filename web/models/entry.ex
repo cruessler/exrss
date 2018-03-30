@@ -50,11 +50,17 @@ defmodule ExRss.Entry do
     }
   end
 
+  # For details on available directives, see
+  # https://hexdocs.pm/timex/Timex.Format.DateTime.Formatters.Strftime.html
   @time_formats [
     # Tue, 03 Jan 2017 14:55:00 +0100
     "%a, %d %b %Y %H:%M:%S %z",
     # Sun, 13 Nov 2016 21:00:00 GMT
-    "%a, %d %b %Y %H:%M:%S %Z"
+    "%a, %d %b %Y %H:%M:%S %Z",
+    # Internet date/time format as specified by RFC 3339
+    # See https://tools.ietf.org/html/rfc3339
+    # 2018-01-13T19:05:08+00:00
+    "%Y-%m-%dT%H:%M:%S%:z"
   ]
 
   def parse_time(time) do
