@@ -7,6 +7,10 @@
   <p>
     Hello <%= @current_user.email %>!
   </p>
+  <p>
+    Your feeds can be found at <a href="<%= feed_path(@conn, :index) %>">
+      <%= feed_path(@conn, :index) %></a>.
+  </p>
 <% else %>
   <p>
     Right now, there is not much you can do. Maybe you want to
