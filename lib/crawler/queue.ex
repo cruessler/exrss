@@ -113,11 +113,24 @@ defmodule ExRss.Crawler.Queue do
     {:noreply, %{state | feeds: new_queue}, timeout(new_queue)}
   end
 
+  def handle_cast({:remove_feed, feed}, %{feeds: feeds} = state) do
+    Logger.info("Removing feed #{feed.title} (#{feed.url})")
+
+    new_queue = remove(feeds, feed)
+
+    {:noreply, %{state | feeds: new_queue}, timeout(new_queue)}
+  end
+
   def insert(queue, feed) do
     [feed | queue]
     |> Enum.sort(fn a, b ->
       Timex.compare(a.next_update_at, b.next_update_at) == -1
     end)
+  end
+
+  def remove(queue, feed) do
+    queue
+    |> Enum.reject(fn f -> f.id == feed.id end)
   end
 
   def timeout([%{next_update_at: nil} | _]) do
