@@ -100,7 +100,7 @@ defmodule ExRss.FeedAdder do
       end)
 
     try do
-      {min_date, max_date} = Enum.min_max(entries)
+      {min_date, max_date} = Enum.min_max_by(entries, &Timex.to_gregorian_microseconds/1)
 
       %{posts: Enum.count(entries), seconds: Timex.diff(max_date, min_date, :seconds)}
     rescue
