@@ -1,13 +1,21 @@
 /* This file is for your main application css. */
 
-@import "bootstrap";
-
 /* Hide Phoenix flash messages. */
 .alert:empty { display: none; }
 
+* {
+  box-sizing: border-box;
+  font-family: Lato, Raleway, -apple-system, system, sans-serif;
+}
+
 html {
+  background-color: rgb(250, 250, 250);
+
   font-size: 14px;
 }
+
+$black: rgb(0, 0, 0);
+$gray-light: rgb(99, 108, 114);
 
 @import "_feed";
 @import "_options";

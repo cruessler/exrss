@@ -15,7 +15,6 @@ close : String -> Html Msg
 close url =
     H.button
         [ A.type_ "button"
-        , A.class "close"
         , E.onClick <| RemoveResponse url
         ]
         [ H.text "×" ]
@@ -23,7 +22,7 @@ close url =
 
 inProgressFieldset : Candidate -> Html Msg
 inProgressFieldset candidate =
-    H.fieldset [ A.class "form-group" ]
+    H.fieldset []
         [ H.legend [] [ H.text "This feed is being added" ]
         , H.p []
             [ H.text "Waiting for answer for "
@@ -35,7 +34,7 @@ inProgressFieldset candidate =
 
 successFieldset : Addition.Success -> Html Msg
 successFieldset success =
-    H.fieldset [ A.class "form-group" ]
+    H.fieldset []
         [ H.legend [] [ H.text "This feed has been added" ]
         , H.code [] [ H.text success.candidate.url ]
         , close success.candidate.url
@@ -44,7 +43,7 @@ successFieldset success =
 
 errorFieldset : Addition.Error -> Html Msg
 errorFieldset error =
-    H.fieldset [ A.class "form-group" ]
+    H.fieldset []
         [ H.legend [] [ H.text "This feed could not be added" ]
         , H.p []
             [ H.text "It was not possible to add the feed at "
@@ -53,9 +52,7 @@ errorFieldset error =
             ]
         , close error.candidate.url
         , H.button
-            [ A.class "btn btn-primary btn-sm"
-            , E.onClick <| AddFeed error.candidate
-            ]
+            [ E.onClick <| AddFeed error.candidate ]
             [ H.text "Retry" ]
         ]
 

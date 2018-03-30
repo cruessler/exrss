@@ -52,9 +52,7 @@ additionalInfo feed =
             else
                 toString (length) ++ " entries"
     in
-        H.small
-            [ A.class "text-muted" ]
-            [ H.text infoText ]
+        H.small [] [ H.text infoText ]
 
 
 feed : Visibility -> Feed -> Html Msg

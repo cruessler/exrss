@@ -16,7 +16,6 @@ close : String -> Html Msg
 close url =
     H.button
         [ A.type_ "button"
-        , A.class "close"
         , E.onClick <| RemoveResponse url
         ]
         [ H.text "×" ]
@@ -36,29 +35,24 @@ onEnter msg =
 
 newFeedFieldset : String -> Html Msg
 newFeedFieldset discoveryUrl =
-    H.fieldset [ A.class "form-group" ]
+    H.fieldset []
         [ H.legend [] [ H.text "Discover feeds on a site" ]
         , H.label
-            [ A.for "feed-url"
-            , A.class "form-control-label"
-            ]
+            [ A.for "feed-url" ]
             [ H.text "Address to discover feeds on" ]
         , H.input
             [ A.id "feed-url"
             , A.type_ "url"
-            , A.class "form-control"
             , A.value discoveryUrl
             , E.onInput SetDiscoveryUrl
             , onEnter <| DiscoverFeeds discoveryUrl
             ]
             []
         , H.button
-            [ A.class "btn btn-primary btn-sm"
-            , E.onClick <| DiscoverFeeds discoveryUrl
-            ]
+            [ E.onClick <| DiscoverFeeds discoveryUrl ]
             [ H.text "Discover" ]
         , H.p
-            [ A.class "form-text text-muted" ]
+            []
             [ H.text "Enter the address of a site that contains one or more feeds. "
             , H.text "Make sure it starts with "
             , H.code [] [ H.text "http://" ]
@@ -71,7 +65,7 @@ newFeedFieldset discoveryUrl =
 
 inProgressFieldset : String -> Html Msg
 inProgressFieldset url =
-    H.fieldset [ A.class "form-group" ]
+    H.fieldset []
         [ H.legend [] [ H.text "This url is being looked up" ]
         , H.p []
             [ H.text "Waiting for answer for "
@@ -112,7 +106,6 @@ addableFeed candidate =
         , H.p [] [ H.code [] [ H.text candidate.url ] ]
         , H.button
             [ A.type_ "button"
-            , A.class "btn btn-primary btn-sm"
             , E.onClick <| AddFeed candidate
             ]
             [ H.text "Add" ]
@@ -122,7 +115,7 @@ addableFeed candidate =
 successFieldset : Discovery.Success -> Html Msg
 successFieldset success =
     if List.isEmpty success.candidates then
-        H.fieldset [ A.class "form-group" ]
+        H.fieldset []
             [ H.legend [] [ H.text "No feeds found" ]
             , H.p []
                 [ H.text "The page at "
@@ -136,7 +129,7 @@ successFieldset success =
             children =
                 List.map addableFeed success.candidates
         in
-            H.fieldset [ A.class "form-group" ]
+            H.fieldset []
                 [ H.legend [] [ H.text "These feeds can be added" ]
                 , H.ul [] children
                 , close success.url
@@ -145,7 +138,7 @@ successFieldset success =
 
 errorFieldset : Discovery.Error -> Html Msg
 errorFieldset error =
-    H.fieldset [ A.class "form-group" ]
+    H.fieldset []
         [ H.legend [] [ H.text "The lookup for a url failed" ]
         , H.p []
             [ H.text "It was not possible to discover feeds on "
@@ -154,9 +147,7 @@ errorFieldset error =
             ]
         , close error.url
         , H.button
-            [ A.class "btn btn-primary btn-sm"
-            , E.onClick <| DiscoverFeeds error.url
-            ]
+            [ E.onClick <| DiscoverFeeds error.url ]
             [ H.text "Retry" ]
         ]
 

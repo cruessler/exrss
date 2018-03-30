@@ -15,12 +15,11 @@ import Types.Feed exposing (..)
 
 radio : Visibility -> Visibility -> String -> Html Msg
 radio currentVisibility visibility text_ =
-    H.div [ A.class "form-check" ]
+    H.div []
         [ H.label
-            [ A.class "form-check-label" ]
+            []
             [ H.input
                 [ A.type_ "radio"
-                , A.class "form-check-input"
                 , A.checked (visibility == currentVisibility)
                 , E.onClick (SetVisibility visibility)
                 ]
@@ -32,18 +31,15 @@ radio currentVisibility visibility text_ =
 
 collapsible : Bool -> List (Html Msg) -> Html Msg
 collapsible show children =
-    H.div
-        [ A.classList
-            [ ( "collapse", True )
-            , ( "show", show )
-            ]
-        ]
-        [ H.div [ A.class "card card-block" ] children ]
+    if show then
+        H.div [] children
+    else
+        H.div [] []
 
 
 visibilityFieldset : Visibility -> Html Msg
 visibilityFieldset visibility =
-    H.fieldset [ A.class "form-group" ]
+    H.fieldset []
         [ H.legend [] [ H.text "Visibility" ]
         , radio visibility ShowAllEntries "Show all entries"
         , radio visibility HideReadEntries "Hide read entries"
@@ -62,7 +58,6 @@ view model =
         H.div []
             [ H.button
                 [ A.type_ "button"
-                , A.class "btn btn-primary btn-sm"
                 , E.onClick ToggleOptions
                 ]
                 [ H.text buttonText ]
