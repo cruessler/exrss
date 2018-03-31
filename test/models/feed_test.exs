@@ -2,7 +2,7 @@ defmodule ExRss.FeedTest do
   use ExRss.ModelCase
 
   alias Ecto.Changeset
-  alias ExRss.Feed
+  alias ExRss.{Entry, Feed, User}
   alias Timex.Duration
 
   @valid_attrs %{title: "some content", url: "some content"}
@@ -80,5 +80,39 @@ defmodule ExRss.FeedTest do
 
     assert Changeset.get_field(changeset, :retries) == 0
     assert_in_delta diff, @timeout, 100
+  end
+
+  setup do
+    Repo.insert!(%User{id: 1, email: "jane@doe.com"})
+    Repo.insert!(%Feed{id: 1, user_id: 1, title: "Title", url: "http://example.com"})
+
+    Repo.insert!(%Entry{
+      id: 1,
+      url: "http://example.com/1",
+      title: "Title",
+      raw_posted_at: "Sun, 21 Dec 2014 16:08:00 +0100",
+      read: false,
+      feed_id: 1
+    })
+
+    Repo.insert!(%Entry{
+      id: 2,
+      url: "http://example.com/2",
+      title: "Title 2",
+      raw_posted_at: "Sun, 21 Dec 2015 16:08:00 +0100",
+      read: false,
+      feed_id: 1
+    })
+
+    :ok
+  end
+
+  test "mark_as_read" do
+    changeset =
+      Repo.get!(Feed, 1)
+      |> Repo.preload(:entries)
+      |> Feed.mark_as_read()
+
+    for e <- Changeset.get_field(changeset, :entries), do: assert e.read == true
   end
 end

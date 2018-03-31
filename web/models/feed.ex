@@ -12,14 +12,14 @@ defmodule ExRss.Feed do
   @derive {Poison.Encoder, only: [:id, :title, :url, :entries]}
 
   schema "feeds" do
-    field :title, :string
-    field :url, :string
-    field :next_update_at, :utc_datetime
-    field :retries, :integer
+    field(:title, :string)
+    field(:url, :string)
+    field(:next_update_at, :utc_datetime)
+    field(:retries, :integer)
 
-    belongs_to :user, User
+    belongs_to(:user, User)
 
-    has_many :entries, Entry
+    has_many(:entries, Entry)
 
     timestamps()
   end
@@ -33,6 +33,14 @@ defmodule ExRss.Feed do
     |> validate_required([:user_id, :title, :url])
     |> assoc_constraint(:user)
     |> unique_constraint(:url)
+  end
+
+  def mark_as_read(feed) do
+    entries = for e <- feed.entries, do: Changeset.change(e, read: true)
+
+    feed
+    |> Changeset.change([])
+    |> Changeset.put_assoc(:entries, entries)
   end
 
   def schedule_update_on_error(changeset) do
