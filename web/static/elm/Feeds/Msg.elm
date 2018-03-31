@@ -19,7 +19,9 @@ type Msg
     | ToggleFeed Feed
     | RemoveFeed Feed
     | MarkAsRead Entry
+    | MarkFeedAsRead Feed
     | PatchEntry (Result Http.Error Entry)
+    | PatchFeed (Result Http.Error Feed)
     | Discovery (Result Discovery.Error Discovery.Success)
     | Addition (Result Addition.Error Addition.Success)
     | Removal (Result Removal.Error Removal.Success)

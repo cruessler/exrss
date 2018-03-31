@@ -86,6 +86,25 @@ patchEntry apiConfig entry =
         |> Http.send PatchEntry
 
 
+markFeedAsRead : Api.Config -> Feed -> Cmd Msg
+markFeedAsRead apiConfig feed =
+    let
+        encodeFeed =
+            Encode.object
+                [ ( "feed"
+                  , Encode.object [ ( "read", Encode.bool True ) ]
+                  )
+                ]
+    in
+        Api.patch
+            apiConfig
+            { url = Paths.feed feed
+            , params = encodeFeed
+            , decoder = Types.Feed.decodeFeed
+            }
+            |> Http.send PatchFeed
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -176,6 +195,22 @@ update msg model =
             in
                 ( { model | feeds = newFeeds }, cmd )
 
+        MarkFeedAsRead feed ->
+            let
+                newEntries =
+                    Dict.map
+                        (\_ entry -> { entry | read = True, status = UpdatePending })
+                        feed.entries
+
+                newFeeds =
+                    Dict.insert feed.id { feed | entries = newEntries } model.feeds
+
+                cmd =
+                    feed
+                        |> markFeedAsRead model.apiConfig
+            in
+                ( { model | feeds = newFeeds }, cmd )
+
         PatchEntry (Ok newEntry) ->
             let
                 newFeeds =
@@ -187,6 +222,16 @@ update msg model =
                 ( { model | feeds = newFeeds }, Cmd.none )
 
         PatchEntry (Err _) ->
+            ( model, Cmd.none )
+
+        PatchFeed (Ok newFeed) ->
+            let
+                newFeeds =
+                    Dict.insert newFeed.id newFeed model.feeds
+            in
+                ( { model | feeds = newFeeds }, Cmd.none )
+
+        PatchFeed (Err _) ->
             ( model, Cmd.none )
 
         Msg.Discovery result ->

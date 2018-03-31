@@ -6,6 +6,7 @@ module Types.Feed
         , Candidate
         , Frequency
         , decodeFeeds
+        , decodeFeed
         , decodeEntry
         , decodeCandidates
         , encodeCandidate

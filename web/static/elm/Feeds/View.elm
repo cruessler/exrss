@@ -55,9 +55,11 @@ additionalInfo feed =
         H.small [] [ H.text infoText ]
 
 
-actions : Feed -> Html Msg
+actions : Feed -> List (Html Msg)
 actions feed =
-    H.button [ E.onClick (RemoveFeed feed) ] [ H.text "Remove" ]
+    [ H.button [ E.onClick (RemoveFeed feed) ] [ H.text "Remove" ]
+    , H.button [ E.onClick (MarkFeedAsRead feed) ] [ H.text "Mark as read" ]
+    ]
 
 
 feed : Visibility -> Feed -> Html Msg
@@ -79,10 +81,11 @@ feed visibility feed =
             [ A.class "feed" ]
             [ H.h1
                 [ E.onClick (ToggleFeed feed) ]
-                [ H.text feed.title
-                , additionalInfo feed
-                , actions feed
-                ]
+                ([ H.text feed.title
+                 , additionalInfo feed
+                 ]
+                    ++ actions feed
+                )
             , feed_
             ]
 
