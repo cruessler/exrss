@@ -5,6 +5,7 @@ module Api
         , get
         , post
         , patch
+        , delete
         )
 
 {-| @docs get, post, patch, send
@@ -31,6 +32,7 @@ type Method
     = Get
     | Post
     | Patch
+    | Delete
 
 
 config : String -> Config
@@ -49,6 +51,9 @@ toString method =
 
         Patch ->
             "PATCH"
+
+        Delete ->
+            "DELETE"
 
 
 {-| Create a task for sending a GET request to a url.
@@ -70,6 +75,13 @@ post =
 patch : Config -> Request a -> Http.Request a
 patch =
     send Patch
+
+
+{-| Create a task for sending a DELETE request to a url.
+-}
+delete : Config -> Request a -> Http.Request a
+delete =
+    send Delete
 
 
 {-| Create a task for sending a request to a url.
