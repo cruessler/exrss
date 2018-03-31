@@ -39,6 +39,30 @@ defmodule ExRss.Api.V1.FeedControllerTest do
     assert %{"errors" => %{"title" => _, "url" => _}} = response
   end
 
+  test "PATCH /feeds/1 marks entries as read", %{conn: conn} do
+    conn =
+      conn
+      |> with_authorization
+      |> patch("/api/v1/feeds/1", feed: [read: true])
+
+    response = json_response(conn, 200)
+
+    assert %{
+             "entries" => [
+               %{
+                 "id" => 1,
+                 "posted_at" => nil,
+                 "read" => true,
+                 "title" => "Title",
+                 "url" => "http://example.com/1"
+               }
+             ],
+             "id" => 1,
+             "title" => "Title",
+             "url" => "http://example.com"
+           } = response
+  end
+
   test "DELETE /feeds/1 succeeds", %{conn: conn} do
     conn =
       conn
