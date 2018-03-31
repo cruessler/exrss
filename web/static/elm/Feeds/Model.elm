@@ -9,6 +9,7 @@ import Api
 import Dict exposing (Dict)
 import Feeds.Addition exposing (Addition)
 import Feeds.Discovery exposing (Discovery)
+import Feeds.Removal exposing (Removal)
 import Types.Feed exposing (..)
 
 
@@ -20,6 +21,7 @@ type Visibility
 type Request
     = Discovery Discovery
     | Addition Addition
+    | Removal Removal
 
 
 type alias Model =

@@ -55,6 +55,11 @@ additionalInfo feed =
         H.small [] [ H.text infoText ]
 
 
+actions : Feed -> Html Msg
+actions feed =
+    H.button [ E.onClick (RemoveFeed feed) ] [ H.text "Remove" ]
+
+
 feed : Visibility -> Feed -> Html Msg
 feed visibility feed =
     let
@@ -76,6 +81,7 @@ feed visibility feed =
                 [ E.onClick (ToggleFeed feed) ]
                 [ H.text feed.title
                 , additionalInfo feed
+                , actions feed
                 ]
             , feed_
             ]

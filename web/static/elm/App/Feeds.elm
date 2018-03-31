@@ -4,6 +4,7 @@ import Api
 import Dict exposing (Dict)
 import Feeds.Addition as Addition
 import Feeds.Discovery as Discovery
+import Feeds.Removal as Removal
 import Feeds.Model as Model exposing (..)
 import Feeds.Msg as Msg exposing (..)
 import Feeds.View as View
@@ -126,6 +127,19 @@ update msg model =
                     |> Task.attempt Msg.Addition
                 )
 
+        RemoveFeed feed ->
+            let
+                newRequests =
+                    Dict.insert
+                        feed.url
+                        (Model.Removal <| Request.InProgress feed)
+                        model.requests
+            in
+                ( { model | requests = newRequests }
+                , Removal.delete model.apiConfig feed
+                    |> Task.attempt Msg.Removal
+                )
+
         RemoveResponse url ->
             let
                 newRequests =
@@ -207,6 +221,24 @@ update msg model =
                     Dict.insert
                         url
                         (Model.Addition <| Done result)
+                        model.requests
+            in
+                ( { model | requests = newRequests }, Cmd.none )
+
+        Msg.Removal result ->
+            let
+                url =
+                    case result of
+                        Ok success ->
+                            success.feed.url
+
+                        Err error ->
+                            error.feed.url
+
+                newRequests =
+                    Dict.insert
+                        url
+                        (Model.Removal <| Done result)
                         model.requests
             in
                 ( { model | requests = newRequests }, Cmd.none )
