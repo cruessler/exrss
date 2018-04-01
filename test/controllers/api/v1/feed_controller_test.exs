@@ -26,7 +26,7 @@ defmodule ExRss.Api.V1.FeedControllerTest do
       |> post("/api/v1/feeds", feed: [title: "Title", url: "http://www.example.com"])
 
     response = json_response(conn, 200)
-    assert %{"id" => _, "title" => "Title"} = response
+    assert %{"id" => _, "title" => "Title", "entries" => []} = response
   end
 
   test "POST /feeds returns errors on failure", %{conn: conn} do

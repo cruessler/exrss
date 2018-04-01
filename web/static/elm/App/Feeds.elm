@@ -267,8 +267,16 @@ update msg model =
                         url
                         (Model.Addition <| Done result)
                         model.requests
+
+                newFeeds =
+                    case result of
+                        Ok { feed } ->
+                            Dict.insert feed.id feed model.feeds
+
+                        _ ->
+                            model.feeds
             in
-                ( { model | requests = newRequests }, Cmd.none )
+                ( { model | feeds = newFeeds, requests = newRequests }, Cmd.none )
 
         Msg.Removal result ->
             let

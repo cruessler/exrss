@@ -23,7 +23,9 @@ defmodule ExRss.Api.V1.FeedController do
 
     case Repo.transaction(multi) do
       {:ok, %{feed: feed}} ->
-        json(conn, Map.take(feed, [:id, :url, :title]))
+        feed = feed |> Map.take([:id, :url, :title]) |> Map.put(:entries, [])
+
+        json(conn, feed)
 
       {:error, :feed, changeset, _} ->
         conn

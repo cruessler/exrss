@@ -21,7 +21,7 @@ type alias Error =
 
 
 type alias Success =
-    { candidate : Candidate
+    { feed : Feed
     }
 
 
@@ -52,6 +52,6 @@ post apiConfig candidate =
         Api.post apiConfig
             { url = Paths.createFeed
             , params = Types.Feed.encodeCandidate candidate
-            , decoder = Decode.succeed <| Success candidate
+            , decoder = Types.Feed.decodeFeed |> Decode.map Success
             }
             |> fromApi error

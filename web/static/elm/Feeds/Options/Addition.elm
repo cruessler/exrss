@@ -36,8 +36,8 @@ successFieldset : Addition.Success -> Html Msg
 successFieldset success =
     H.fieldset []
         [ H.legend [] [ H.text "This feed has been added" ]
-        , H.code [] [ H.text success.candidate.url ]
-        , close success.candidate.url
+        , H.code [] [ H.text success.feed.url ]
+        , close success.feed.url
         ]
 
 
