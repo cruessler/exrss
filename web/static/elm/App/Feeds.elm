@@ -293,5 +293,13 @@ update msg model =
                         url
                         (Model.Removal <| Done result)
                         model.requests
+
+                newFeeds =
+                    case result of
+                        Ok { feed } ->
+                            Dict.remove feed.id model.feeds
+
+                        _ ->
+                            model.feeds
             in
-                ( { model | requests = newRequests }, Cmd.none )
+                ( { model | feeds = newFeeds, requests = newRequests }, Cmd.none )
