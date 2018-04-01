@@ -37,6 +37,9 @@ entry entry =
                 ]
                 [ H.text entry.title ]
             , H.p [] [ H.text postedAt ]
+            , H.button
+                [ E.onClick (MarkAsRead entry) ]
+                [ H.text "Mark as read" ]
             ]
 
 
