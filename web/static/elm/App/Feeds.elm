@@ -238,11 +238,11 @@ update msg model =
             let
                 url =
                     case result of
-                        Ok success ->
-                            success.url
+                        Ok { url } ->
+                            url
 
-                        Err error ->
-                            error.url
+                        Err { url } ->
+                            url
 
                 newRequests =
                     Dict.insert
@@ -256,11 +256,11 @@ update msg model =
             let
                 url =
                     case result of
-                        Ok success ->
-                            success.candidate.url
+                        Ok { feed } ->
+                            feed.url
 
-                        Err error ->
-                            error.candidate.url
+                        Err { candidate } ->
+                            candidate.url
 
                 newRequests =
                     Dict.insert
@@ -282,11 +282,11 @@ update msg model =
             let
                 url =
                     case result of
-                        Ok success ->
-                            success.feed.url
+                        Ok { feed } ->
+                            feed.url
 
-                        Err error ->
-                            error.feed.url
+                        Err { feed } ->
+                            feed.url
 
                 newRequests =
                     Dict.insert
