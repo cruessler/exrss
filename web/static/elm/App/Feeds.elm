@@ -52,7 +52,7 @@ init flags =
         ( { apiConfig = Api.config flags.apiToken
           , visibility = ShowAllEntries
           , feeds = feeds
-          , showOptions = True
+          , showOptions = False
           , discoveryUrl = ""
           , requests = Dict.empty
           }
