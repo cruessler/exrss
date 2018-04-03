@@ -99,7 +99,7 @@ view model =
         feeds =
             List.map (feed model.visibility) <| Dict.values model.feeds
     in
-        H.div []
+        H.main_ [ A.attribute "role" "main" ]
             [ Options.view model
             , H.ul [ A.class "feeds" ] feeds
             ]
