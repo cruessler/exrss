@@ -19,7 +19,7 @@ entry entry =
             entry.postedAt
                 |> Maybe.map
                     (Date.fromTime
-                        >> Date.Format.format "%B %e, %Y, %I:%M:%S %P"
+                        >> Date.Format.format "%B %e, %Y, %k:%M"
                     )
                 |> Maybe.withDefault "unknown"
     in
