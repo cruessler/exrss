@@ -1,25 +1,41 @@
+div.actions {
+  display: flex;
+  justify-content: end;
+
+  margin-top: 0.25rem;
+
+  button {
+    margin-left: 0.75rem;
+  }
+}
+
 ul.feeds {
   padding-left: 0px;
   list-style-type: none;
 
   li.feed {
-    h1 {
-      border-bottom: 1px solid $black;
+    display: flex;
+    flex-flow: column;
 
-      small {
-        display: block;
-      }
+    margin-top: 1rem;
+
+    h1 {
+      margin: 0;
     }
   }
 
   ul.feed {
+    display: flex;
+    flex-direction: column;
+
     padding-left: 0px;
     list-style-type: none;
 
     li.entry {
-      padding: .3rem;
-      padding-left: .2rem;
-      border-bottom: 1px solid $gray-light;
+      display: flex;
+      flex-direction: column;
+
+      margin-top: 1.25rem;
 
       &.read {
         opacity: 0.5;

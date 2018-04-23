@@ -22,6 +22,26 @@ entry entry =
                         >> Date.Format.format "%B %e, %Y, %k:%M"
                     )
                 |> Maybe.withDefault "unknown"
+
+        maybeButton =
+            if entry.read then
+                H.text ""
+            else
+                H.button
+                    [ E.onClick (MarkAsRead entry) ]
+                    [ H.text "Mark as read" ]
+
+        actions =
+            H.div [ A.class "actions" ]
+                [ H.a
+                    [ A.href entry.url
+                    , A.target "_blank"
+                    , A.class "button"
+                    , E.onClick (MarkAsRead entry)
+                    ]
+                    [ H.text "View" ]
+                , maybeButton
+                ]
     in
         H.li
             [ A.classList
@@ -36,10 +56,8 @@ entry entry =
                 , E.onClick (MarkAsRead entry)
                 ]
                 [ H.text entry.title ]
-            , H.p [] [ H.text postedAt ]
-            , H.button
-                [ E.onClick (MarkAsRead entry) ]
-                [ H.text "Mark as read" ]
+            , H.span [] [ H.text postedAt ]
+            , actions
             ]
 
 
@@ -55,14 +73,7 @@ additionalInfo feed =
             else
                 toString (length) ++ " entries"
     in
-        H.small [] [ H.text infoText ]
-
-
-actions : Feed -> List (Html Msg)
-actions feed =
-    [ H.button [ E.onClick (RemoveFeed feed) ] [ H.text "Remove" ]
-    , H.button [ E.onClick (MarkFeedAsRead feed) ] [ H.text "Mark as read" ]
-    ]
+        H.span [] [ H.text infoText ]
 
 
 feed : Visibility -> Feed -> Html Msg
@@ -79,18 +90,23 @@ feed visibility feed =
                 H.ul [ A.class "feed" ] (List.map entry entries)
             else
                 H.text ""
+
+        actions =
+            H.div [ A.class "actions" ]
+                [ H.button [ E.onClick (RemoveFeed feed) ] [ H.text "Remove" ]
+                , H.button [ E.onClick (MarkFeedAsRead feed) ] [ H.text "Mark as read" ]
+                ]
+
+        children =
+            [ H.h1 [ E.onClick (ToggleFeed feed) ] [ H.text feed.title ]
+            , additionalInfo feed
+            , actions
+            , feed_
+            ]
     in
         H.li
             [ A.class "feed" ]
-            [ H.h1
-                [ E.onClick (ToggleFeed feed) ]
-                ([ H.text feed.title
-                 , additionalInfo feed
-                 ]
-                    ++ actions feed
-                )
-            , feed_
-            ]
+            children
 
 
 view : Model -> Html Msg
