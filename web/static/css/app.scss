@@ -3,6 +3,9 @@
 /* Hide Phoenix flash messages. */
 .alert:empty { display: none; }
 
+$black: rgb(0, 0, 0);
+$gray-light: rgb(99, 108, 114);
+
 * {
   box-sizing: border-box;
   font-family: Raleway, -apple-system, system, sans-serif;
@@ -14,8 +17,27 @@ html {
   font-size: 14px;
 }
 
-$black: rgb(0, 0, 0);
-$gray-light: rgb(99, 108, 114);
+a {
+  text-decoration: none;
+  color: $black;
+
+  &:visited {
+    color: $black;
+  }
+}
+
+button, a.button {
+  border-width: 0;
+  margin: 0;
+  padding: 0;
+  padding: .375rem .75rem;
+
+  font-size: smaller;
+  font-weight: 800;
+
+  background-color: rgb(9, 86, 142);
+  color: rgb(255, 255, 255);
+}
 
 @import "_feed";
 @import "_options";
