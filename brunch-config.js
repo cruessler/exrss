@@ -77,5 +77,8 @@ exports.config = {
 
   npm: {
     enabled: true
-  }
+  },
+
+  // Don’t show desktop notifications.
+  notifications: false
 };
