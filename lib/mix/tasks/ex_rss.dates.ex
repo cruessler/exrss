@@ -43,6 +43,9 @@ defmodule Mix.Tasks.ExRss.Dates do
 
       opts[:parse] ->
         parse()
+
+      true ->
+        Mix.Task.run("help", ["ex_rss.dates"])
     end
   end
 
