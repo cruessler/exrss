@@ -79,11 +79,25 @@ additionalInfo feed =
 feed : Visibility -> Feed -> Html Msg
 feed visibility feed =
     let
+        compareByPostedAt a b =
+            case ( a.postedAt, b.postedAt ) of
+                ( Just x, Just y ) ->
+                    -- Flipping x and y saves a later call to `List.reverse`.
+                    compare y x
+
+                _ ->
+                    EQ
+
+        sortedEntries =
+            feed.entries
+                |> Dict.values
+                |> List.sortWith compareByPostedAt
+
         entries =
             if visibility == HideReadEntries then
-                List.filter (not << .read) <| Dict.values feed.entries
+                List.filter (not << .read) <| sortedEntries
             else
-                Dict.values feed.entries
+                sortedEntries
 
         feed_ =
             if feed.open then
