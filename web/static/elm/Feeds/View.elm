@@ -64,16 +64,36 @@ entry entry =
 additionalInfo : Feed -> Html Msg
 additionalInfo feed =
     let
-        length =
+        numberOfEntries =
             Dict.size feed.entries
 
+        numberOfUnreadEntries =
+            Dict.foldl
+                (\k v acc ->
+                    if v.read then
+                        acc
+                    else
+                        acc + 1
+                )
+                0
+                feed.entries
+
         infoText =
-            if length == 1 then
+            if numberOfEntries == 1 then
                 "1 entry"
             else
-                toString (length) ++ " entries"
+                toString (numberOfEntries) ++ " entries"
+
+        infoTextUnread =
+            if numberOfUnreadEntries == 0 then
+                ""
+            else
+                toString (numberOfUnreadEntries) ++ " unread"
     in
-        H.span [] [ H.text infoText ]
+        H.ul [ A.class "additional-info" ]
+            [ H.li [] [ H.text infoText ]
+            , H.li [] [ H.text infoTextUnread ]
+            ]
 
 
 feed : Visibility -> Feed -> Html Msg

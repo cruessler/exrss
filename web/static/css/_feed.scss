@@ -47,3 +47,13 @@ ul.feeds {
     }
   }
 }
+
+ul.additional-info {
+  padding-left: 0px;
+  list-style-type: none;
+
+  li {
+    margin-right: 0.4rem;
+    display: inline-block;
+  }
+}
