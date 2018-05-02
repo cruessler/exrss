@@ -5,6 +5,7 @@ module Types.Feed
         , Status(..)
         , Candidate
         , Frequency
+        , compareByPostedAt
         , decodeFeeds
         , decodeFeed
         , decodeEntry
@@ -56,6 +57,16 @@ type alias Candidate =
     , href : String
     , frequency : Maybe Frequency
     }
+
+
+compareByPostedAt : Entry -> Entry -> Order
+compareByPostedAt a b =
+    case ( a.postedAt, b.postedAt ) of
+        ( Just x, Just y ) ->
+            compare x y
+
+        _ ->
+            EQ
 
 
 decodeFeeds : Decode.Decoder (List Feed)

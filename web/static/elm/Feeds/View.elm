@@ -9,7 +9,7 @@ import Feeds.Options as Options
 import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
-import Types.Feed exposing (..)
+import Types.Feed as Feed exposing (..)
 
 
 entry : Entry -> Html Msg
@@ -99,19 +99,11 @@ additionalInfo feed =
 feed : Visibility -> Feed -> Html Msg
 feed visibility feed =
     let
-        compareByPostedAt a b =
-            case ( a.postedAt, b.postedAt ) of
-                ( Just x, Just y ) ->
-                    -- Flipping x and y saves a later call to `List.reverse`.
-                    compare y x
-
-                _ ->
-                    EQ
-
         sortedEntries =
             feed.entries
                 |> Dict.values
-                |> List.sortWith compareByPostedAt
+                |> List.sortWith Feed.compareByPostedAt
+                |> List.reverse
 
         entries =
             if visibility == HideReadEntries then
