@@ -139,7 +139,12 @@ view : Model -> Html Msg
 view model =
     let
         feeds =
-            List.map (feed model.visibility) <| Dict.values model.feeds
+            model.feeds
+                |> Dict.values
+                |> List.sortWith Feed.compareByNewestEntry
+                |> List.reverse
+                |> List.sortWith Feed.compareByStatus
+                |> List.map (feed model.visibility)
     in
         H.main_ [ A.attribute "role" "main" ]
             [ Options.view model

@@ -5,6 +5,8 @@ module Types.Feed
         , Status(..)
         , Candidate
         , Frequency
+        , compareByNewestEntry
+        , compareByStatus
         , compareByPostedAt
         , decodeFeeds
         , decodeFeed
@@ -57,6 +59,54 @@ type alias Candidate =
     , href : String
     , frequency : Maybe Frequency
     }
+
+
+compareByNewestEntry : Feed -> Feed -> Order
+compareByNewestEntry a b =
+    let
+        flip : Order -> Order
+        flip o =
+            case o of
+                LT ->
+                    GT
+
+                EQ ->
+                    EQ
+
+                GT ->
+                    LT
+
+        newestOf : Feed -> Maybe Entry
+        newestOf =
+            .entries
+                >> Dict.values
+                >> List.sortWith (\a b -> compareByPostedAt a b |> flip)
+                >> List.head
+    in
+        case ( newestOf a, newestOf b ) of
+            ( Just x, Just y ) ->
+                compareByPostedAt x y
+
+            _ ->
+                EQ
+
+
+compareByStatus : Feed -> Feed -> Order
+compareByStatus a b =
+    let
+        anyUnread : Dict Int Entry -> Bool
+        anyUnread =
+            Dict.foldl (\_ v acc -> acc || (not v.read)) False
+    in
+        case ( anyUnread a.entries, anyUnread b.entries ) of
+            ( True, False ) ->
+                LT
+
+            ( False, True ) ->
+                GT
+
+            _ ->
+                EQ
 
 
 compareByPostedAt : Entry -> Entry -> Order
