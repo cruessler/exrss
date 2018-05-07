@@ -51,7 +51,7 @@ defmodule ExRss.Router do
 
       get "/feeds/discover", FeedController, :discover
 
-      resources "/feeds", FeedController, only: [ :create, :update, :delete ]
+      resources "/feeds", FeedController, only: [ :index, :create, :update, :delete ]
     end
   end
 

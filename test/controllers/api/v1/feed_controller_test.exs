@@ -19,6 +19,16 @@ defmodule ExRss.Api.V1.FeedControllerTest do
     :ok
   end
 
+  test "GET /feeds", %{conn: conn} do
+    conn =
+      conn
+      |> with_authorization
+      |> get("/api/v1/feeds")
+
+    response = json_response(conn, 200)
+    assert [%{"entries" => [%{"id" => 1}]}] = response
+  end
+
   test "POST /feeds returns new feed on success", %{conn: conn} do
     conn =
       conn

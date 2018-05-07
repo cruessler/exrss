@@ -4,6 +4,19 @@ defmodule ExRss.Api.V1.FeedController do
   alias ExRss.{Entry, Feed, User}
   alias ExRss.{FeedAdder, FeedRemover}
 
+  def index(conn, _) do
+    current_user =
+      Repo.get!(User, conn.assigns.current_account.id)
+
+    feeds =
+      current_user
+      |> assoc(:feeds)
+      |> Repo.all()
+      |> Repo.preload(:entries)
+
+    json(conn, feeds)
+  end
+
   def discover(conn, %{"url" => url}) do
     case FeedAdder.discover_feeds(url) do
       {:ok, feeds} ->
