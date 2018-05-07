@@ -2,6 +2,7 @@ module Paths
     exposing
         ( candidates
         , createFeed
+        , feeds
         , feed
         , entry
         )
@@ -18,6 +19,11 @@ candidates url =
 createFeed : String
 createFeed =
     "/api/v1/feeds"
+
+
+feeds : String
+feeds =
+    "/api/v1/feeds/"
 
 
 feed : Feed -> String

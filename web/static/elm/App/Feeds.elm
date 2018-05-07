@@ -30,33 +30,23 @@ main =
 
 type alias Flags =
     { apiToken : String
-    , feeds : Decode.Value
     }
-
-
-decodeFeeds : Decode.Value -> Dict Int Feed
-decodeFeeds value =
-    value
-        |> Decode.decodeValue Types.Feed.decodeFeeds
-        |> Result.withDefault []
-        |> List.map (\f -> ( f.id, f ))
-        |> Dict.fromList
 
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
-        feeds =
-            decodeFeeds flags.feeds
+        apiConfig =
+            Api.config flags.apiToken
     in
-        ( { apiConfig = Api.config flags.apiToken
+        ( { apiConfig = apiConfig
           , visibility = ShowAllEntries
-          , feeds = feeds
+          , feeds = Dict.empty
           , showOptions = False
           , discoveryUrl = ""
           , requests = Dict.empty
           }
-        , Cmd.none
+        , getFeeds apiConfig
         )
 
 
@@ -73,6 +63,17 @@ updateEntry id f =
             }
     in
         Dict.map updateEntry_
+
+
+getFeeds : Api.Config -> Cmd Msg
+getFeeds apiConfig =
+    Api.get
+        apiConfig
+        { url = Paths.feeds
+        , params = Encode.null
+        , decoder = Types.Feed.decodeFeeds
+        }
+        |> Http.send NewFeeds
 
 
 patchEntry : Api.Config -> Entry -> Cmd Msg
@@ -116,6 +117,21 @@ update msg model =
 
         SetDiscoveryUrl url ->
             ( { model | discoveryUrl = url }, Cmd.none )
+
+        GetFeeds ->
+            ( model, getFeeds model.apiConfig )
+
+        NewFeeds (Ok feeds) ->
+            let
+                newFeeds =
+                    feeds
+                        |> List.map (\f -> ( f.id, f ))
+                        |> Dict.fromList
+            in
+                ( { model | feeds = newFeeds }, Cmd.none )
+
+        NewFeeds (Err _) ->
+            ( model, Cmd.none )
 
         DiscoverFeeds url ->
             if String.isEmpty url then

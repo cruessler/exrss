@@ -13,6 +13,8 @@ type Msg
     = SetVisibility Visibility
     | ToggleOptions
     | SetDiscoveryUrl String
+    | GetFeeds
+    | NewFeeds (Result Http.Error (List Feed))
     | DiscoverFeeds String
     | AddFeed Candidate
     | RemoveResponse String

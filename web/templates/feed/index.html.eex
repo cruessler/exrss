@@ -1,5 +1,3 @@
 <%=
-  elm_module("App.Feeds",
-    %{apiToken: assigns[:api_token],
-      feeds: @feeds})
+  elm_module("App.Feeds", %{apiToken: assigns[:api_token]})
 %>
