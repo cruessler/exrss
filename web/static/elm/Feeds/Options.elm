@@ -41,8 +41,15 @@ visibilityFieldset : Visibility -> Html Msg
 visibilityFieldset visibility =
     H.fieldset []
         [ H.legend [] [ H.text "Visibility" ]
-        , radio visibility ShowAllEntries "Show all entries"
-        , radio visibility HideReadEntries "Hide read entries"
+        , radio visibility
+            ShowAllEntries
+            "Show all entries"
+        , radio visibility
+            HideReadEntries
+            "Hide read entries"
+        , radio visibility
+            AlwaysShowUnreadEntries
+            "Smart: Show unread entries if feed is collapsed, show all entries if feed is not collapsed"
         ]
 
 

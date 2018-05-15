@@ -106,16 +106,27 @@ feed visibility feed =
                 |> List.reverse
 
         entries =
-            if visibility == HideReadEntries then
-                List.filter (not << .read) <| sortedEntries
-            else
-                sortedEntries
+            case visibility of
+                HideReadEntries ->
+                    if feed.open then
+                        List.filter (not << .read) <| sortedEntries
+                    else
+                        []
+
+                AlwaysShowUnreadEntries ->
+                    if feed.open then
+                        sortedEntries
+                    else
+                        List.filter (not << .read) <| sortedEntries
+
+                ShowAllEntries ->
+                    if feed.open then
+                        sortedEntries
+                    else
+                        []
 
         feed_ =
-            if feed.open then
-                H.ul [ A.class "feed" ] (List.map entry entries)
-            else
-                H.text ""
+            H.ul [ A.class "feed" ] (List.map entry entries)
 
         actions =
             H.div [ A.class "actions" ]

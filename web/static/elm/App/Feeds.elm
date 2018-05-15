@@ -40,7 +40,7 @@ init flags =
             Api.config flags.apiToken
     in
         ( { apiConfig = apiConfig
-          , visibility = ShowAllEntries
+          , visibility = AlwaysShowUnreadEntries
           , feeds = Dict.empty
           , showOptions = False
           , discoveryUrl = ""

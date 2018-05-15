@@ -16,6 +16,7 @@ import Types.Feed exposing (..)
 type Visibility
     = ShowAllEntries
     | HideReadEntries
+    | AlwaysShowUnreadEntries
 
 
 type Request
