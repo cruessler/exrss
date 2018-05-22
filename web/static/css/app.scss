@@ -5,6 +5,8 @@
 
 $black: rgb(0, 0, 0);
 $gray-light: rgb(99, 108, 114);
+$button-color: rgb(9, 86, 142);
+$button-color-light: rgb(134, 181, 216);
 
 * {
   box-sizing: border-box;
@@ -39,7 +41,7 @@ button, a.button {
   font-size: smaller;
   font-weight: 800;
 
-  background-color: rgb(9, 86, 142);
+  background-color: $button-color;
   color: rgb(255, 255, 255);
 }
 

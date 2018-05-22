@@ -22,6 +22,12 @@ ul.feeds {
     h1 {
       margin: 0;
     }
+
+    & > div.actions {
+      button {
+        background-color: $button-color-light;
+      }
+    }
   }
 
   ul.feed {
