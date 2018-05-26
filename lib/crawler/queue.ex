@@ -46,7 +46,7 @@ defmodule ExRss.Crawler.Queue do
 
   # Handle regular success and error cases: Add the feed back to the queue.
   def handle_info({_ref, {:ok, feed}}, %{feeds: feeds} = state) do
-    Logger.info("Updated feed #{feed.title}")
+    Logger.info("Updated feed #{feed.title} (#{feed.url})")
 
     new_feed =
       feed
@@ -60,7 +60,7 @@ defmodule ExRss.Crawler.Queue do
   end
 
   def handle_info({_ref, {:error, feed}}, %{feeds: feeds} = state) do
-    Logger.info("Error while updating #{feed.title}")
+    Logger.info("Error while updating #{feed.title} (#{feed.url})")
 
     new_feed =
       feed
@@ -88,7 +88,7 @@ defmodule ExRss.Crawler.Queue do
   def handle_info({:DOWN, ref, :process, _, _}, %{feeds: feeds, refs: refs} = state) do
     {feed, refs} = Map.pop(refs, ref)
 
-    Logger.info("Uncaught error while updating #{feed.title}")
+    Logger.info("Uncaught error while updating #{feed.title} (#{feed.url})")
 
     new_feed =
       feed
