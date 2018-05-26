@@ -37,6 +37,15 @@ collapsible show children =
         H.div [] []
 
 
+actionsFieldset : Html Msg
+actionsFieldset =
+    H.fieldset []
+        [ H.legend [] [ H.text "Actions" ]
+        , H.button [ A.type_ "button", E.onClick GetFeeds ]
+            [ H.text "Update feeds" ]
+        ]
+
+
 visibilityFieldset : Visibility -> Html Msg
 visibilityFieldset visibility =
     H.fieldset []
@@ -88,7 +97,8 @@ view model =
                 [ H.text buttonText ]
             , collapsible
                 model.showOptions
-                [ visibilityFieldset model.visibility
+                [ actionsFieldset
+                , visibilityFieldset model.visibility
                 , Discovery.newFeedFieldset model.discoveryUrl
                 , requests model.requests
                 ]
