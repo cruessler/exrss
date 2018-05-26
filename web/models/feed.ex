@@ -12,16 +12,16 @@ defmodule ExRss.Feed do
   @derive {Poison.Encoder, only: [:id, :title, :url, :entries]}
 
   schema "feeds" do
-    field(:title, :string)
-    field(:url, :string)
-    field(:next_update_at, :utc_datetime)
-    field(:retries, :integer)
+    field :title, :string
+    field :url, :string
+    field :next_update_at, :utc_datetime
+    field :retries, :integer
 
-    belongs_to(:user, User)
+    belongs_to :user, User
 
-    has_many(:entries, Entry)
+    has_many :entries, Entry
 
-    timestamps()
+    timestamps
   end
 
   @doc """
