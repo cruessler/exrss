@@ -1,6 +1,6 @@
 module Feeds.Options.Discovery
     exposing
-        ( newFeedFieldset
+        ( discoverFeedsFieldset
         , requestFieldset
         )
 
@@ -37,8 +37,8 @@ onEnter msg =
         E.on "keydown" <| Decode.andThen isEnter E.keyCode
 
 
-newFeedFieldset : String -> Html Msg
-newFeedFieldset discoveryUrl =
+discoverFeedsFieldset : String -> Html Msg
+discoverFeedsFieldset discoveryUrl =
     H.fieldset []
         [ H.legend [] [ H.text "Discover feeds on a site" ]
         , H.label

@@ -99,7 +99,7 @@ view model =
                 model.showOptions
                 [ actionsFieldset
                 , visibilityFieldset model.visibility
-                , Discovery.newFeedFieldset model.discoveryUrl
+                , Discovery.discoverFeedsFieldset model.discoveryUrl
                 , requests model.requests
                 ]
             ]
