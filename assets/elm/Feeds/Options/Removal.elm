@@ -34,11 +34,26 @@ inProgressFieldset feed =
 
 successFieldset : Removal.Success -> Html Msg
 successFieldset success =
-    H.fieldset []
-        [ H.legend [] [ H.text "This feed has been deleted" ]
-        , H.code [] [ H.text success.feed.url ]
-        , close success.feed.url
-        ]
+    let
+        feed =
+            success.feed
+
+        candidate =
+            { url = feed.url
+            , title = feed.title
+            , href = feed.url
+            , frequency = Nothing
+            }
+    in
+        H.fieldset []
+            [ H.legend [] [ H.text "This feed has been deleted" ]
+            , H.code [] [ H.text feed.url ]
+            , H.text ". You can undo the removal by clicking "
+            , H.button
+                [ E.onClick <| AddFeed candidate ]
+                [ H.text "Undo" ]
+            , close feed.url
+            ]
 
 
 errorFieldset : Removal.Error -> Html Msg
