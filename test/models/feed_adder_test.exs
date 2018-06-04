@@ -90,6 +90,14 @@ defmodule ExRss.FeedAdderTest do
              feeds
   end
 
+  test "extracts feed metadata" do
+    {:ok, raw_feed, _} = FeederEx.parse(@rss)
+
+    candidate = FeedAdder.extract_candidate(raw_feed)
+
+    assert %{url: _, title: _, href: _, frequency: _} = candidate
+  end
+
   test "fails when URI not absolute" do
     assert {:error, :uri_not_absolute} = FeedAdder.discover_feeds("example.com")
   end

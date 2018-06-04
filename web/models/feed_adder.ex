@@ -24,6 +24,27 @@ defmodule ExRss.FeedAdder do
     end)
   end
 
+  def discover_feed(url) do
+    with uri = URI.parse(url),
+         %URI{authority: authority} when not is_nil(authority) <- uri,
+         {:ok, response} <- HTTPoison.get(uri, [], follow_redirect: true),
+         200 <- response.status_code,
+         {:ok, raw_feed, _} <- FeederEx.parse(response.body) do
+      candidate = extract_candidate(raw_feed)
+
+      {:ok, candidate}
+    else
+      i when is_integer(i) ->
+        {:error, :wrong_status_code}
+
+      %URI{} ->
+        {:error, :uri_not_absolute}
+
+      x ->
+        x
+    end
+  end
+
   def discover_feeds(url) do
     with uri = URI.parse(url),
          %URI{authority: authority} when not is_nil(authority) <- uri,
@@ -53,6 +74,13 @@ defmodule ExRss.FeedAdder do
     (rss_feeds(html) ++ atom_feeds(html))
     |> Enum.map(&extract_feed/1)
     |> Enum.reject(&is_nil/1)
+  end
+
+  def extract_candidate(feed) do
+    feed
+    |> Map.put(:href, feed.url)
+    |> Map.put(:frequency, extract_frequency_info(feed))
+    |> Map.take([:url, :title, :href, :frequency])
   end
 
   def extract_feed(feed) do
