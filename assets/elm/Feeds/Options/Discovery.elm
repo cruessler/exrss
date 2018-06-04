@@ -2,6 +2,7 @@ module Feeds.Options.Discovery
     exposing
         ( discoverFeedsFieldset
         , requestFieldset
+        , addableFeed
         )
 
 import Dict exposing (Dict)
@@ -79,7 +80,7 @@ inProgressFieldset url =
         ]
 
 
-frequencyInfo : Frequency -> Html Msg
+frequencyInfo : Frequency -> Html msg
 frequencyInfo frequency =
     let
         formatDuration seconds =
@@ -96,8 +97,8 @@ frequencyInfo frequency =
                 ++ (formatDuration frequency.seconds)
 
 
-addableFeed : Candidate -> Html Msg
-addableFeed candidate =
+addableFeed : { onAdd : Candidate -> msg } -> Candidate -> Html msg
+addableFeed { onAdd } candidate =
     H.li
         []
         [ H.text candidate.title
@@ -110,7 +111,7 @@ addableFeed candidate =
         , H.p [] [ H.code [] [ H.text candidate.url ] ]
         , H.button
             [ A.type_ "button"
-            , E.onClick <| AddFeed candidate
+            , E.onClick <| onAdd candidate
             ]
             [ H.text "Add" ]
         ]
@@ -131,7 +132,7 @@ successFieldset success =
     else
         let
             children =
-                List.map addableFeed success.candidates
+                List.map (addableFeed { onAdd = AddFeed }) success.candidates
         in
             H.fieldset []
                 [ H.legend [] [ H.text "These feeds can be added" ]

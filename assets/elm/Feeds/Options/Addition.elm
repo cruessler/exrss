@@ -11,16 +11,22 @@ import Request exposing (..)
 import Types.Feed exposing (..)
 
 
-close : String -> Html Msg
-close url =
+type alias Config msg =
+    { onAdd : Candidate -> msg
+    , onRemove : String -> msg
+    }
+
+
+close : Config msg -> String -> Html msg
+close { onRemove } url =
     H.button
         [ A.type_ "button"
-        , E.onClick <| RemoveResponse url
+        , E.onClick <| onRemove url
         ]
         [ H.text "×" ]
 
 
-inProgressFieldset : Candidate -> Html Msg
+inProgressFieldset : Candidate -> Html msg
 inProgressFieldset candidate =
     H.fieldset []
         [ H.legend [] [ H.text "This feed is being added" ]
@@ -32,17 +38,17 @@ inProgressFieldset candidate =
         ]
 
 
-successFieldset : Addition.Success -> Html Msg
-successFieldset success =
+successFieldset : Config msg -> Addition.Success -> Html msg
+successFieldset config success =
     H.fieldset []
         [ H.legend [] [ H.text "This feed has been added" ]
         , H.code [] [ H.text success.feed.url ]
-        , close success.feed.url
+        , close config success.feed.url
         ]
 
 
-errorFieldset : Addition.Error -> Html Msg
-errorFieldset error =
+errorFieldset : Config msg -> Addition.Error -> Html msg
+errorFieldset ({ onAdd } as config) error =
     H.fieldset []
         [ H.legend [] [ H.text "This feed could not be added" ]
         , H.p []
@@ -50,21 +56,21 @@ errorFieldset error =
             , H.code [] [ H.text error.candidate.url ]
             , H.text "."
             ]
-        , close error.candidate.url
+        , close config error.candidate.url
         , H.button
-            [ E.onClick <| AddFeed error.candidate ]
+            [ E.onClick <| onAdd error.candidate ]
             [ H.text "Retry" ]
         ]
 
 
-requestFieldset : Addition -> Html Msg
-requestFieldset request =
+requestFieldset : Config msg -> Addition -> Html msg
+requestFieldset config request =
     case request of
         InProgress candidate ->
             inProgressFieldset candidate
 
         Done (Ok success) ->
-            successFieldset success
+            successFieldset config success
 
         Done (Err error) ->
-            errorFieldset error
+            errorFieldset config error

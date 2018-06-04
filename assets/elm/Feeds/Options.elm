@@ -71,7 +71,9 @@ requests =
                     Discovery.requestFieldset d
 
                 Model.Addition a ->
-                    Addition.requestFieldset a
+                    Addition.requestFieldset
+                        { onAdd = AddFeed, onRemove = RemoveResponse }
+                        a
 
                 Model.Removal r ->
                     Removal.requestFieldset r
