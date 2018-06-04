@@ -1,6 +1,7 @@
 module Feeds.Options.Discovery
     exposing
         ( discoverFeedsFieldset
+        , discoverFeedFieldset
         , requestFieldset
         , addableFeed
         )
@@ -12,6 +13,7 @@ import Feeds.Msg exposing (..)
 import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
+import Http
 import Json.Decode as Decode
 import Request exposing (..)
 import Types.Feed exposing (..)
@@ -59,6 +61,33 @@ discoverFeedsFieldset discoveryUrl =
         , H.p
             []
             [ H.text "Enter the address of a site that contains one or more feeds. "
+            , H.text "Make sure it starts with "
+            , H.code [] [ H.text "http://" ]
+            , H.text " or "
+            , H.code [] [ H.text "https://" ]
+            , H.text "."
+            ]
+        ]
+
+
+discoverFeedFieldset : Html Msg
+discoverFeedFieldset =
+    H.fieldset []
+        [ H.legend [] [ H.text "Add feed by address" ]
+        , H.form [ A.method "GET", A.action "/feeds/new/" ]
+            [ H.label [ A.for "add-feed-url" ] [ H.text "Address of the feed" ]
+            , H.input
+                [ A.id "add-feed-url"
+                , A.type_ "url"
+                , A.name "url"
+                ]
+                []
+            , H.input
+                [ A.type_ "submit", A.value "Discover" ]
+                []
+            ]
+        , H.p []
+            [ H.text "Enter the address of an RSS or Atom feed. "
             , H.text "Make sure it starts with "
             , H.code [] [ H.text "http://" ]
             , H.text " or "

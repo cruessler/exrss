@@ -102,6 +102,7 @@ view model =
                 [ actionsFieldset
                 , visibilityFieldset model.visibility
                 , Discovery.discoverFeedsFieldset model.discoveryUrl
+                , Discovery.discoverFeedFieldset
                 , requests model.requests
                 ]
             ]
