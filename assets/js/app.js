@@ -11,7 +11,15 @@ import css from '../css/app.scss';
 //
 import "phoenix_html"
 
-import Elm from "../elm/App/Feeds.elm";
+import Feeds from "../elm/App/Feeds.elm"
+import NewFeed from "../elm/App/NewFeed.elm"
+
+const Elm =
+  { App:
+    { Feeds: Feeds.App.Feeds,
+      NewFeed: NewFeed.App.NewFeed
+    }
+  }
 
 // Import local files
 //

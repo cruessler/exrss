@@ -39,7 +39,11 @@ defmodule ExRss.Router do
     scope "/" do
       pipe_through :authenticated
 
-      resources "/feeds", FeedController, only: [ :index ]
+      scope "/feeds" do
+        resources "/", FeedController, only: [ :index ]
+
+        get "/new", FeedController, :new
+      end
     end
   end
 

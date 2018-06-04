@@ -12,6 +12,7 @@ module Types.Feed
         , decodeFeed
         , decodeEntry
         , decodeCandidates
+        , decodeCandidate
         , encodeCandidate
         , encodeEntry
         )
