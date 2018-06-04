@@ -35,7 +35,8 @@ class App {
     for(const node of nodes) {
       // The module name may be `App` or `App.Feeds`. `modulePath` would be
       // ["App"] or ["App", "Feeds"], then.
-      const modulePath = node.dataset.elmModule.split(".")
+      const moduleName = node.dataset.elmModule
+      const modulePath = moduleName.split(".")
       const elmModule  = modulePath.reduce(
         (acc, part) => acc[part],
         Elm)
@@ -44,6 +45,8 @@ class App {
 
       if(elmModule != undefined) {
         elmModule.embed(node, params)
+      } else {
+        console.error(`No module named ‘${moduleName}’ could be found`)
       }
     }
   }
