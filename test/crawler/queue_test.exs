@@ -46,7 +46,7 @@ defmodule ExRss.Crawler.QueueTest do
   test "sends message to updater with delay" do
     {:ok, pid} = Queue.start_link(store: TestStore, updater: TestUpdater)
 
-    next_update_at = Timex.shift(DateTime.utc_now(), milliseconds: 200)
+    next_update_at = Timex.shift(DateTime.utc_now(), milliseconds: 20)
 
     feed = %{
       title: "Test feed",
@@ -57,6 +57,6 @@ defmodule ExRss.Crawler.QueueTest do
 
     GenServer.cast(pid, {:add_feed, feed})
 
-    assert_receive :update, 200
+    assert_receive :update, 100
   end
 end
