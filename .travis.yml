@@ -2,6 +2,11 @@ language: elixir
 elixir: '1.6.4'
 otp_release: '20.0'
 
+cache:
+  directories:
+    - _build
+    - deps
+
 services:
   - postgresql
 
