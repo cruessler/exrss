@@ -4,88 +4,102 @@ defmodule ExRss.Api.V1.FeedControllerTest do
   alias ExRss.{Entry, Feed, User}
 
   setup do
-    Repo.insert!(%User{id: 1, email: "jane@doe.com"})
-    Repo.insert!(%Feed{id: 1, user_id: 1, title: "Title", url: "http://example.com"})
+    user = Repo.insert!(%User{email: "jane@doe.com"})
 
-    Repo.insert!(%Entry{
-      id: 1,
-      url: "http://example.com/1",
-      title: "Title",
-      raw_posted_at: "Sun, 21 Dec 2014 16:08:00 +0100",
-      read: false,
-      feed_id: 1
-    })
+    feed =
+      user
+      |> Ecto.build_assoc(:feeds, %{title: "Title", url: "http://example.com"})
+      |> Repo.insert!()
 
-    :ok
+    entry =
+      feed
+      |> Ecto.build_assoc(
+        :entries,
+        %{
+          url: "http://example.com/1",
+          title: "Title",
+          raw_posted_at: "Sun, 21 Dec 2014 16:08:00 +0100",
+          read: false,
+          feed_id: 1
+        }
+      )
+      |> Repo.insert!()
+
+    %{user: user, feed: feed, entry: entry}
   end
 
-  test "GET /feeds", %{conn: conn} do
+  test "GET /feeds", %{conn: conn, user: user, entry: %{id: entry_id}} do
     conn =
       conn
-      |> with_authorization
+      |> with_authorization(user)
       |> get("/api/v1/feeds")
 
     response = json_response(conn, 200)
-    assert [%{"entries" => [%{"id" => 1}]}] = response
+    assert [%{"entries" => [%{"id" => entry_id}]}] = response
   end
 
-  test "POST /feeds returns new feed on success", %{conn: conn} do
+  test "POST /feeds returns new feed on success", %{conn: conn, user: user} do
     conn =
       conn
-      |> with_authorization
+      |> with_authorization(user)
       |> post("/api/v1/feeds", feed: [title: "Title", url: "http://www.example.com"])
 
     response = json_response(conn, 200)
     assert %{"id" => _, "title" => "Title", "entries" => []} = response
   end
 
-  test "POST /feeds returns errors on failure", %{conn: conn} do
+  test "POST /feeds returns errors on failure", %{conn: conn, user: user} do
     conn =
       conn
-      |> with_authorization
+      |> with_authorization(user)
       |> post("/api/v1/feeds", feed: [title: "", url: ""])
 
     response = json_response(conn, 400)
     assert %{"errors" => %{"title" => _, "url" => _}} = response
   end
 
-  test "PATCH /feeds/1 marks entries as read", %{conn: conn} do
+  test "PATCH /feeds/1 marks entries as read", %{
+    conn: conn,
+    user: user,
+    feed: %{id: feed_id},
+    entry: %{id: entry_id, url: entry_url}
+  } do
     conn =
       conn
-      |> with_authorization
-      |> patch("/api/v1/feeds/1", feed: [read: true])
+      |> with_authorization(user)
+      |> patch("/api/v1/feeds/#{feed_id}", feed: [read: true])
 
     response = json_response(conn, 200)
 
     assert %{
              "entries" => [
                %{
-                 "id" => 1,
+                 "id" => entry_id,
                  "posted_at" => nil,
                  "read" => true,
                  "title" => "Title",
-                 "url" => "http://example.com/1"
+                 "url" => entry_url
                }
              ],
-             "id" => 1,
+             "id" => feed_id,
              "title" => "Title",
              "url" => "http://example.com"
            } = response
   end
 
-  test "DELETE /feeds/1 succeeds", %{conn: conn} do
+  test "DELETE /feeds/1 succeeds", %{conn: conn, user: user, feed: feed} do
     conn =
       conn
-      |> with_authorization
-      |> delete("/api/v1/feeds/1")
+      |> with_authorization(user)
+      |> delete("/api/v1/feeds/#{feed.id}")
 
     json_response(conn, 200)
   end
 
-  test "DELETE /feeds/2 raises error for non-existing feed", %{conn: conn} do
+  test "DELETE /feeds/2 raises error for non-existing feed", %{conn: conn, user: user} do
     assert_raise Ecto.NoResultsError, fn ->
       conn
-      |> with_authorization
+      |> with_authorization(user)
       |> delete("/api/v1/feeds/2")
     end
   end

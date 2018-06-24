@@ -15,11 +15,10 @@ alias ExRss.Feed
 alias ExRss.Repo
 alias ExRss.User
 
-Repo.insert!(%User{id: 1, email: "jane@doe.com"})
-Repo.insert!(%Feed{id: 1, user_id: 1, title: "Title", url: "http://example.com"})
+Repo.insert!(%User{email: "jane@doe.com"})
+Repo.insert!(%Feed{user_id: 1, title: "Title", url: "http://example.com"})
 
 Repo.insert!(%Entry{
-  id: 1,
   url: "http://example.com",
   title: "Title",
   raw_posted_at: "Sun, 21 Dec 2014 16:08:00 +0100",
