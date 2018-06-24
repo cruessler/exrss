@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/cruessler/exrss.svg?branch=master)](https://travis-ci.org/cruessler/exrss)
+
 # ExRss
 
 ExRss is a web-based RSS feed reader, optimized for use on mobile devices. It
