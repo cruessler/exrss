@@ -1,6 +1,8 @@
 defmodule ExRss.Api.V1.FeedController do
   use ExRss.Web, :controller
 
+  require Logger
+
   alias ExRss.{Entry, Feed, User}
   alias ExRss.{FeedAdder, FeedRemover}
 
@@ -22,7 +24,9 @@ defmodule ExRss.Api.V1.FeedController do
       {:ok, feeds} ->
         json(conn, feeds)
 
-      _ ->
+      {:error, error} ->
+        Logger.info("Could not discover feeds on #{url}: #{inspect(error)}")
+
         conn
         |> resp(:bad_request, "")
         |> halt()
