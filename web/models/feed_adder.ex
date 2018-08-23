@@ -9,6 +9,8 @@ defmodule ExRss.FeedAdder do
   alias ExRss.Feed
   alias HTTPoison.Response
 
+  @no_title "feed does not have a title"
+
   def add_feed(user, feed_params) do
     changeset =
       user
@@ -86,11 +88,23 @@ defmodule ExRss.FeedAdder do
   end
 
   def extract_feed(feed) do
-    with [title] <- Floki.attribute(feed, "title"),
-         [href] <- Floki.attribute(feed, "href") do
-      %{title: title, href: href}
-    else
+    case Floki.attribute(feed, "href") do
+      [href] ->
+        title = extract_title(feed)
+
+        %{title: title, href: href}
+
       [] -> nil
+    end
+  end
+
+  def extract_title(feed) do
+    case Floki.attribute(feed, "title") do
+      [title] ->
+        title
+
+      [] ->
+        @no_title
     end
   end
 
