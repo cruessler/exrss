@@ -1,4 +1,6 @@
 defmodule ExRss.FeedAdder do
+  require Logger
+
   import Ecto
   import Ecto.Changeset
 
@@ -106,6 +108,11 @@ defmodule ExRss.FeedAdder do
     with {:ok, %Response{body: body}} <- HTTPoison.get(feed.url),
          {:ok, raw_feed, _} <- FeederEx.parse(body) do
       Map.put(feed, :frequency, extract_frequency_info(raw_feed))
+    else
+      {:error, error} ->
+        Logger.info("Could not add frequency info for #{feed.url}: #{inspect(error)}")
+
+        Map.put(feed, :frequency, nil)
     end
   end
 
