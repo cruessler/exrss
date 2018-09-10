@@ -35,7 +35,7 @@ defmodule ExRss.Api.V1.FeedControllerTest do
       |> get("/api/v1/feeds")
 
     response = json_response(conn, 200)
-    assert [%{"entries" => [%{"id" => entry_id}]}] = response
+    assert [%{"entries" => [%{"id" => ^entry_id}]}] = response
   end
 
   test "POST /feeds returns new feed on success", %{conn: conn, user: user} do
@@ -62,7 +62,7 @@ defmodule ExRss.Api.V1.FeedControllerTest do
     conn: conn,
     user: user,
     feed: %{id: feed_id},
-    entry: %{id: entry_id, url: entry_url}
+    entry: %{id: entry_id, url: entry_url, read: false}
   } do
     conn =
       conn
@@ -74,14 +74,14 @@ defmodule ExRss.Api.V1.FeedControllerTest do
     assert %{
              "entries" => [
                %{
-                 "id" => entry_id,
+                 "id" => ^entry_id,
                  "posted_at" => nil,
                  "read" => true,
                  "title" => "Title",
-                 "url" => entry_url
+                 "url" => ^entry_url
                }
              ],
-             "id" => feed_id,
+             "id" => ^feed_id,
              "title" => "Title",
              "url" => "http://example.com"
            } = response
