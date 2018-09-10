@@ -19,6 +19,10 @@ defmodule ExRss.AuthenticationTest do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
 
     Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
+
+    Repo.insert!(%User{id: 1, email: "jane@doe.com"})
+
+    :ok
   end
 
   test "Plug.Authentication" do
