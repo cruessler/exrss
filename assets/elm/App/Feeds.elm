@@ -130,8 +130,12 @@ update msg model =
             in
                 ( { model | feeds = newFeeds }, Cmd.none )
 
-        NewFeeds (Err _) ->
-            ( model, Cmd.none )
+        NewFeeds (Err message) ->
+            let
+                _ =
+                    Debug.log "Error getting new feeds" message
+            in
+                ( model, Cmd.none )
 
         DiscoverFeeds url ->
             if String.isEmpty url then
