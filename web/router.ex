@@ -11,7 +11,6 @@ defmodule ExRss.Router do
     plug :put_secure_browser_headers
 
     plug ExRss.Plug.AssignDefaults
-    plug ExRss.Plug.AssignApiToken, @api_token_salt
   end
 
   pipeline :api do
@@ -22,6 +21,7 @@ defmodule ExRss.Router do
 
   pipeline :authenticated do
     plug ExRss.Plug.Authentication, "/"
+    plug ExRss.Plug.AssignApiToken, @api_token_salt
   end
 
   scope "/", ExRss do

@@ -1,6 +1,7 @@
 defmodule ExRss.Plug.AssignApiToken do
   import Plug.Conn
 
+  alias ExRss.User
   alias ExRss.User.Account
 
   @context ExRss.Endpoint
@@ -10,8 +11,8 @@ defmodule ExRss.Plug.AssignApiToken do
   end
 
   def call(conn, salt) do
-    if current_user = conn.assigns[:current_user] do
-      token = Phoenix.Token.sign(@context, salt, %Account{id: current_user.id})
+    if %User{id: id} = conn.assigns[:current_user] do
+      token = Phoenix.Token.sign(@context, salt, %Account{id: id})
 
       assign(conn, :api_token, token)
     else
