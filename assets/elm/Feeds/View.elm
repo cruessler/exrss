@@ -55,7 +55,7 @@ entry entry =
                 , A.target "_blank"
                 , E.onClick (MarkAsRead entry)
                 ]
-                [ H.text entry.title ]
+                [ entry.title |> Maybe.withDefault "[no title]" |> H.text ]
             , H.span [] [ H.text postedAt ]
             , actions
             ]

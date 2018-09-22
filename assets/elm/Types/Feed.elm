@@ -41,7 +41,7 @@ type Status
 type alias Entry =
     { id : Int
     , url : String
-    , title : String
+    , title : Maybe String
     , read : Bool
     , postedAt : Maybe Time
     , status : Status
@@ -205,7 +205,7 @@ decodeEntry =
     map6 Entry
         (field "id" int)
         (field "url" string)
-        (field "title" string)
+        (field "title" <| nullable string)
         (field "read" bool)
         decodePostedAt
         (succeed NoChange)
