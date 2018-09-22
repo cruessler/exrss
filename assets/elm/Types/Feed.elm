@@ -197,7 +197,7 @@ decodePostedAt =
         date =
             string |> Decode.map parseDate
     in
-        field "posted_at" <| oneOf [ null Nothing, date ]
+        field "posted_at" date
 
 
 decodeEntry : Decode.Decoder Entry
