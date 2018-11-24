@@ -195,7 +195,7 @@ decodePostedAt =
                 >> Result.toMaybe
 
         date =
-            string |> Decode.map parseDate
+            nullable string |> (Decode.map (Maybe.andThen parseDate))
     in
         field "posted_at" date
 
