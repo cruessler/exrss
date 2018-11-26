@@ -59,6 +59,8 @@ defmodule ExRss.Entry do
     "%a, %d %b %Y %H:%M:%S %Z",
     # 13 Mar 2018 00:00:00 GMT
     "%d %b %Y %H:%M:%S %Z",
+    # 2018-08-22T10:07:06.121Z
+    "%Y-%m-%dT%H:%M:%S.%LZ",
     # Internet date/time format as specified by RFC 3339
     # See https://tools.ietf.org/html/rfc3339
     # 2018-01-13T19:05:08+00:00
