@@ -130,7 +130,7 @@ decodeFeed =
     map5 Feed
         (field "id" int)
         (field "url" string)
-        (field "title" string)
+        (oneOf [ null "", field "title" string ])
         (field "entries" decodeEntries)
         (succeed False)
 
