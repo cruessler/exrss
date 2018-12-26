@@ -8,6 +8,7 @@ defmodule ExRss.FeedUpdater do
       for entry <- raw_feed.entries do
         entry
         |> Entry.parse()
+        |> Entry.make_url_absolute(feed.url)
         |> Map.put(:feed_id, feed.id)
       end
 

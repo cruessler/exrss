@@ -13,7 +13,12 @@ defmodule ExRss.FeedUpdaterTest do
       entries: [
         %{
           title: "This is a title",
-          link: "http://example.com",
+          link: "http://example.com/posts/1.html",
+          updated: DateTime.utc_now() |> DateTime.to_string()
+        },
+        %{
+          title: "This is a title",
+          link: "/posts/2.html",
           updated: DateTime.utc_now() |> DateTime.to_string()
         }
       ]
@@ -22,11 +27,13 @@ defmodule ExRss.FeedUpdaterTest do
     multi = FeedUpdater.update(feed, raw_feed)
 
     assert [
-             {:insert_entries, {:insert_all, ExRss.Entry, [entry], _}},
+             {:insert_entries, {:insert_all, ExRss.Entry, [first, second], _}},
              {:feed, {:update, feed_changeset, []}}
            ] = Multi.to_list(multi)
 
-    assert entry.feed_id == feed.id
+    assert first.feed_id == feed.id
+    assert first.url == "http://example.com/posts/1.html"
+    assert second.url == "http://example.com/posts/2.html"
     assert feed_changeset.valid?
   end
 end

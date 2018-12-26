@@ -92,4 +92,8 @@ defmodule ExRss.Entry do
   def url_for(feed_url, entry_url) do
     URI.merge(feed_url, entry_url) |> to_string
   end
+
+  def make_url_absolute(entry, feed_url) do
+    Map.put(entry, :url, url_for(feed_url, entry.url))
+  end
 end
