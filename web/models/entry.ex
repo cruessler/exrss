@@ -86,4 +86,10 @@ defmodule ExRss.Entry do
         end
     end
   end
+
+  # If an entry does not have an absolute URL, we merge it with the feed’s URL
+  # to get an absolute URL.
+  def url_for(feed_url, entry_url) do
+    URI.merge(feed_url, entry_url) |> to_string
+  end
 end

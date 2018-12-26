@@ -10,4 +10,17 @@ defmodule ExRss.EntryTest do
     assert {:ok, _} = Entry.parse_time("13 Mar 2018 00:00:00 GMT")
     assert {:ok, _} = Entry.parse_time("2018-08-22T10:07:06.121Z")
   end
+
+  test "returns absolute link" do
+    assert "http://example.com/posts/2018/12/26/1.html" =
+             Entry.url_for("http://example.com", "/posts/2018/12/26/1.html")
+    assert "https://example.com/posts/2018/12/26/1.html" =
+             Entry.url_for("https://example.com", "/posts/2018/12/26/1.html")
+    assert "http://example.com/posts/2018/12/26/1.html" =
+             Entry.url_for("http://example.com", "posts/2018/12/26/1.html")
+    assert "http://example.com/posts/2018/12/26/1.html" =
+             Entry.url_for("http://example.com", "http://example.com/posts/2018/12/26/1.html")
+    assert "http://example.com/2018/12/26/1.html" =
+             Entry.url_for("http://example.com/posts", "/2018/12/26/1.html")
+  end
 end
