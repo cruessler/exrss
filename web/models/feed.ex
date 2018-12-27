@@ -35,6 +35,21 @@ defmodule ExRss.Feed do
     |> unique_constraint(:url)
   end
 
+  def parse(xml) do
+    try do
+      FeederEx.parse(xml)
+    catch
+      :throw, value ->
+        {:error, value}
+    else
+      {:ok, raw_feed, _} ->
+        {:ok, raw_feed}
+
+      {:fatal_error, _, error, _, _} ->
+        {:error, error}
+    end
+  end
+
   def mark_as_read(feed) do
     entries = for e <- feed.entries, do: Changeset.change(e, read: true)
 

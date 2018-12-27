@@ -33,7 +33,7 @@ defmodule ExRss.FeedAdder do
          %URI{authority: authority} when not is_nil(authority) <- uri,
          {:ok, response} <- HTTPoison.get(uri, [], follow_redirect: true),
          200 <- response.status_code,
-         {:ok, raw_feed, _} <- FeederEx.parse(response.body) do
+         {:ok, raw_feed} <- Feed.parse(response.body) do
       candidate = extract_candidate(raw_feed)
 
       {:ok, candidate}
@@ -120,7 +120,7 @@ defmodule ExRss.FeedAdder do
 
   def add_frequency_info(feed) do
     with {:ok, %Response{body: body}} <- HTTPoison.get(feed.url),
-         {:ok, raw_feed, _} <- FeederEx.parse(body) do
+         {:ok, raw_feed} <- Feed.parse(body) do
       Map.put(feed, :frequency, extract_frequency_info(raw_feed))
     else
       {:error, error} ->
