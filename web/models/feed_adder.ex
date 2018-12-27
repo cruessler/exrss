@@ -119,7 +119,7 @@ defmodule ExRss.FeedAdder do
   end
 
   def add_frequency_info(feed) do
-    with {:ok, %Response{body: body}} <- HTTPoison.get(feed.url),
+    with {:ok, %Response{body: body}} <- HTTPoison.get(feed.url, [], follow_redirect: true),
          {:ok, raw_feed} <- Feed.parse(body) do
       Map.put(feed, :frequency, extract_frequency_info(raw_feed))
     else
