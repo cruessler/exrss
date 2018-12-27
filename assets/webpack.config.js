@@ -4,7 +4,7 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-const elmRoot = path.resolve(__dirname, 'elm')
+const elmRoot = path.resolve(__dirname, 'elm');
 
 module.exports = (env, options) => ({
   optimization: {
