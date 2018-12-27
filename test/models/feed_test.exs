@@ -18,7 +18,7 @@ defmodule ExRss.FeedTest do
     refute changeset.valid?
   end
 
-  @timeout Duration.from_minutes(15) |> Duration.to_milliseconds()
+  @timeout Duration.from_minutes(60) |> Duration.to_milliseconds()
   @max_timeout Duration.from_days(1) |> Duration.to_milliseconds()
 
   test "schedule_update_on_error" do

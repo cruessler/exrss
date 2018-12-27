@@ -6,7 +6,7 @@ defmodule ExRss.Feed do
   alias ExRss.User
   alias Timex.Duration
 
-  @base_timeout Duration.from_minutes(15) |> Duration.to_milliseconds()
+  @base_timeout Duration.from_minutes(60) |> Duration.to_milliseconds()
   @max_timeout Duration.from_days(1) |> Duration.to_milliseconds() |> round
 
   @derive {Poison.Encoder, only: [:id, :title, :url, :entries]}
