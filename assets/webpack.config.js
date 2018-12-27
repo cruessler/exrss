@@ -40,7 +40,8 @@ module.exports = (env, options) => ({
         exclude: [/elm-stuff/],
         loader: 'elm-webpack-loader',
         options: {
-          cwd: elmRoot
+          cwd: elmRoot,
+          pathToMake: '../node_modules/.bin/elm-make'
         }
       }
     ],
