@@ -14,12 +14,16 @@ defmodule ExRss.EntryTest do
   test "returns absolute link" do
     assert "http://example.com/posts/2018/12/26/1.html" =
              Entry.url_for("http://example.com", "/posts/2018/12/26/1.html")
+
     assert "https://example.com/posts/2018/12/26/1.html" =
              Entry.url_for("https://example.com", "/posts/2018/12/26/1.html")
+
     assert "http://example.com/posts/2018/12/26/1.html" =
              Entry.url_for("http://example.com", "posts/2018/12/26/1.html")
+
     assert "http://example.com/posts/2018/12/26/1.html" =
              Entry.url_for("http://example.com", "http://example.com/posts/2018/12/26/1.html")
+
     assert "http://example.com/2018/12/26/1.html" =
              Entry.url_for("http://example.com/posts", "/2018/12/26/1.html")
   end

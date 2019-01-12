@@ -26,22 +26,23 @@ defmodule ExRss.Router do
   end
 
   scope "/", ExRss do
-    pipe_through :browser # Use the default browser stack
+    # Use the default browser stack
+    pipe_through :browser
 
     get "/", PageController, :index
 
     resources "/session",
-      SessionController,
-      only: [ :create, :new, :delete ],
-      singleton: true
+              SessionController,
+              only: [:create, :new, :delete],
+              singleton: true
 
-    resources "/users", UserController, only: [ :create, :new ]
+    resources "/users", UserController, only: [:create, :new]
 
     scope "/" do
       pipe_through :authenticated
 
       scope "/feeds" do
-        resources "/", FeedController, only: [ :index ]
+        resources "/", FeedController, only: [:index]
 
         get "/new", FeedController, :new
       end
@@ -52,11 +53,11 @@ defmodule ExRss.Router do
     pipe_through :api
 
     scope "/v1", V1 do
-      resources "/entries", EntryController, only: [ :update ]
+      resources "/entries", EntryController, only: [:update]
 
       get "/feeds/discover", FeedController, :discover
 
-      resources "/feeds", FeedController, only: [ :index, :create, :update, :delete ]
+      resources "/feeds", FeedController, only: [:index, :create, :update, :delete]
     end
   end
 

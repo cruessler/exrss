@@ -7,8 +7,7 @@ defmodule ExRss.Api.V1.FeedController do
   alias ExRss.{FeedAdder, FeedRemover}
 
   def index(conn, _) do
-    current_user =
-      Repo.get!(User, conn.assigns.current_account.id)
+    current_user = Repo.get!(User, conn.assigns.current_account.id)
 
     feeds =
       current_user

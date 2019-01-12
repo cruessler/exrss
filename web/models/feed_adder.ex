@@ -94,7 +94,8 @@ defmodule ExRss.FeedAdder do
 
         %{title: title, href: href}
 
-      [] -> nil
+      [] ->
+        nil
     end
   end
 

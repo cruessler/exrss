@@ -113,7 +113,7 @@ defmodule ExRss.FeedTest do
       |> Repo.preload(:entries)
       |> Feed.mark_as_read()
 
-    for e <- Changeset.get_field(changeset, :entries), do: assert e.read == true
+    for e <- Changeset.get_field(changeset, :entries), do: assert(e.read == true)
   end
 
   @xml """
