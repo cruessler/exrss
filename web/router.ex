@@ -20,6 +20,7 @@ defmodule ExRss.Router do
   end
 
   pipeline :authenticated do
+    plug ExRss.Plug.RememberUser
     plug ExRss.Plug.Authentication, "/"
     plug ExRss.Plug.AssignApiToken, @api_token_salt
   end

@@ -2,19 +2,21 @@ defmodule ExRss.SessionController do
   use ExRss.Web, :controller
 
   alias ExRss.Session
+  alias ExRss.User
 
   def new(conn, _params) do
     render(conn, "new.html")
   end
 
   def create(conn, %{"session" => session_params}) do
-    case Session.login(session_params) do
-      {:ok, user} ->
-        conn
-        |> put_session(:current_user, user)
-        |> put_flash(:info, "You are now logged in.")
-        |> redirect(to: feed_path(conn, :index))
-
+    with {:ok, user} <- Session.login(session_params),
+         {:ok, user} <- User.renew_remember_me_token(user) |> Repo.update() do
+      conn
+      |> put_session(:current_user, user)
+      |> Session.renew_remember_me_cookie()
+      |> put_flash(:info, "You are now logged in.")
+      |> redirect(to: feed_path(conn, :index))
+    else
       :error ->
         conn
         |> put_flash(:error, "You supplied a wrong email or password.")

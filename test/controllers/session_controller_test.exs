@@ -24,6 +24,8 @@ defmodule ExRss.SessionControllerTest do
     conn = post(conn, "/session", params)
 
     assert html_response(conn, 302)
+    assert %{remember_me_token: remember_me_token} = get_session(conn, :current_user)
+    assert is_binary(remember_me_token)
   end
 
   test "DELETE /session", %{conn: conn} do
