@@ -116,6 +116,12 @@ compareByPostedAt a b =
         ( Just x, Just y ) ->
             compare x y
 
+        ( Just _, Nothing ) ->
+            GT
+
+        ( Nothing, Just _ ) ->
+            LT
+
         _ ->
             EQ
 
