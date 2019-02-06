@@ -9,8 +9,6 @@ import Feeds.Options.Removal as Removal
 import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
-import Request exposing (..)
-import Types.Feed exposing (..)
 
 
 radio : Visibility -> Visibility -> String -> Html Msg

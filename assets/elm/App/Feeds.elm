@@ -8,7 +8,6 @@ import Feeds.Removal as Removal
 import Feeds.Model as Model exposing (..)
 import Feeds.Msg as Msg exposing (..)
 import Feeds.View as View
-import Json.Decode as Decode
 import Json.Encode as Encode
 import Html
 import Http
@@ -19,6 +18,7 @@ import Task exposing (Task)
 import Types.Feed exposing (..)
 
 
+main : Program Flags Model Msg
 main =
     Html.programWithFlags
         { init = init

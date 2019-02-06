@@ -1,6 +1,5 @@
 module Feeds.Msg exposing (Msg(..))
 
-import Api
 import Feeds.Addition as Addition
 import Feeds.Discovery as Discovery
 import Feeds.Removal as Removal
