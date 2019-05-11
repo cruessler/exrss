@@ -52,7 +52,7 @@ defmodule ExRss.Mixfile do
       {:plug, "~> 1.3"},
       {:ecto, "~> 2.1"},
       {:postgrex, "~> 0.13.0"},
-      {:phoenix_html, "~> 2.6"},
+      {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
       {:floki, "~> 0.11.0"},
