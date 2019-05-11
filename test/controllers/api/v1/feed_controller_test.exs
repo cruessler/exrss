@@ -38,6 +38,29 @@ defmodule ExRss.Api.V1.FeedControllerTest do
     assert [%{"entries" => [%{"id" => ^entry_id}]}] = response
   end
 
+  test "GET /feeds/only_unread_entries", %{conn: conn, user: user, feed: feed} do
+    feed
+    |> Ecto.build_assoc(
+      :entries,
+      %{
+        url: "http://example.com/2",
+        title: "Title 2",
+        raw_posted_at: "Sun, 22 Dec 2014 16:08:00 +0100",
+        read: true,
+        feed_id: 1
+      }
+    )
+    |> Repo.insert!()
+
+    conn =
+      conn
+      |> with_authorization(user)
+      |> get("/api/v1/feeds/only_unread_entries")
+
+    response = json_response(conn, 200)
+    assert [%{"entries" => [%{"url" => "http://example.com/1"}]}] = response
+  end
+
   test "POST /feeds returns new feed on success", %{conn: conn, user: user} do
     conn =
       conn

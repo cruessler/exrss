@@ -18,6 +18,20 @@ defmodule ExRss.Api.V1.FeedController do
     json(conn, feeds)
   end
 
+  def only_unread_entries(conn, _) do
+    current_user = Repo.get!(User, conn.assigns.current_account.id)
+
+    unread_entries = from(e in Entry, where: e.read == false)
+
+    feeds =
+      current_user
+      |> assoc(:feeds)
+      |> Repo.all()
+      |> Repo.preload(entries: unread_entries)
+
+    json(conn, feeds)
+  end
+
   def discover(conn, %{"url" => url}) do
     case FeedAdder.discover_feeds(url) do
       {:ok, feeds} ->
