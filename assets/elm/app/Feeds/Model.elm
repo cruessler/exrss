@@ -1,6 +1,7 @@
 module Feeds.Model exposing
     ( Model
     , Request(..)
+    , SortBy(..)
     , Visibility(..)
     )
 
@@ -18,6 +19,11 @@ type Visibility
     | AlwaysShowUnreadEntries
 
 
+type SortBy
+    = SortByNewest
+    | SortByNewestUnread
+
+
 type Request
     = Discovery Discovery
     | Addition Addition
@@ -27,6 +33,7 @@ type Request
 type alias Model =
     { apiConfig : Api.Config
     , visibility : Visibility
+    , sortBy : SortBy
     , feeds : Dict Int Feed
     , showOptions : Bool
     , discoveryUrl : String

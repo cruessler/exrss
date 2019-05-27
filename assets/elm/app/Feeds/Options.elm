@@ -11,18 +11,18 @@ import Html.Attributes as A
 import Html.Events as E
 
 
-radio : Visibility -> Visibility -> String -> Html Msg
-radio currentVisibility visibility text_ =
+radio : msg -> a -> a -> String -> Html msg
+radio onClick currentValue value text =
     H.div []
         [ H.label
             []
             [ H.input
                 [ A.type_ "radio"
-                , A.checked (visibility == currentVisibility)
-                , E.onClick (SetVisibility visibility)
+                , A.checked (value == currentValue)
+                , E.onClick onClick
                 ]
                 []
-            , H.text text_
+            , H.text text
             ]
         ]
 
@@ -45,19 +45,43 @@ actionsFieldset =
         ]
 
 
+visibilityRadio : Visibility -> Visibility -> String -> Html Msg
+visibilityRadio currentVisibility visibility text =
+    radio (SetVisibility visibility) currentVisibility visibility text
+
+
 visibilityFieldset : Visibility -> Html Msg
 visibilityFieldset visibility =
     H.fieldset []
         [ H.legend [] [ H.text "Visibility" ]
-        , radio visibility
+        , visibilityRadio visibility
             ShowAllEntries
             "Show all entries"
-        , radio visibility
+        , visibilityRadio visibility
             HideReadEntries
             "Hide read entries"
-        , radio visibility
+        , visibilityRadio visibility
             AlwaysShowUnreadEntries
             "Smart: Show unread entries if feed is collapsed, show all entries if feed is not collapsed"
+        ]
+
+
+sortByRadio : SortBy -> SortBy -> String -> Html Msg
+sortByRadio currentSortBy sortBy text =
+    radio (SetSortBy sortBy) currentSortBy sortBy text
+
+
+sortByFieldset : SortBy -> Html Msg
+sortByFieldset sortBy =
+    H.fieldset []
+        [ H.legend [] [ H.text "Sort feeds by" ]
+        , sortByRadio sortBy
+            SortByNewest
+            "Sort by newest entry"
+        , sortByRadio sortBy
+            SortByNewestUnread
+            "Sort by newest unread entry"
+        , H.p [] [ H.text "Feeds with unread entries will always be shown first" ]
         ]
 
 
@@ -101,6 +125,7 @@ view model =
             model.showOptions
             [ actionsFieldset
             , visibilityFieldset model.visibility
+            , sortByFieldset model.sortBy
             , Discovery.discoverFeedsFieldset model.discoveryUrl
             , Discovery.discoverFeedFieldset
             , requests model.requests

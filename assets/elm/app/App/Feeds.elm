@@ -2,10 +2,10 @@ module App.Feeds exposing (main)
 
 import Api
 import Browser
-import Dict
+import Dict exposing (Dict)
 import Feeds.Addition as Addition
 import Feeds.Discovery as Discovery
-import Feeds.Model as Model exposing (Model, Visibility(..))
+import Feeds.Model as Model exposing (Model, SortBy(..), Visibility(..))
 import Feeds.Msg as Msg exposing (Msg(..))
 import Feeds.Removal as Removal
 import Feeds.View as View
@@ -40,6 +40,7 @@ init flags =
     in
     ( { apiConfig = apiConfig
       , visibility = AlwaysShowUnreadEntries
+      , sortBy = SortByNewestUnread
       , feeds = Dict.empty
       , showOptions = False
       , discoveryUrl = ""
@@ -92,6 +93,9 @@ update msg model =
     case msg of
         SetVisibility visibility ->
             ( { model | visibility = visibility }, Cmd.none )
+
+        SetSortBy sortBy ->
+            ( { model | sortBy = sortBy }, Cmd.none )
 
         ToggleOptions ->
             ( { model | showOptions = not model.showOptions }, Cmd.none )

@@ -5,6 +5,7 @@ module Types.Feed exposing
     , Frequency
     , Status(..)
     , compareByNewestEntry
+    , compareByNewestUnreadEntry
     , compareByPostedAt
     , compareByStatus
     , createWithCounts
@@ -214,34 +215,40 @@ updateEntries (Feed feed) newEntries =
     Feed { feed | entries = newEntries }
 
 
-compareByNewestEntry : Feed -> Feed -> Order
-compareByNewestEntry a b =
+compareBy : (Entry -> Bool) -> Feed -> Feed -> Order
+compareBy filter a b =
     let
-        flip : Order -> Order
-        flip o =
-            case o of
-                LT ->
-                    GT
-
-                EQ ->
-                    EQ
-
-                GT ->
-                    LT
-
-        newestOf : Feed -> Maybe Entry
-        newestOf (Feed feed) =
+        significantEntry : Feed -> Maybe Entry
+        significantEntry (Feed feed) =
             feed.entries
                 |> Dict.values
-                |> List.sortWith (\x y -> compareByPostedAt x y |> flip)
+                |> List.filter filter
+                |> List.sortWith compareByPostedAt
+                |> List.reverse
                 |> List.head
     in
-    case ( newestOf a, newestOf b ) of
+    case ( significantEntry a, significantEntry b ) of
         ( Just x, Just y ) ->
             compareByPostedAt x y
 
+        ( Just _, Nothing ) ->
+            GT
+
+        ( Nothing, Just _ ) ->
+            LT
+
         _ ->
             EQ
+
+
+compareByNewestUnreadEntry : Feed -> Feed -> Order
+compareByNewestUnreadEntry =
+    compareBy (\a -> not a.read)
+
+
+compareByNewestEntry : Feed -> Feed -> Order
+compareByNewestEntry =
+    compareBy (always True)
 
 
 compareByStatus : Feed -> Feed -> Order

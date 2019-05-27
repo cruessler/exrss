@@ -147,13 +147,23 @@ viewFeed visibility feed =
         children
 
 
+sortWith : SortBy -> (Feed -> Feed -> Order)
+sortWith sortBy =
+    case sortBy of
+        SortByNewest ->
+            Feed.compareByNewestEntry
+
+        SortByNewestUnread ->
+            Feed.compareByNewestUnreadEntry
+
+
 view : Model -> Html Msg
 view model =
     let
         feeds =
             model.feeds
                 |> Dict.values
-                |> List.sortWith Feed.compareByNewestEntry
+                |> List.sortWith (sortWith model.sortBy)
                 |> List.reverse
                 |> List.sortWith Feed.compareByStatus
                 |> List.map (viewFeed model.visibility)

@@ -10,6 +10,7 @@ import Types.Feed exposing (..)
 
 type Msg
     = SetVisibility Visibility
+    | SetSortBy SortBy
     | ToggleOptions
     | SetDiscoveryUrl String
     | GetFeeds
