@@ -30,6 +30,8 @@ type alias Feed =
     , title : String
     , entries : Dict Int Entry
     , open : Bool
+    , unreadEntriesCount : Int
+    , readEntriesCount : Int
     }
 
 
@@ -131,14 +133,48 @@ decodeFeeds =
     list decodeFeed
 
 
-decodeFeed : Decode.Decoder Feed
-decodeFeed =
-    map5 Feed
+countEntries : Dict Int Entry -> Decode.Decoder Feed
+countEntries entries =
+    map7 Feed
         (field "id" int)
         (field "url" string)
         (oneOf [ null "", field "title" string ])
-        (field "entries" decodeEntries)
+        (succeed entries)
         (succeed False)
+        (succeed <| numberOfUnreadEntries entries)
+        (succeed <| numberOfReadEntries entries)
+
+
+numberOfUnreadEntries : Dict Int Entry -> Int
+numberOfUnreadEntries entries =
+    Dict.foldl
+        (\k v acc ->
+            if v.read then
+                acc
+            else
+                acc + 1
+        )
+        0
+        entries
+
+
+numberOfReadEntries : Dict Int Entry -> Int
+numberOfReadEntries entries =
+    Dict.foldl
+        (\k v acc ->
+            if v.read then
+                acc + 1
+            else
+                acc
+        )
+        0
+        entries
+
+
+decodeFeed : Decode.Decoder Feed
+decodeFeed =
+    (field "entries" decodeEntries)
+        |> andThen countEntries
 
 
 decodeEntries : Decode.Decoder (Dict Int Entry)
