@@ -21,11 +21,29 @@ defmodule ExRss.Api.V1.FeedController do
   def only_unread_entries(conn, _) do
     current_user = Repo.get!(User, conn.assigns.current_account.id)
 
-    unread_entries = from(e in Entry, where: e.read == false)
+    feeds_of_current_user = current_user |> assoc(:feeds)
+
+    unread_entries =
+      from(
+        e in Entry,
+        where: e.read == false
+      )
+
+    feeds_with_counts =
+      from(
+        f in feeds_of_current_user,
+        join: e in Entry,
+        on: f.id == e.feed_id,
+        group_by: f.id,
+        select: %{
+          f
+          | unread_entries_count: filter(count(e.id), e.read == false),
+            read_entries_count: filter(count(e.id), e.read == true)
+        }
+      )
 
     feeds =
-      current_user
-      |> assoc(:feeds)
+      feeds_with_counts
       |> Repo.all()
       |> Repo.preload(entries: unread_entries)
 
