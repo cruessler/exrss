@@ -48,10 +48,10 @@ defmodule ExRss.Mixfile do
     [
       {:phoenix, "~> 1.4.0"},
       {:phoenix_pubsub, "~> 1.0"},
-      {:phoenix_ecto, "~> 3.0"},
+      {:phoenix_ecto, "~> 4.0"},
       {:plug, "~> 1.3"},
-      {:ecto, "~> 2.1"},
-      {:postgrex, "~> 0.13.0"},
+      {:ecto_sql, "~> 3.0"},
+      {:postgrex, "~> 0.14.0"},
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
