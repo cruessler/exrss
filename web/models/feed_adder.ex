@@ -21,7 +21,7 @@ defmodule ExRss.FeedAdder do
 
     Multi.new()
     |> Multi.insert(:feed, changeset)
-    |> Multi.run(:notify_queue, fn %{feed: feed} ->
+    |> Multi.run(:notify_queue, fn _repo, %{feed: feed} ->
       GenServer.cast(ExRss.Crawler.Queue, {:add_feed, feed})
 
       {:ok, nil}

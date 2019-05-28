@@ -13,7 +13,7 @@ defmodule ExRss.FeedRemover do
 
     Multi.new()
     |> Multi.delete(:feed, feed)
-    |> Multi.run(:notify_queue, fn %{feed: feed} ->
+    |> Multi.run(:notify_queue, fn _repo, %{feed: feed} ->
       GenServer.cast(ExRss.Crawler.Queue, {:remove_feed, feed})
 
       {:ok, nil}
