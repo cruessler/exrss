@@ -9,7 +9,9 @@ module Types.Feed
         , compareByStatus
         , compareByPostedAt
         , decodeFeeds
+        , decodeFeedsOnlyUnreadEntries
         , decodeFeed
+        , decodeFeedOnlyUnreadEntries
         , decodeEntry
         , decodeCandidates
         , decodeCandidate
@@ -133,6 +135,11 @@ decodeFeeds =
     list decodeFeed
 
 
+decodeFeedsOnlyUnreadEntries : Decode.Decoder (List Feed)
+decodeFeedsOnlyUnreadEntries =
+    list decodeFeedOnlyUnreadEntries
+
+
 countEntries : Dict Int Entry -> Decode.Decoder Feed
 countEntries entries =
     map7 Feed
@@ -175,6 +182,18 @@ decodeFeed : Decode.Decoder Feed
 decodeFeed =
     (field "entries" decodeEntries)
         |> andThen countEntries
+
+
+decodeFeedOnlyUnreadEntries : Decode.Decoder Feed
+decodeFeedOnlyUnreadEntries =
+    map7 Feed
+        (field "id" int)
+        (field "url" string)
+        (oneOf [ null "", field "title" string ])
+        (field "entries" decodeEntries)
+        (succeed False)
+        (field "unread_entries_count" int)
+        (field "read_entries_count" int)
 
 
 decodeEntries : Decode.Decoder (Dict Int Entry)
