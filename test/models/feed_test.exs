@@ -18,44 +18,44 @@ defmodule ExRss.FeedTest do
     refute changeset.valid?
   end
 
-  @timeout Duration.from_minutes(60) |> Duration.to_milliseconds()
-  @max_timeout Duration.from_days(1) |> Duration.to_milliseconds()
+  @now DateTime.truncate(DateTime.utc_now(), :second)
+  @timeout Duration.from_minutes(60) |> Duration.to_seconds()
+  @max_timeout Duration.from_days(1) |> Duration.to_seconds() |> round
 
   test "schedule_update_on_error" do
     changeset =
-      %Feed{retries: 0, next_update_at: DateTime.utc_now()}
+      %Feed{retries: 0, next_update_at: @now}
       |> Changeset.change()
       |> Feed.schedule_update_on_error()
 
-    diff = Timex.diff(changeset.changes.next_update_at, DateTime.utc_now(), :milliseconds)
+    diff = Timex.diff(changeset.changes.next_update_at, @now, :seconds)
 
     assert %{retries: 1} = changeset.changes
-    assert_in_delta diff, @timeout, 100
+    assert diff == @timeout
+    assert changeset.changes.next_update_at.microsecond == {0, 0}
 
     changeset =
       changeset
       |> Feed.schedule_update_on_error()
 
     assert %{retries: 2} = changeset.changes
-    assert Timex.compare(changeset.changes.next_update_at, DateTime.utc_now()) == 1
+    assert Timex.compare(changeset.changes.next_update_at, @now) == 1
   end
 
   test "schedule_update has a maximum timeout" do
     changeset =
-      %Feed{retries: 20, next_update_at: DateTime.utc_now()}
+      %Feed{retries: 20, next_update_at: @now}
       |> Changeset.change()
       |> Feed.schedule_update_on_error()
 
-    diff = Timex.diff(changeset.changes.next_update_at, DateTime.utc_now(), :milliseconds)
+    diff = Timex.diff(changeset.changes.next_update_at, @now, :seconds)
 
-    # We cannot check for equality becase Duration.from_milliseconds in
-    # Feed.schedule_update might yield small rounding errors.
-    assert_in_delta diff, @max_timeout, 10
+    assert diff == @max_timeout
   end
 
   test "schedule_update schedules update in the future" do
     next_update_at =
-      DateTime.utc_now()
+      @now
       |> Timex.subtract(Duration.from_days(2))
 
     changeset =
@@ -63,23 +63,21 @@ defmodule ExRss.FeedTest do
       |> Changeset.change()
       |> Feed.schedule_update_on_error()
 
-    diff = Timex.diff(changeset.changes.next_update_at, DateTime.utc_now(), :milliseconds)
+    diff = Timex.diff(changeset.changes.next_update_at, @now, :seconds)
 
-    # We cannot check for equality becase Duration.from_milliseconds in
-    # Feed.schedule_update might yield small rounding errors.
-    assert_in_delta diff, @max_timeout, 10
+    assert diff == @max_timeout
   end
 
   test "schedule_update_on_success" do
     changeset =
-      %Feed{retries: 0, next_update_at: DateTime.utc_now()}
+      %Feed{retries: 0, next_update_at: @now}
       |> Changeset.change()
       |> Feed.schedule_update_on_success()
 
-    diff = Timex.diff(changeset.changes.next_update_at, DateTime.utc_now(), :milliseconds)
+    diff = Timex.diff(changeset.changes.next_update_at, @now, :seconds)
 
     assert Changeset.get_field(changeset, :retries) == 0
-    assert_in_delta diff, @timeout, 100
+    assert diff == @timeout
   end
 
   setup do

@@ -17,7 +17,7 @@ defmodule ExRss.FeedAdder do
       |> build_assoc(:feeds)
       |> Feed.changeset(feed_params)
       |> put_change(:retries, 0)
-      |> put_change(:next_update_at, DateTime.utc_now())
+      |> put_change(:next_update_at, DateTime.truncate(DateTime.utc_now(), :second))
 
     Multi.new()
     |> Multi.insert(:feed, changeset)
