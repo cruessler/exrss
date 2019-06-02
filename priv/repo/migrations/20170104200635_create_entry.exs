@@ -8,7 +8,7 @@ defmodule ExRss.Repo.Migrations.CreateEntry do
       add :url, :string
       add :title, :string
 
-      add :posted_at, :datetime
+      add :posted_at, :utc_datetime
 
       timestamps()
     end
