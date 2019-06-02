@@ -5,6 +5,8 @@ defmodule ExRss.Entry do
 
   @derive {Poison.Encoder, only: [:id, :url, :title, :read, :posted_at]}
 
+  @timestamps_opts [type: :utc_datetime]
+
   schema "entries" do
     belongs_to :feed, Feed
 

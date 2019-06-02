@@ -6,6 +6,8 @@ defmodule ExRss.User do
   alias ExRss.Feed
   alias ExRss.User
 
+  @timestamps_opts [type: :utc_datetime]
+
   schema "users" do
     field :email, :string
     field :hashed_password, :string

@@ -11,6 +11,8 @@ defmodule ExRss.Feed do
 
   @derive {Poison.Encoder, only: [:id, :title, :url, :entries]}
 
+  @timestamps_opts [type: :utc_datetime]
+
   schema "feeds" do
     field :title, :string
     field :url, :string

@@ -3,6 +3,8 @@ defmodule ExRss.User.Registration do
 
   alias Comeonin.Bcrypt
 
+  @timestamps_opts [type: :utc_datetime]
+
   schema "users" do
     field :email, :string
     field :password, :string, virtual: true
