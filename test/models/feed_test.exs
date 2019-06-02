@@ -26,7 +26,7 @@ defmodule ExRss.FeedTest do
     changeset =
       %Feed{retries: 0, next_update_at: @now}
       |> Changeset.change()
-      |> Feed.schedule_update_on_error()
+      |> Feed.schedule_update_on_error(@now)
 
     diff = Timex.diff(changeset.changes.next_update_at, @now, :seconds)
 
@@ -36,7 +36,7 @@ defmodule ExRss.FeedTest do
 
     changeset =
       changeset
-      |> Feed.schedule_update_on_error()
+      |> Feed.schedule_update_on_error(@now)
 
     assert %{retries: 2} = changeset.changes
     assert Timex.compare(changeset.changes.next_update_at, @now) == 1
@@ -46,7 +46,7 @@ defmodule ExRss.FeedTest do
     changeset =
       %Feed{retries: 20, next_update_at: @now}
       |> Changeset.change()
-      |> Feed.schedule_update_on_error()
+      |> Feed.schedule_update_on_error(@now)
 
     diff = Timex.diff(changeset.changes.next_update_at, @now, :seconds)
 
@@ -61,7 +61,7 @@ defmodule ExRss.FeedTest do
     changeset =
       %Feed{retries: 20, next_update_at: next_update_at}
       |> Changeset.change()
-      |> Feed.schedule_update_on_error()
+      |> Feed.schedule_update_on_error(@now)
 
     diff = Timex.diff(changeset.changes.next_update_at, @now, :seconds)
 
@@ -72,7 +72,7 @@ defmodule ExRss.FeedTest do
     changeset =
       %Feed{retries: 0, next_update_at: @now}
       |> Changeset.change()
-      |> Feed.schedule_update_on_success()
+      |> Feed.schedule_update_on_success(@now)
 
     diff = Timex.diff(changeset.changes.next_update_at, @now, :seconds)
 

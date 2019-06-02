@@ -58,21 +58,25 @@ defmodule ExRss.Feed do
     |> Changeset.put_assoc(:entries, entries)
   end
 
-  def schedule_update_on_error(changeset) do
+  def schedule_update_on_error(changeset, now \\ now_with_seconds_precision) do
     retries = Changeset.get_field(changeset, :retries)
 
     changeset
-    |> schedule_update
+    |> schedule_update(now)
     |> Changeset.put_change(:retries, retries + 1)
   end
 
-  def schedule_update_on_success(changeset) do
+  def schedule_update_on_success(changeset, now \\ now_with_seconds_precision) do
     changeset
     |> Changeset.put_change(:retries, 0)
-    |> schedule_update
+    |> schedule_update(now)
   end
 
-  defp schedule_update(changeset) do
+  defp now_with_seconds_precision do
+    DateTime.utc_now() |> DateTime.truncate(:second)
+  end
+
+  defp schedule_update(changeset, now) do
     retries = Changeset.get_field(changeset, :retries)
 
     new_timeout =
@@ -83,7 +87,7 @@ defmodule ExRss.Feed do
     next_update_at =
       changeset
       |> Changeset.get_field(:next_update_at)
-      |> later(DateTime.utc_now())
+      |> later(now)
       |> Timex.shift(seconds: new_timeout)
       |> DateTime.truncate(:second)
 
