@@ -58,7 +58,7 @@ defmodule ExRss.Feed do
     |> Changeset.put_assoc(:entries, entries)
   end
 
-  def schedule_update_on_error(changeset, now \\ now_with_seconds_precision) do
+  def schedule_update_on_error(changeset, now \\ now_with_seconds_precision()) do
     retries = Changeset.get_field(changeset, :retries)
 
     changeset
@@ -66,7 +66,7 @@ defmodule ExRss.Feed do
     |> Changeset.put_change(:retries, retries + 1)
   end
 
-  def schedule_update_on_success(changeset, now \\ now_with_seconds_precision) do
+  def schedule_update_on_success(changeset, now \\ now_with_seconds_precision()) do
     changeset
     |> Changeset.put_change(:retries, 0)
     |> schedule_update(now)
