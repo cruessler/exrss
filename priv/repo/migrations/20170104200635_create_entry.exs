@@ -10,7 +10,7 @@ defmodule ExRss.Repo.Migrations.CreateEntry do
 
       add :posted_at, :utc_datetime
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
     create index(:entries, [:feed_id, :url], unique: true)

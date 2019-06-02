@@ -6,7 +6,7 @@ defmodule ExRss.Repo.Migrations.CreateFeed do
       add :title, :string
       add :url, :string
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
   end
 end

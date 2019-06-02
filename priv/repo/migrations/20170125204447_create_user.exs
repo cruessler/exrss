@@ -6,7 +6,7 @@ defmodule ExRss.Repo.Migrations.CreateUser do
       add :email, :string
       add :hashed_password, :string
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
     alter table(:feeds) do
