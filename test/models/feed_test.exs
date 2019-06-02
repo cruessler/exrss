@@ -19,7 +19,7 @@ defmodule ExRss.FeedTest do
   end
 
   @now DateTime.truncate(DateTime.utc_now(), :second)
-  @timeout Duration.from_minutes(60) |> Duration.to_seconds()
+  @timeout Duration.from_minutes(60) |> Duration.to_seconds() |> round
   @max_timeout Duration.from_days(1) |> Duration.to_seconds() |> round
 
   test "schedule_update_on_error" do
