@@ -33,7 +33,7 @@ defmodule ExRss.Entry do
   end
 
   def parse(entry) do
-    now = DateTime.utc_now()
+    now = DateTime.utc_now() |> DateTime.truncate(:second)
 
     posted_at =
       case parse_time(entry.updated) do
