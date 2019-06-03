@@ -32,6 +32,7 @@ defmodule ExRss.Mixfile do
         :postgrex,
         :tzdata,
         :httpoison,
+        :telemetry,
         :timex
       ]
     ]
