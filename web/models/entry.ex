@@ -83,7 +83,10 @@ defmodule ExRss.Entry do
       [head | tail] ->
         case Timex.parse(time, head, :strftime) do
           {:ok, posted_at} ->
-            {:ok, posted_at |> Timex.Timezone.convert("Etc/UTC")}
+            {:ok,
+             posted_at
+             |> Timex.Timezone.convert("Etc/UTC")
+             |> DateTime.truncate(:second)}
 
           {:error, _} ->
             parse_time(time, tail)

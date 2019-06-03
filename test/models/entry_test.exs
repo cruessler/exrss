@@ -12,6 +12,13 @@ defmodule ExRss.EntryTest do
     assert {:ok, _} = Entry.parse_time("2019-01-17T00:00:00Z")
   end
 
+  test "parses time, truncating microseconds" do
+    {:ok, %{microsecond: {microsecond, precision}}} = Entry.parse_time("2018-08-22T10:07:06.121Z")
+
+    assert microsecond == 0
+    assert precision == 0
+  end
+
   test "returns absolute link" do
     assert "http://example.com/posts/2018/12/26/1.html" =
              Entry.url_for("http://example.com", "/posts/2018/12/26/1.html")
