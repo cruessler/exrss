@@ -69,9 +69,9 @@ getFeeds : Api.Config -> Cmd Msg
 getFeeds apiConfig =
     Api.get
         apiConfig
-        { url = Paths.feeds
+        { url = Paths.feedsOnlyUnreadEntries
         , params = Encode.null
-        , decoder = Types.Feed.decodeFeeds
+        , decoder = Types.Feed.decodeFeedsOnlyUnreadEntries
         }
         |> Http.send NewFeeds
 

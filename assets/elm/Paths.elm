@@ -3,6 +3,7 @@ module Paths
         ( candidates
         , createFeed
         , feeds
+        , feedsOnlyUnreadEntries
         , feed
         , entry
         )
@@ -24,6 +25,11 @@ createFeed =
 feeds : String
 feeds =
     "/api/v1/feeds/"
+
+
+feedsOnlyUnreadEntries : String
+feedsOnlyUnreadEntries =
+    "/api/v1/feeds/only_unread_entries"
 
 
 feed : Feed -> String
