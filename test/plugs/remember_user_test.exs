@@ -47,7 +47,7 @@ defmodule ExRss.RememberUser do
       |> put_session(:current_user, user)
       |> Session.renew_remember_me_cookie()
 
-    assert user = get_session(conn, :current_user)
+    assert ^user = get_session(conn, :current_user)
 
     new_conn =
       conn(:get, "/")
