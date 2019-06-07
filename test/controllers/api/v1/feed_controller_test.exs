@@ -1,7 +1,7 @@
 defmodule ExRss.Api.V1.FeedControllerTest do
   use ExRss.ConnCase
 
-  alias ExRss.{Entry, Feed, User}
+  alias ExRss.User
 
   setup do
     user = Repo.insert!(%User{email: "jane@doe.com"})
