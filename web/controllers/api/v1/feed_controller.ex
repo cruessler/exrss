@@ -78,7 +78,8 @@ defmodule ExRss.Api.V1.FeedController do
       {:error, :feed, changeset, _} ->
         conn
         |> put_status(:bad_request)
-        |> render(ExRss.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(ExRss.ChangesetView)
+        |> render("error.json", changeset: changeset)
 
       _ ->
         conn
