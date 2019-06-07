@@ -3,6 +3,9 @@ defmodule ExRss.Plug.Api.Authorization do
 
   @context ExRss.Endpoint
 
+  # 1 day
+  @max_age 86_400
+
   def init(salt) do
     salt
   end
@@ -21,7 +24,7 @@ defmodule ExRss.Plug.Api.Authorization do
   end
 
   defp verify_token(["Bearer " <> token], salt) do
-    Phoenix.Token.verify(@context, salt, token)
+    Phoenix.Token.verify(@context, salt, token, max_age: @max_age)
   end
 
   defp verify_token(_, _) do

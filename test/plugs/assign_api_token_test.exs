@@ -18,6 +18,9 @@ defmodule ExRss.AssignApiToken do
              signing_salt: "yadayada"
            )
 
+  # 1 day
+  @max_age 86_400
+
   test "Plug.AssignApiToken" do
     conn =
       conn(:get, "/")
@@ -26,6 +29,11 @@ defmodule ExRss.AssignApiToken do
       |> AssignApiToken.call(@plug)
 
     assert {:ok, %Account{id: 1}} =
-             Phoenix.Token.verify(ExRss.Endpoint, @salt, conn.assigns.api_token)
+             Phoenix.Token.verify(
+               ExRss.Endpoint,
+               @salt,
+               conn.assigns.api_token,
+               max_age: @max_age
+             )
   end
 end
