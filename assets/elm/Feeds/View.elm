@@ -68,19 +68,10 @@ additionalInfo : Feed -> Html Msg
 additionalInfo feed =
     let
         numberOfEntries =
-            Dict.size feed.entries
+            feed.unreadEntriesCount + feed.readEntriesCount
 
         numberOfUnreadEntries =
-            Dict.foldl
-                (\k v acc ->
-                    if v.read then
-                        acc
-
-                    else
-                        acc + 1
-                )
-                0
-                feed.entries
+            feed.unreadEntriesCount
 
         infoText =
             if numberOfEntries == 1 then
