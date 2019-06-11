@@ -1,10 +1,9 @@
-module Feeds.Options.Discovery
-    exposing
-        ( discoverFeedsFieldset
-        , discoverFeedFieldset
-        , requestFieldset
-        , addableFeed
-        )
+module Feeds.Options.Discovery exposing
+    ( addableFeed
+    , discoverFeedFieldset
+    , discoverFeedsFieldset
+    , requestFieldset
+    )
 
 import Dict exposing (Dict)
 import Feeds.Discovery as Discovery exposing (Discovery)
@@ -34,10 +33,11 @@ onEnter msg =
         isEnter key =
             if key == 13 then
                 Decode.succeed msg
+
             else
                 Decode.fail "keyCode != 13"
     in
-        E.on "keydown" <| Decode.andThen isEnter E.keyCode
+    E.on "keydown" <| Decode.andThen isEnter E.keyCode
 
 
 discoverFeedsFieldset : String -> Html Msg
@@ -114,16 +114,17 @@ frequencyInfo frequency =
     let
         formatDuration seconds =
             if seconds < 2 * 86400 then
-                (toString <| round <| (toFloat seconds) / 3600.0)
+                (String.fromInt <| round <| toFloat seconds / 3600.0)
                     ++ " hours"
+
             else
-                (toString <| round <| (toFloat seconds) / 86400.0)
+                (String.fromInt <| round <| toFloat seconds / 86400.0)
                     ++ " days"
     in
-        H.text <|
-            (toString frequency.posts)
-                ++ " posts in "
-                ++ (formatDuration frequency.seconds)
+    H.text <|
+        String.fromInt frequency.posts
+            ++ " posts in "
+            ++ formatDuration frequency.seconds
 
 
 addableFeed : { onAdd : Candidate -> msg } -> Candidate -> Html msg
@@ -158,16 +159,17 @@ successFieldset success =
                 ]
             , close success.url
             ]
+
     else
         let
             children =
                 List.map (addableFeed { onAdd = AddFeed }) success.candidates
         in
-            H.fieldset []
-                [ H.legend [] [ H.text "These feeds can be added" ]
-                , H.ul [] children
-                , close success.url
-                ]
+        H.fieldset []
+            [ H.legend [] [ H.text "These feeds can be added" ]
+            , H.ul [] children
+            , close success.url
+            ]
 
 
 errorFieldset : Discovery.Error -> Html Msg

@@ -1,9 +1,8 @@
-module Feeds.Model
-    exposing
-        ( Model
-        , Visibility(..)
-        , Request(..)
-        )
+module Feeds.Model exposing
+    ( Model
+    , Request(..)
+    , Visibility(..)
+    )
 
 import Api
 import Dict exposing (Dict)

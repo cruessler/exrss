@@ -1,29 +1,28 @@
-module Types.Feed
-    exposing
-        ( Feed
-        , Entry
-        , Status(..)
-        , Candidate
-        , Frequency
-        , compareByNewestEntry
-        , compareByStatus
-        , compareByPostedAt
-        , decodeFeeds
-        , decodeFeedsOnlyUnreadEntries
-        , decodeFeed
-        , decodeFeedOnlyUnreadEntries
-        , decodeEntry
-        , decodeCandidates
-        , decodeCandidate
-        , encodeCandidate
-        , encodeEntry
-        )
+module Types.Feed exposing
+    ( Candidate
+    , Entry
+    , Feed
+    , Frequency
+    , Status(..)
+    , compareByNewestEntry
+    , compareByPostedAt
+    , compareByStatus
+    , decodeCandidate
+    , decodeCandidates
+    , decodeEntry
+    , decodeFeed
+    , decodeFeedOnlyUnreadEntries
+    , decodeFeeds
+    , decodeFeedsOnlyUnreadEntries
+    , encodeCandidate
+    , encodeEntry
+    )
 
-import Date
 import Dict exposing (Dict)
+import Iso8601
 import Json.Decode as Decode exposing (..)
 import Json.Encode as Encode
-import Time exposing (Time)
+import Time
 
 
 type alias Feed =
@@ -47,7 +46,7 @@ type alias Entry =
     , url : String
     , title : Maybe String
     , read : Bool
-    , postedAt : Maybe Time
+    , postedAt : Maybe Time.Posix
     , status : Status
     }
 
@@ -85,15 +84,15 @@ compareByNewestEntry a b =
         newestOf =
             .entries
                 >> Dict.values
-                >> List.sortWith (\a b -> compareByPostedAt a b |> flip)
+                >> List.sortWith (\x y -> compareByPostedAt x y |> flip)
                 >> List.head
     in
-        case ( newestOf a, newestOf b ) of
-            ( Just x, Just y ) ->
-                compareByPostedAt x y
+    case ( newestOf a, newestOf b ) of
+        ( Just x, Just y ) ->
+            compareByPostedAt x y
 
-            _ ->
-                EQ
+        _ ->
+            EQ
 
 
 compareByStatus : Feed -> Feed -> Order
@@ -101,24 +100,24 @@ compareByStatus a b =
     let
         anyUnread : Dict Int Entry -> Bool
         anyUnread =
-            Dict.foldl (\_ v acc -> acc || (not v.read)) False
+            Dict.foldl (\_ v acc -> acc || not v.read) False
     in
-        case ( anyUnread a.entries, anyUnread b.entries ) of
-            ( True, False ) ->
-                LT
+    case ( anyUnread a.entries, anyUnread b.entries ) of
+        ( True, False ) ->
+            LT
 
-            ( False, True ) ->
-                GT
+        ( False, True ) ->
+            GT
 
-            _ ->
-                EQ
+        _ ->
+            EQ
 
 
 compareByPostedAt : Entry -> Entry -> Order
 compareByPostedAt a b =
     case ( a.postedAt, b.postedAt ) of
         ( Just x, Just y ) ->
-            compare x y
+            compare (Time.posixToMillis x) (Time.posixToMillis y)
 
         ( Just _, Nothing ) ->
             GT
@@ -158,6 +157,7 @@ numberOfUnreadEntries entries =
         (\k v acc ->
             if v.read then
                 acc
+
             else
                 acc + 1
         )
@@ -171,6 +171,7 @@ numberOfReadEntries entries =
         (\k v acc ->
             if v.read then
                 acc + 1
+
             else
                 acc
         )
@@ -180,7 +181,7 @@ numberOfReadEntries entries =
 
 decodeFeed : Decode.Decoder Feed
 decodeFeed =
-    (field "entries" decodeEntries)
+    field "entries" decodeEntries
         |> andThen countEntries
 
 
@@ -203,8 +204,8 @@ decodeEntries =
             List.map (\f -> ( f.id, f )) list
                 |> Dict.fromList
     in
-        list decodeEntry
-            |> map toDict
+    list decodeEntry
+        |> map toDict
 
 
 decodeCandidates : Decode.Decoder (List Candidate)
@@ -247,18 +248,17 @@ encodeEntry entry =
         ]
 
 
-decodePostedAt : Decode.Decoder (Maybe Time)
+decodePostedAt : Decode.Decoder (Maybe Time.Posix)
 decodePostedAt =
     let
         parseDate =
-            Date.fromString
-                >> (Result.map Date.toTime)
+            Iso8601.toTime
                 >> Result.toMaybe
 
         date =
             oneOf [ null Nothing, string |> Decode.map parseDate ]
     in
-        field "posted_at" date
+    field "posted_at" date
 
 
 decodeEntry : Decode.Decoder Entry

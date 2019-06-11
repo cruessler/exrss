@@ -1,9 +1,9 @@
 module Feeds.Discovery exposing (Discovery, Error, Success, get)
 
 import Api
+import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
-import Http
 import Paths
 import Request exposing (..)
 import Task exposing (Task)
@@ -57,10 +57,10 @@ get apiConfig url =
         error =
             Error url message
     in
-        Api.get
-            apiConfig
-            { url = Paths.candidates url
-            , params = Encode.null
-            , decoder = successDecoder url
-            }
-            |> fromApi error
+    Api.get
+        apiConfig
+        { url = Paths.candidates url
+        , params = Encode.null
+        , decoder = successDecoder url
+        }
+        |> fromApi error

@@ -49,9 +49,9 @@ post apiConfig candidate =
         error =
             Error candidate message
     in
-        Api.post apiConfig
-            { url = Paths.createFeed
-            , params = Types.Feed.encodeCandidate candidate
-            , decoder = Types.Feed.decodeFeed |> Decode.map Success
-            }
-            |> fromApi error
+    Api.post apiConfig
+        { url = Paths.createFeed
+        , params = Types.Feed.encodeCandidate candidate
+        , decoder = Types.Feed.decodeFeed |> Decode.map Success
+        }
+        |> fromApi error

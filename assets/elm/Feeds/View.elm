@@ -1,31 +1,34 @@
 module Feeds.View exposing (view)
 
+import DateFormat as F
 import Dict
-import Date
-import Date.Format
 import Feeds.Model exposing (..)
 import Feeds.Msg exposing (..)
 import Feeds.Options as Options
 import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
+import Time
 import Types.Feed as Feed exposing (..)
 
 
-entry : Entry -> Html Msg
-entry entry =
+formatPostedAt : Time.Posix -> String
+formatPostedAt =
+    F.format [ F.monthNameFull, F.text " ", F.dayOfMonthNumber, F.text ", ", F.yearNumber, F.text ", ", F.hourMilitaryFixed, F.text ":", F.minuteFixed ] Time.utc
+
+
+viewEntry : Entry -> Html Msg
+viewEntry entry =
     let
         postedAt =
             entry.postedAt
-                |> Maybe.map
-                    (Date.fromTime
-                        >> Date.Format.format "%B %e, %Y, %k:%M"
-                    )
+                |> Maybe.map formatPostedAt
                 |> Maybe.withDefault "unknown"
 
         maybeButton =
             if entry.read then
                 H.text ""
+
             else
                 H.button
                     [ E.onClick (MarkAsRead entry) ]
@@ -43,22 +46,22 @@ entry entry =
                 , maybeButton
                 ]
     in
-        H.li
-            [ A.classList
-                [ ( "entry", True )
-                , ( "read", entry.read )
-                , ( "update-pending", entry.status == UpdatePending )
-                ]
+    H.li
+        [ A.classList
+            [ ( "entry", True )
+            , ( "read", entry.read )
+            , ( "update-pending", entry.status == UpdatePending )
             ]
-            [ H.a
-                [ A.href entry.url
-                , A.target "_blank"
-                , E.onClick (MarkAsRead entry)
-                ]
-                [ entry.title |> Maybe.withDefault "[no title]" |> H.text ]
-            , H.span [] [ H.text postedAt ]
-            , actions
+        ]
+        [ H.a
+            [ A.href entry.url
+            , A.target "_blank"
+            , E.onClick (MarkAsRead entry)
             ]
+            [ entry.title |> Maybe.withDefault "[no title]" |> H.text ]
+        , H.span [] [ H.text postedAt ]
+        , actions
+        ]
 
 
 additionalInfo : Feed -> Html Msg
@@ -72,6 +75,7 @@ additionalInfo feed =
                 (\k v acc ->
                     if v.read then
                         acc
+
                     else
                         acc + 1
                 )
@@ -81,23 +85,25 @@ additionalInfo feed =
         infoText =
             if numberOfEntries == 1 then
                 "1 entry"
+
             else
-                toString (numberOfEntries) ++ " entries"
+                String.fromInt numberOfEntries ++ " entries"
 
         infoTextUnread =
             if numberOfUnreadEntries == 0 then
                 ""
+
             else
-                toString (numberOfUnreadEntries) ++ " unread"
+                String.fromInt numberOfUnreadEntries ++ " unread"
     in
-        H.ul [ A.class "additional-info" ]
-            [ H.li [] [ H.text infoText ]
-            , H.li [] [ H.text infoTextUnread ]
-            ]
+    H.ul [ A.class "additional-info" ]
+        [ H.li [] [ H.text infoText ]
+        , H.li [] [ H.text infoTextUnread ]
+        ]
 
 
-feed : Visibility -> Feed -> Html Msg
-feed visibility feed =
+viewFeed : Visibility -> Feed -> Html Msg
+viewFeed visibility feed =
     let
         sortedEntries =
             feed.entries
@@ -110,23 +116,26 @@ feed visibility feed =
                 HideReadEntries ->
                     if feed.open then
                         List.filter (not << .read) <| sortedEntries
+
                     else
                         []
 
                 AlwaysShowUnreadEntries ->
                     if feed.open then
                         sortedEntries
+
                     else
                         List.filter (not << .read) <| sortedEntries
 
                 ShowAllEntries ->
                     if feed.open then
                         sortedEntries
+
                     else
                         []
 
         feed_ =
-            H.ul [ A.class "feed" ] (List.map entry entries)
+            H.ul [ A.class "feed" ] (List.map viewEntry entries)
 
         actions =
             H.div [ A.class "actions" ]
@@ -141,9 +150,9 @@ feed visibility feed =
             , feed_
             ]
     in
-        H.li
-            [ A.class "feed" ]
-            children
+    H.li
+        [ A.class "feed" ]
+        children
 
 
 view : Model -> Html Msg
@@ -155,9 +164,9 @@ view model =
                 |> List.sortWith Feed.compareByNewestEntry
                 |> List.reverse
                 |> List.sortWith Feed.compareByStatus
-                |> List.map (feed model.visibility)
+                |> List.map (viewFeed model.visibility)
     in
-        H.main_ [ A.attribute "role" "main" ]
-            [ Options.view model
-            , H.ul [ A.class "feeds" ] feeds
-            ]
+    H.main_ [ A.attribute "role" "main" ]
+        [ Options.view model
+        , H.ul [ A.class "feeds" ] feeds
+        ]

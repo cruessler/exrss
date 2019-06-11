@@ -1,6 +1,7 @@
 module App.NewFeed exposing (main)
 
 import Api
+import Browser
 import Feeds.Addition as Addition
 import Feeds.Options.Addition
 import Feeds.Options.Discovery
@@ -39,11 +40,11 @@ type Msg
 
 
 main =
-    H.programWithFlags
+    Browser.element
         { init = init
         , update = update
         , view = view
-        , subscriptions = (\_ -> Sub.none)
+        , subscriptions = \_ -> Sub.none
         }
 
 
@@ -51,18 +52,18 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
         apiConfig =
-            Api.config flags.apiToken
+            Api.configFromToken flags.apiToken
 
         result =
             Decode.decodeValue Types.Feed.decodeCandidate flags.candidate
     in
-        ( { url = flags.url
-          , apiConfig = apiConfig
-          , candidate = Result.toMaybe result
-          , request = Nothing
-          }
-        , Cmd.none
-        )
+    ( { url = flags.url
+      , apiConfig = apiConfig
+      , candidate = Result.toMaybe result
+      , request = Nothing
+      }
+    , Cmd.none
+    )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -71,19 +72,19 @@ update msg model =
         AddFeed candidate ->
             let
                 request =
-                    (Addition <| Request.InProgress candidate)
+                    Addition <| Request.InProgress candidate
             in
-                ( { model | request = Just request }
-                , Addition.post model.apiConfig candidate
-                    |> Task.attempt FeedAdded
-                )
+            ( { model | request = Just request }
+            , Addition.post model.apiConfig candidate
+                |> Task.attempt FeedAdded
+            )
 
         FeedAdded result ->
             let
                 request =
                     Addition <| Done result
             in
-                ( { model | request = Just request }, Cmd.none )
+            ( { model | request = Just request }, Cmd.none )
 
         RemoveRequest ->
             ( { model | request = Nothing }, Cmd.none )
@@ -92,13 +93,13 @@ update msg model =
 addFeedFieldset : Model -> Html Msg
 addFeedFieldset { url, candidate } =
     case candidate of
-        Just candidate ->
+        Just c ->
             H.fieldset []
                 [ H.legend [] [ H.text "This feed can be added" ]
                 , H.ul []
                     [ Feeds.Options.Discovery.addableFeed
                         { onAdd = AddFeed }
-                        candidate
+                        c
                     ]
                 ]
 

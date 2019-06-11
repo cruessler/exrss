@@ -1,4 +1,4 @@
-module Feeds.Removal exposing (Removal, Error, Success, delete)
+module Feeds.Removal exposing (Error, Removal, Success, delete)
 
 import Api
 import Http
@@ -49,9 +49,9 @@ delete apiConfig feed =
         error =
             Error feed message
     in
-        Api.delete apiConfig
-            { url = Paths.feed feed
-            , params = Encode.null
-            , decoder = Decode.succeed <| Success feed
-            }
-            |> fromApi error
+    Api.delete apiConfig
+        { url = Paths.feed feed
+        , params = Encode.null
+        , decoder = Decode.succeed <| Success feed
+        }
+        |> fromApi error

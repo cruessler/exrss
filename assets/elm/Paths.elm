@@ -1,42 +1,41 @@
-module Paths
-    exposing
-        ( candidates
-        , createFeed
-        , feeds
-        , feedsOnlyUnreadEntries
-        , feed
-        , entry
-        )
+module Paths exposing
+    ( candidates
+    , createFeed
+    , entry
+    , feed
+    , feeds
+    , feedsOnlyUnreadEntries
+    )
 
-import Http
+import Url.Builder exposing (absolute, string)
 import Types.Feed exposing (..)
 
 
 candidates : String -> String
 candidates url =
-    "/api/v1/feeds/discover?url=" ++ (Http.encodeUri url)
+    absolute [ "api", "v1", "feeds", "discover" ] [ string "url" url ]
 
 
 createFeed : String
 createFeed =
-    "/api/v1/feeds"
+    absolute [ "api", "v1", "feeds" ] []
 
 
 feeds : String
 feeds =
-    "/api/v1/feeds/"
+    absolute [ "api", "v1", "feeds" ] []
 
 
 feedsOnlyUnreadEntries : String
 feedsOnlyUnreadEntries =
-    "/api/v1/feeds/only_unread_entries"
+    absolute [ "api", "v1", "feeds", "only_unread_entries"] []
 
 
 feed : Feed -> String
-feed feed =
-    "/api/v1/feeds/" ++ (toString feed.id)
+feed feed_ =
+    absolute [ "api", "v1", "feeds", String.fromInt feed_.id ] []
 
 
 entry : Entry -> String
-entry entry =
-    "/api/v1/entries/" ++ (toString entry.id)
+entry entry_ =
+    absolute [ "api", "v1", "entries", String.fromInt entry_.id ] []

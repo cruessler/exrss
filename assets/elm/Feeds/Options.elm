@@ -31,6 +31,7 @@ collapsible : Bool -> List (Html Msg) -> Html Msg
 collapsible show children =
     if show then
         H.div [] children
+
     else
         H.div [] []
 
@@ -63,18 +64,18 @@ visibilityFieldset visibility =
 requests : Dict String Model.Request -> Html Msg
 requests =
     Dict.map
-        (\_ r ->
-            case r of
-                Model.Discovery d ->
-                    Discovery.requestFieldset d
+        (\_ request ->
+            case request of
+                Model.Discovery discovery ->
+                    Discovery.requestFieldset discovery
 
-                Model.Addition a ->
+                Model.Addition addition ->
                     Addition.requestFieldset
                         { onAdd = AddFeed, onRemove = RemoveResponse }
-                        a
+                        addition
 
-                Model.Removal r ->
-                    Removal.requestFieldset r
+                Model.Removal removal ->
+                    Removal.requestFieldset removal
         )
         >> Dict.values
         >> H.div []
@@ -86,21 +87,22 @@ view model =
         buttonText =
             if model.showOptions then
                 "Hide options"
+
             else
                 "Show options"
     in
-        H.div []
-            [ H.button
-                [ A.type_ "button"
-                , E.onClick ToggleOptions
-                ]
-                [ H.text buttonText ]
-            , collapsible
-                model.showOptions
-                [ actionsFieldset
-                , visibilityFieldset model.visibility
-                , Discovery.discoverFeedsFieldset model.discoveryUrl
-                , Discovery.discoverFeedFieldset
-                , requests model.requests
-                ]
+    H.div []
+        [ H.button
+            [ A.type_ "button"
+            , E.onClick ToggleOptions
             ]
+            [ H.text buttonText ]
+        , collapsible
+            model.showOptions
+            [ actionsFieldset
+            , visibilityFieldset model.visibility
+            , Discovery.discoverFeedsFieldset model.discoveryUrl
+            , Discovery.discoverFeedFieldset
+            , requests model.requests
+            ]
+        ]

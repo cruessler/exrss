@@ -1,9 +1,9 @@
 module Feeds.Options.Removal exposing (requestFieldset)
 
 import Dict exposing (Dict)
-import Feeds.Removal as Removal exposing (Removal)
 import Feeds.Model exposing (..)
 import Feeds.Msg exposing (..)
+import Feeds.Removal as Removal exposing (Removal)
 import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
@@ -45,15 +45,15 @@ successFieldset success =
             , frequency = Nothing
             }
     in
-        H.fieldset []
-            [ H.legend [] [ H.text "This feed has been deleted" ]
-            , H.code [] [ H.text feed.url ]
-            , H.text ". You can undo the removal by clicking "
-            , H.button
-                [ E.onClick <| AddFeed candidate ]
-                [ H.text "Undo" ]
-            , close feed.url
-            ]
+    H.fieldset []
+        [ H.legend [] [ H.text "This feed has been deleted" ]
+        , H.code [] [ H.text feed.url ]
+        , H.text ". You can undo the removal by clicking "
+        , H.button
+            [ E.onClick <| AddFeed candidate ]
+            [ H.text "Undo" ]
+        , close feed.url
+        ]
 
 
 errorFieldset : Removal.Error -> Html Msg

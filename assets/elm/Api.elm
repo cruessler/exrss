@@ -1,20 +1,18 @@
-module Api
-    exposing
-        ( Config
-        , config
-        , get
-        , post
-        , patch
-        , delete
-        )
+module Api exposing
+    ( get, post, patch
+    , Config, configFromToken, delete
+    )
 
-{-| @docs get, post, patch, send
+{-|
+
+@docs get, post, patch, send
+
 -}
 
 import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
-import Task exposing (Task, succeed, fail)
+import Task exposing (Task, fail, succeed)
 
 
 type alias Config =
@@ -35,8 +33,8 @@ type Method
     | Delete
 
 
-config : String -> Config
-config apiToken =
+configFromToken : String -> Config
+configFromToken apiToken =
     Config apiToken
 
 

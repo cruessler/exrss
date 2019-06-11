@@ -16,8 +16,8 @@ import NewFeed from "../elm/App/NewFeed.elm"
 
 const Elm =
   { App:
-    { Feeds: Feeds.App.Feeds,
-      NewFeed: NewFeed.App.NewFeed
+    { Feeds: Feeds.Elm.App.Feeds,
+      NewFeed: NewFeed.Elm.App.NewFeed
     }
   }
 
@@ -44,7 +44,7 @@ class App {
       const params = JSON.parse(node.dataset.elmParams) || {}
 
       if(elmModule != undefined) {
-        elmModule.embed(node, params)
+        elmModule.init({ node, flags: params });
       } else {
         console.error(`No module named ‘${moduleName}’ could be found`)
       }

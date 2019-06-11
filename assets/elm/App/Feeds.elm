@@ -1,16 +1,17 @@
 module App.Feeds exposing (main)
 
 import Api
+import Browser
 import Dict exposing (Dict)
 import Feeds.Addition as Addition
 import Feeds.Discovery as Discovery
-import Feeds.Removal as Removal
 import Feeds.Model as Model exposing (..)
 import Feeds.Msg as Msg exposing (..)
+import Feeds.Removal as Removal
 import Feeds.View as View
-import Json.Encode as Encode
 import Html
 import Http
+import Json.Encode as Encode
 import Paths
 import Request exposing (..)
 import String
@@ -20,11 +21,11 @@ import Types.Feed exposing (..)
 
 main : Program Flags Model Msg
 main =
-    Html.programWithFlags
+    Browser.element
         { init = init
         , update = update
         , view = View.view
-        , subscriptions = (\_ -> Sub.none)
+        , subscriptions = \_ -> Sub.none
         }
 
 
@@ -37,17 +38,17 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
         apiConfig =
-            Api.config flags.apiToken
+            Api.configFromToken flags.apiToken
     in
-        ( { apiConfig = apiConfig
-          , visibility = AlwaysShowUnreadEntries
-          , feeds = Dict.empty
-          , showOptions = False
-          , discoveryUrl = ""
-          , requests = Dict.empty
-          }
-        , getFeeds apiConfig
-        )
+    ( { apiConfig = apiConfig
+      , visibility = AlwaysShowUnreadEntries
+      , feeds = Dict.empty
+      , showOptions = False
+      , discoveryUrl = ""
+      , requests = Dict.empty
+      }
+    , getFeeds apiConfig
+    )
 
 
 updateEntry : Int -> (Entry -> Entry) -> Dict Int Feed -> Dict Int Feed
@@ -62,7 +63,7 @@ updateEntry id f =
                         feed.entries
             }
     in
-        Dict.map updateEntry_
+    Dict.map updateEntry_
 
 
 getFeeds : Api.Config -> Cmd Msg
@@ -97,13 +98,13 @@ markFeedAsRead apiConfig feed =
                   )
                 ]
     in
-        Api.patch
-            apiConfig
-            { url = Paths.feed feed
-            , params = encodeFeed
-            , decoder = Types.Feed.decodeFeed
-            }
-            |> Http.send PatchFeed
+    Api.patch
+        apiConfig
+        { url = Paths.feed feed
+        , params = encodeFeed
+        , decoder = Types.Feed.decodeFeed
+        }
+        |> Http.send PatchFeed
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -128,18 +129,19 @@ update msg model =
                         |> List.map (\f -> ( f.id, f ))
                         |> Dict.fromList
             in
-                ( { model | feeds = newFeeds }, Cmd.none )
+            ( { model | feeds = newFeeds }, Cmd.none )
 
         NewFeeds (Err message) ->
             let
                 _ =
                     Debug.log "Error getting new feeds" message
             in
-                ( model, Cmd.none )
+            ( model, Cmd.none )
 
         DiscoverFeeds url ->
             if String.isEmpty url then
                 ( model, Cmd.none )
+
             else
                 let
                     newRequests =
@@ -148,10 +150,10 @@ update msg model =
                             (Model.Discovery <| Request.InProgress url)
                             model.requests
                 in
-                    ( { model | requests = newRequests }
-                    , Discovery.get model.apiConfig url
-                        |> Task.attempt Msg.Discovery
-                    )
+                ( { model | requests = newRequests }
+                , Discovery.get model.apiConfig url
+                    |> Task.attempt Msg.Discovery
+                )
 
         AddFeed candidate ->
             let
@@ -161,10 +163,10 @@ update msg model =
                         (Model.Addition <| Request.InProgress candidate)
                         model.requests
             in
-                ( { model | requests = newRequests }
-                , Addition.post model.apiConfig candidate
-                    |> Task.attempt Msg.Addition
-                )
+            ( { model | requests = newRequests }
+            , Addition.post model.apiConfig candidate
+                |> Task.attempt Msg.Addition
+            )
 
         RemoveFeed feed ->
             let
@@ -174,21 +176,21 @@ update msg model =
                         (Model.Removal <| Request.InProgress feed)
                         model.requests
             in
-                ( { model | requests = newRequests }
-                , Removal.delete model.apiConfig feed
-                    |> Task.attempt Msg.Removal
-                )
+            ( { model | requests = newRequests }
+            , Removal.delete model.apiConfig feed
+                |> Task.attempt Msg.Removal
+            )
 
         RemoveResponse url ->
             let
                 newRequests =
                     Dict.remove url model.requests
             in
-                ( { model
-                    | requests = newRequests
-                  }
-                , Cmd.none
-                )
+            ( { model
+                | requests = newRequests
+              }
+            , Cmd.none
+            )
 
         ToggleFeed feed ->
             let
@@ -197,7 +199,7 @@ update msg model =
                         { feed | open = not feed.open }
                         model.feeds
             in
-                ( { model | feeds = newFeeds }, Cmd.none )
+            ( { model | feeds = newFeeds }, Cmd.none )
 
         MarkAsRead entry ->
             let
@@ -213,7 +215,7 @@ update msg model =
                     newEntry
                         |> patchEntry model.apiConfig
             in
-                ( { model | feeds = newFeeds }, cmd )
+            ( { model | feeds = newFeeds }, cmd )
 
         MarkFeedAsRead feed ->
             let
@@ -229,7 +231,7 @@ update msg model =
                     feed
                         |> markFeedAsRead model.apiConfig
             in
-                ( { model | feeds = newFeeds }, cmd )
+            ( { model | feeds = newFeeds }, cmd )
 
         PatchEntry (Ok newEntry) ->
             let
@@ -239,7 +241,7 @@ update msg model =
                         (always newEntry)
                         model.feeds
             in
-                ( { model | feeds = newFeeds }, Cmd.none )
+            ( { model | feeds = newFeeds }, Cmd.none )
 
         PatchEntry (Err _) ->
             ( model, Cmd.none )
@@ -249,14 +251,14 @@ update msg model =
                 newFeeds =
                     Dict.insert newFeed.id newFeed model.feeds
             in
-                ( { model | feeds = newFeeds }, Cmd.none )
+            ( { model | feeds = newFeeds }, Cmd.none )
 
         PatchFeed (Err _) ->
             ( model, Cmd.none )
 
         Msg.Discovery result ->
             let
-                url =
+                url_ =
                     case result of
                         Ok { url } ->
                             url
@@ -266,11 +268,11 @@ update msg model =
 
                 newRequests =
                     Dict.insert
-                        url
+                        url_
                         (Model.Discovery <| Done result)
                         model.requests
             in
-                ( { model | requests = newRequests }, Cmd.none )
+            ( { model | requests = newRequests }, Cmd.none )
 
         Msg.Addition result ->
             let
@@ -296,7 +298,7 @@ update msg model =
                         _ ->
                             model.feeds
             in
-                ( { model | feeds = newFeeds, requests = newRequests }, Cmd.none )
+            ( { model | feeds = newFeeds, requests = newRequests }, Cmd.none )
 
         Msg.Removal result ->
             let
@@ -322,4 +324,4 @@ update msg model =
                         _ ->
                             model.feeds
             in
-                ( { model | feeds = newFeeds, requests = newRequests }, Cmd.none )
+            ( { model | feeds = newFeeds, requests = newRequests }, Cmd.none )

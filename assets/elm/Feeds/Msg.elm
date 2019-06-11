@@ -2,8 +2,8 @@ module Feeds.Msg exposing (Msg(..))
 
 import Feeds.Addition as Addition
 import Feeds.Discovery as Discovery
-import Feeds.Removal as Removal
 import Feeds.Model exposing (..)
+import Feeds.Removal as Removal
 import Http
 import Types.Feed exposing (..)
 
