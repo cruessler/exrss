@@ -7,7 +7,7 @@ import Json.Encode as Encode
 import Paths
 import Request exposing (..)
 import Task exposing (Task)
-import Types.Feed exposing (..)
+import Types.Feed as Feed exposing (..)
 
 
 type alias Removal =
@@ -43,7 +43,7 @@ delete apiConfig feed =
     let
         message =
             "The feed at "
-                ++ feed.url
+                ++ Feed.url feed
                 ++ " could not be deleted"
 
         error =

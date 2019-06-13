@@ -16,6 +16,16 @@ module Types.Feed exposing
     , decodeFeedsOnlyUnreadEntries
     , encodeCandidate
     , encodeEntry
+    , entries
+    , id
+    , open
+    , readEntriesCount
+    , title
+    , toggle
+    , unreadEntriesCount
+    , updateEntries
+    , updateEntry
+    , url
     )
 
 import Dict exposing (Dict)
@@ -25,15 +35,16 @@ import Json.Encode as Encode
 import Time
 
 
-type alias Feed =
-    { id : Int
-    , url : String
-    , title : String
-    , entries : Dict Int Entry
-    , open : Bool
-    , unreadEntriesCount : Int
-    , readEntriesCount : Int
-    }
+type Feed
+    = Feed
+        { id : Int
+        , url : String
+        , title : String
+        , entries : Dict Int Entry
+        , open : Bool
+        , unreadEntriesCount : Int
+        , readEntriesCount : Int
+        }
 
 
 type Status
@@ -65,6 +76,67 @@ type alias Candidate =
     }
 
 
+id : Feed -> Int
+id (Feed feed) =
+    feed.id
+
+
+url : Feed -> String
+url (Feed feed) =
+    feed.url
+
+
+title : Feed -> String
+title (Feed feed) =
+    feed.title
+
+
+open : Feed -> Bool
+open (Feed feed) =
+    feed.open
+
+
+toggle : Feed -> Feed
+toggle (Feed feed) =
+    Feed { feed | open = not feed.open }
+
+
+entries : Feed -> Dict Int Entry
+entries (Feed feed) =
+    feed.entries
+
+
+unreadEntriesCount : Feed -> Int
+unreadEntriesCount (Feed feed) =
+    feed.unreadEntriesCount
+
+
+readEntriesCount : Feed -> Int
+readEntriesCount (Feed feed) =
+    feed.readEntriesCount
+
+
+updateEntry : Int -> (Entry -> Entry) -> Dict Int Feed -> Dict Int Feed
+updateEntry id_ f =
+    let
+        updateEntry_ _ (Feed feed) =
+            { feed
+                | entries =
+                    Dict.update
+                        id_
+                        (Maybe.map f)
+                        feed.entries
+            }
+                |> Feed
+    in
+    Dict.map updateEntry_
+
+
+updateEntries : Feed -> Dict Int Entry -> Feed
+updateEntries (Feed feed) newEntries =
+    Feed { feed | entries = newEntries }
+
+
 compareByNewestEntry : Feed -> Feed -> Order
 compareByNewestEntry a b =
     let
@@ -81,11 +153,11 @@ compareByNewestEntry a b =
                     LT
 
         newestOf : Feed -> Maybe Entry
-        newestOf =
-            .entries
-                >> Dict.values
-                >> List.sortWith (\x y -> compareByPostedAt x y |> flip)
-                >> List.head
+        newestOf (Feed feed) =
+            feed.entries
+                |> Dict.values
+                |> List.sortWith (\x y -> compareByPostedAt x y |> flip)
+                |> List.head
     in
     case ( newestOf a, newestOf b ) of
         ( Just x, Just y ) ->
@@ -96,7 +168,7 @@ compareByNewestEntry a b =
 
 
 compareByStatus : Feed -> Feed -> Order
-compareByStatus a b =
+compareByStatus (Feed a) (Feed b) =
     let
         anyUnread : Dict Int Entry -> Bool
         anyUnread =
@@ -140,19 +212,19 @@ decodeFeedsOnlyUnreadEntries =
 
 
 countEntries : Dict Int Entry -> Decode.Decoder Feed
-countEntries entries =
-    map7 Feed
+countEntries entries_ =
+    map7 (\a b c d e f g -> Feed { id = a, url = b, title = c, entries = d, open = e, unreadEntriesCount = f, readEntriesCount = g })
         (field "id" int)
         (field "url" string)
         (oneOf [ null "", field "title" string ])
-        (succeed entries)
+        (succeed entries_)
         (succeed False)
-        (succeed <| numberOfUnreadEntries entries)
-        (succeed <| numberOfReadEntries entries)
+        (succeed <| numberOfUnreadEntries entries_)
+        (succeed <| numberOfReadEntries entries_)
 
 
 numberOfUnreadEntries : Dict Int Entry -> Int
-numberOfUnreadEntries entries =
+numberOfUnreadEntries entries_ =
     Dict.foldl
         (\k v acc ->
             if v.read then
@@ -162,11 +234,11 @@ numberOfUnreadEntries entries =
                 acc + 1
         )
         0
-        entries
+        entries_
 
 
 numberOfReadEntries : Dict Int Entry -> Int
-numberOfReadEntries entries =
+numberOfReadEntries entries_ =
     Dict.foldl
         (\k v acc ->
             if v.read then
@@ -176,7 +248,7 @@ numberOfReadEntries entries =
                 acc
         )
         0
-        entries
+        entries_
 
 
 decodeFeed : Decode.Decoder Feed
@@ -187,7 +259,7 @@ decodeFeed =
 
 decodeFeedOnlyUnreadEntries : Decode.Decoder Feed
 decodeFeedOnlyUnreadEntries =
-    map7 Feed
+    map7 (\a b c d e f g -> Feed { id = a, url = b, title = c, entries = d, open = e, unreadEntriesCount = f, readEntriesCount = g })
         (field "id" int)
         (field "url" string)
         (oneOf [ null "", field "title" string ])

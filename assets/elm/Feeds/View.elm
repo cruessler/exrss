@@ -68,10 +68,10 @@ additionalInfo : Feed -> Html Msg
 additionalInfo feed =
     let
         numberOfEntries =
-            feed.unreadEntriesCount + feed.readEntriesCount
+            Feed.unreadEntriesCount feed + Feed.readEntriesCount feed
 
         numberOfUnreadEntries =
-            feed.unreadEntriesCount
+            Feed.unreadEntriesCount feed
 
         infoText =
             if numberOfEntries == 1 then
@@ -97,7 +97,8 @@ viewFeed : Visibility -> Feed -> Html Msg
 viewFeed visibility feed =
     let
         sortedEntries =
-            feed.entries
+            feed
+                |> Feed.entries
                 |> Dict.values
                 |> List.sortWith Feed.compareByPostedAt
                 |> List.reverse
@@ -105,21 +106,21 @@ viewFeed visibility feed =
         entries =
             case visibility of
                 HideReadEntries ->
-                    if feed.open then
+                    if Feed.open feed then
                         List.filter (not << .read) <| sortedEntries
 
                     else
                         []
 
                 AlwaysShowUnreadEntries ->
-                    if feed.open then
+                    if Feed.open feed then
                         sortedEntries
 
                     else
                         List.filter (not << .read) <| sortedEntries
 
                 ShowAllEntries ->
-                    if feed.open then
+                    if Feed.open feed then
                         sortedEntries
 
                     else
@@ -135,7 +136,7 @@ viewFeed visibility feed =
                 ]
 
         children =
-            [ H.h1 [ E.onClick (ToggleFeed feed) ] [ H.text feed.title ]
+            [ H.h1 [ E.onClick (ToggleFeed feed) ] [ H.text <| Feed.title feed ]
             , additionalInfo feed
             , actions
             , feed_

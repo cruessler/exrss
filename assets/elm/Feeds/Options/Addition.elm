@@ -8,7 +8,7 @@ import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
 import Request exposing (..)
-import Types.Feed exposing (..)
+import Types.Feed as Feed exposing (..)
 
 
 type alias Config msg =
@@ -42,8 +42,8 @@ successFieldset : Config msg -> Addition.Success -> Html msg
 successFieldset config success =
     H.fieldset []
         [ H.legend [] [ H.text "This feed has been added" ]
-        , H.code [] [ H.text success.feed.url ]
-        , close config success.feed.url
+        , H.code [] [ H.text <| Feed.url success.feed ]
+        , close config <| Feed.url success.feed
         ]
 
 

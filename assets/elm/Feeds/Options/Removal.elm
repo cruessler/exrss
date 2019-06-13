@@ -8,7 +8,7 @@ import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
 import Request exposing (..)
-import Types.Feed exposing (..)
+import Types.Feed as Feed exposing (..)
 
 
 close : String -> Html Msg
@@ -26,7 +26,7 @@ inProgressFieldset feed =
         [ H.legend [] [ H.text "This feed is being deleted" ]
         , H.p []
             [ H.text "Waiting for answer for "
-            , H.code [] [ H.text feed.url ]
+            , H.code [] [ H.text <| Feed.url feed ]
             , H.text "."
             ]
         ]
@@ -39,20 +39,20 @@ successFieldset success =
             success.feed
 
         candidate =
-            { url = feed.url
-            , title = feed.title
-            , href = feed.url
+            { url = Feed.url feed
+            , title = Feed.title feed
+            , href = Feed.url feed
             , frequency = Nothing
             }
     in
     H.fieldset []
         [ H.legend [] [ H.text "This feed has been deleted" ]
-        , H.code [] [ H.text feed.url ]
+        , H.code [] [ H.text <| Feed.url feed ]
         , H.text ". You can undo the removal by clicking "
         , H.button
             [ E.onClick <| AddFeed candidate ]
             [ H.text "Undo" ]
-        , close feed.url
+        , close <| Feed.url feed
         ]
 
 
@@ -62,10 +62,10 @@ errorFieldset error =
         [ H.legend [] [ H.text "This feed could not be deleted" ]
         , H.p []
             [ H.text "It was not possible to delete the feed at "
-            , H.code [] [ H.text error.feed.url ]
+            , H.code [] [ H.text <| Feed.url error.feed ]
             , H.text "."
             ]
-        , close error.feed.url
+        , close <| Feed.url error.feed
         , H.button
             [ E.onClick <| RemoveFeed error.feed ]
             [ H.text "Retry" ]

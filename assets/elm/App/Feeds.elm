@@ -16,7 +16,7 @@ import Paths
 import Request exposing (..)
 import String
 import Task exposing (Task)
-import Types.Feed exposing (..)
+import Types.Feed as Feed exposing (..)
 
 
 main : Program Flags Model Msg
@@ -51,28 +51,13 @@ init flags =
     )
 
 
-updateEntry : Int -> (Entry -> Entry) -> Dict Int Feed -> Dict Int Feed
-updateEntry id f =
-    let
-        updateEntry_ _ feed =
-            { feed
-                | entries =
-                    Dict.update
-                        id
-                        (Maybe.map f)
-                        feed.entries
-            }
-    in
-    Dict.map updateEntry_
-
-
 getFeeds : Api.Config -> Cmd Msg
 getFeeds apiConfig =
     Api.get
         apiConfig
         { url = Paths.feedsOnlyUnreadEntries
         , params = Encode.null
-        , decoder = Types.Feed.decodeFeedsOnlyUnreadEntries
+        , decoder = Feed.decodeFeedsOnlyUnreadEntries
         }
         |> Http.send NewFeeds
 
@@ -82,8 +67,8 @@ patchEntry apiConfig entry =
     Api.patch
         apiConfig
         { url = Paths.entry entry
-        , params = Types.Feed.encodeEntry entry
-        , decoder = Types.Feed.decodeEntry
+        , params = Feed.encodeEntry entry
+        , decoder = Feed.decodeEntry
         }
         |> Http.send PatchEntry
 
@@ -102,7 +87,7 @@ markFeedAsRead apiConfig feed =
         apiConfig
         { url = Paths.feed feed
         , params = encodeFeed
-        , decoder = Types.Feed.decodeFeed
+        , decoder = Feed.decodeFeed
         }
         |> Http.send PatchFeed
 
@@ -126,7 +111,7 @@ update msg model =
             let
                 newFeeds =
                     feeds
-                        |> List.map (\f -> ( f.id, f ))
+                        |> List.map (\f -> ( Feed.id f, f ))
                         |> Dict.fromList
             in
             ( { model | feeds = newFeeds }, Cmd.none )
@@ -172,7 +157,7 @@ update msg model =
             let
                 newRequests =
                     Dict.insert
-                        feed.url
+                        (Feed.url feed)
                         (Model.Removal <| Request.InProgress feed)
                         model.requests
             in
@@ -195,8 +180,8 @@ update msg model =
         ToggleFeed feed ->
             let
                 newFeeds =
-                    Dict.insert feed.id
-                        { feed | open = not feed.open }
+                    Dict.insert (Feed.id feed)
+                        (Feed.toggle feed)
                         model.feeds
             in
             ( { model | feeds = newFeeds }, Cmd.none )
@@ -207,7 +192,7 @@ update msg model =
                     { entry | read = True, status = UpdatePending }
 
                 newFeeds =
-                    updateEntry entry.id
+                    Feed.updateEntry entry.id
                         (always newEntry)
                         model.feeds
 
@@ -220,12 +205,16 @@ update msg model =
         MarkFeedAsRead feed ->
             let
                 newEntries =
-                    Dict.map
-                        (\_ entry -> { entry | read = True, status = UpdatePending })
-                        feed.entries
+                    feed
+                        |> Feed.entries
+                        |> Dict.map
+                            (\_ entry -> { entry | read = True, status = UpdatePending })
+
+                newFeed =
+                    Feed.updateEntries feed newEntries
 
                 newFeeds =
-                    Dict.insert feed.id { feed | entries = newEntries } model.feeds
+                    Dict.insert (Feed.id feed) newFeed model.feeds
 
                 cmd =
                     feed
@@ -249,7 +238,7 @@ update msg model =
         PatchFeed (Ok newFeed) ->
             let
                 newFeeds =
-                    Dict.insert newFeed.id newFeed model.feeds
+                    Dict.insert (Feed.id newFeed) newFeed model.feeds
             in
             ( { model | feeds = newFeeds }, Cmd.none )
 
@@ -279,7 +268,7 @@ update msg model =
                 url =
                     case result of
                         Ok { feed } ->
-                            feed.url
+                            Feed.url feed
 
                         Err { candidate } ->
                             candidate.url
@@ -293,7 +282,7 @@ update msg model =
                 newFeeds =
                     case result of
                         Ok { feed } ->
-                            Dict.insert feed.id feed model.feeds
+                            Dict.insert (Feed.id feed) feed model.feeds
 
                         _ ->
                             model.feeds
@@ -305,10 +294,10 @@ update msg model =
                 url =
                     case result of
                         Ok { feed } ->
-                            feed.url
+                            Feed.url feed
 
                         Err { feed } ->
-                            feed.url
+                            Feed.url feed
 
                 newRequests =
                     Dict.insert
@@ -319,7 +308,7 @@ update msg model =
                 newFeeds =
                     case result of
                         Ok { feed } ->
-                            Dict.remove feed.id model.feeds
+                            Dict.remove (Feed.id feed) model.feeds
 
                         _ ->
                             model.feeds
