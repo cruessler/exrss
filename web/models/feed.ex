@@ -53,6 +53,9 @@ defmodule ExRss.Feed do
 
       {:fatal_error, _, error, _, _} ->
         {:error, error}
+
+      error ->
+        {:error, error}
     end
   end
 
