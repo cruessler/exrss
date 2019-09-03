@@ -7,6 +7,8 @@ module Types.Feed exposing
     , compareByNewestEntry
     , compareByPostedAt
     , compareByStatus
+    , createWithCounts
+    , createWithEntries
     , decodeCandidate
     , decodeCandidates
     , decodeEntry
@@ -74,6 +76,32 @@ type alias Candidate =
     , href : String
     , frequency : Maybe Frequency
     }
+
+
+createWithEntries : Int -> String -> String -> Dict Int Entry -> Feed
+createWithEntries id_ url_ title_ entries_ =
+    Feed
+        { id = id_
+        , url = url_
+        , title = title_
+        , entries = entries_
+        , open = False
+        , unreadEntriesCount = numberOfUnreadEntries entries_
+        , readEntriesCount = numberOfReadEntries entries_
+        }
+
+
+createWithCounts : Int -> String -> String -> Dict Int Entry -> Int -> Int -> Feed
+createWithCounts id_ url_ title_ entries_ unreadEntriesCount_ readEntriesCount_ =
+    Feed
+        { id = id_
+        , url = url_
+        , title = title_
+        , entries = entries_
+        , open = False
+        , unreadEntriesCount = unreadEntriesCount_
+        , readEntriesCount = readEntriesCount_
+        }
 
 
 id : Feed -> Int
@@ -213,14 +241,11 @@ decodeFeedsOnlyUnreadEntries =
 
 countEntries : Dict Int Entry -> Decode.Decoder Feed
 countEntries entries_ =
-    map7 (\a b c d e f g -> Feed { id = a, url = b, title = c, entries = d, open = e, unreadEntriesCount = f, readEntriesCount = g })
+    map3 createWithEntries
         (field "id" int)
         (field "url" string)
         (oneOf [ null "", field "title" string ])
-        (succeed entries_)
-        (succeed False)
-        (succeed <| numberOfUnreadEntries entries_)
-        (succeed <| numberOfReadEntries entries_)
+        |> Decode.map (\f -> f entries_)
 
 
 numberOfUnreadEntries : Dict Int Entry -> Int
