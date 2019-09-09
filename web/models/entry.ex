@@ -61,6 +61,8 @@ defmodule ExRss.Entry do
     "%a, %d %b %Y %H:%M:%S %Z",
     # 13 Mar 2018 00:00:00 GMT
     "%d %b %Y %H:%M:%S %Z",
+    # 06 Sep 2017 12:00 +0000
+    "%d %b %Y %H:%M %z",
     # 2018-08-22T10:07:06.121Z
     "%Y-%m-%dT%H:%M:%S.%LZ",
     # 2019-01-17T00:00:00Z
