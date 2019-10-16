@@ -19,7 +19,9 @@ module Types.Feed exposing
     , encodeCandidate
     , encodeEntry
     , entries
+    , entry
     , id
+    , markAsRead
     , open
     , readEntriesCount
     , title
@@ -134,6 +136,20 @@ entries (Feed feed) =
     feed.entries
 
 
+entry : Int -> Dict Int Feed -> Maybe Entry
+entry entryId =
+    Dict.foldl
+        (\_ (Feed f) acc ->
+            case acc of
+                Nothing ->
+                    Dict.get entryId f.entries
+
+                e ->
+                    e
+        )
+        Nothing
+
+
 unreadEntriesCount : Feed -> Int
 unreadEntriesCount (Feed feed) =
     feed.unreadEntriesCount
@@ -142,6 +158,29 @@ unreadEntriesCount (Feed feed) =
 readEntriesCount : Feed -> Int
 readEntriesCount (Feed feed) =
     feed.readEntriesCount
+
+
+markAsRead : Entry -> Dict Int Feed -> Dict Int Feed
+markAsRead e =
+    let
+        updateFeed _ (Feed feed) =
+            let
+                newEntries =
+                    Dict.update
+                        e.id
+                        (Maybe.map
+                            (\e_ -> { e_ | read = True, status = UpdatePending })
+                        )
+                        feed.entries
+            in
+            Feed
+                { feed
+                    | entries = newEntries
+                    , unreadEntriesCount = numberOfUnreadEntries newEntries
+                    , readEntriesCount = numberOfReadEntries newEntries
+                }
+    in
+    Dict.map updateFeed
 
 
 updateEntry : Int -> (Entry -> Entry) -> Dict Int Feed -> Dict Int Feed
@@ -337,10 +376,10 @@ encodeCandidate candidate =
 
 
 encodeEntry : Entry -> Encode.Value
-encodeEntry entry =
+encodeEntry e =
     Encode.object
         [ ( "entry"
-          , Encode.object [ ( "read", Encode.bool entry.read ) ]
+          , Encode.object [ ( "read", Encode.bool e.read ) ]
           )
         ]
 

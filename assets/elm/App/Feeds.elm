@@ -188,17 +188,16 @@ update msg model =
 
         MarkAsRead entry ->
             let
-                newEntry =
-                    { entry | read = True, status = UpdatePending }
-
                 newFeeds =
-                    Feed.updateEntry entry.id
-                        (always newEntry)
-                        model.feeds
+                    Feed.markAsRead entry model.feeds
+
+                newEntry =
+                    Feed.entry entry.id newFeeds
 
                 cmd =
                     newEntry
-                        |> patchEntry model.apiConfig
+                        |> Maybe.map (patchEntry model.apiConfig)
+                        |> Maybe.withDefault Cmd.none
             in
             ( { model | feeds = newFeeds }, cmd )
 
