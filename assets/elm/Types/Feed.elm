@@ -165,6 +165,11 @@ markAsRead e =
     let
         updateFeed _ (Feed feed) =
             let
+                oldEntryWasUnread =
+                    Dict.get e.id feed.entries
+                        |> Maybe.map (.read >> not)
+                        |> Maybe.withDefault False
+
                 newEntries =
                     Dict.update
                         e.id
@@ -173,12 +178,17 @@ markAsRead e =
                         )
                         feed.entries
             in
-            Feed
-                { feed
-                    | entries = newEntries
-                    , unreadEntriesCount = numberOfUnreadEntries newEntries
-                    , readEntriesCount = numberOfReadEntries newEntries
-                }
+            if oldEntryWasUnread then
+                Feed
+                    { feed
+                        | entries = newEntries
+                        , unreadEntriesCount = feed.unreadEntriesCount - 1
+                        , readEntriesCount = feed.readEntriesCount + 1
+                    }
+
+            else
+                Feed
+                    { feed | entries = newEntries }
     in
     Dict.map updateFeed
 
