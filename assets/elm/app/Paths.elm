@@ -7,8 +7,8 @@ module Paths exposing
     , feedsOnlyUnreadEntries
     )
 
-import Url.Builder exposing (absolute, string)
 import Types.Feed as Feed exposing (..)
+import Url.Builder exposing (absolute, string)
 
 
 candidates : String -> String
@@ -28,7 +28,7 @@ feeds =
 
 feedsOnlyUnreadEntries : String
 feedsOnlyUnreadEntries =
-    absolute [ "api", "v1", "feeds", "only_unread_entries"] []
+    absolute [ "api", "v1", "feeds", "only_unread_entries" ] []
 
 
 feed : Feed -> String
