@@ -35,5 +35,5 @@ matrix:
 
       script:
         - npm run deploy
-        - npx elm-format --validate elm
+        - cd elm && npx elm-format --validate .
         - npm test
