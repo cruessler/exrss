@@ -10,8 +10,8 @@ import css from '../css/app.scss';
 // Import dependencies
 //
 
-import Feeds from "../elm/App/Feeds.elm"
-import NewFeed from "../elm/App/NewFeed.elm"
+import Feeds from '../elm/app/App/Feeds.elm'
+import NewFeed from '../elm/app/App/NewFeed.elm'
 
 const Elm =
   { App:
