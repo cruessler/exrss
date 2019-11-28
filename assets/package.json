@@ -7,7 +7,7 @@
     "test": "cd elm && npx elm-test"
   },
   "dependencies": {
-    "elm-test": "^0.19.0-rev6",
+    "elm-test": "^0.19.1",
     "phoenix": "file:../deps/phoenix",
     "phoenix_html": "file:../deps/phoenix_html"
   },
