@@ -1,18 +1,39 @@
-language: elixir
-elixir: '1.6.4'
-otp_release: '20.0'
+matrix:
+  include:
+    - language: elixir
+      elixir: '1.6.4'
+      otp_release: '20.0'
 
-cache:
-  directories:
-    - _build
-    - deps
+      cache:
+        directories:
+          - _build
+          - deps
 
-services:
-  - postgresql
+      services:
+        - postgresql
 
-addons:
-  postgresql: '9.6'
+      addons:
+        postgresql: '9.6'
 
-before_script:
-  - cp config/test.travis.exs config/test.exs
-  - psql -c 'create database travis_ci_test;' -U postgres
+      before_script:
+        - cp config/test.travis.exs config/test.exs
+        - psql -c 'create database travis_ci_test;' -U postgres
+
+    - language: node_js
+      node_js: node
+
+      cache:
+        directories:
+          - assets/node_modules
+          - assets/elm/elm-stuff
+
+      before_install:
+        - cd assets
+
+      install:
+        - npm install
+
+      script:
+        - npm run deploy
+        - npx elm-format --validate elm
+        - npm test
