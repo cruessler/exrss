@@ -9,7 +9,6 @@ import css from '../css/app.scss';
 //
 // Import dependencies
 //
-import "phoenix_html"
 
 import Feeds from "../elm/App/Feeds.elm"
 import NewFeed from "../elm/App/NewFeed.elm"

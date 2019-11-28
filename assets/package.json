@@ -7,9 +7,7 @@
     "test": "cd elm && npx elm-test"
   },
   "dependencies": {
-    "elm-test": "^0.19.1",
-    "phoenix": "file:../deps/phoenix",
-    "phoenix_html": "file:../deps/phoenix_html"
+    "elm-test": "^0.19.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
