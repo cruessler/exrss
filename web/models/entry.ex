@@ -55,8 +55,10 @@ defmodule ExRss.Entry do
   # For details on available directives, see
   # https://hexdocs.pm/timex/Timex.Format.DateTime.Formatters.Strftime.html
   @time_formats [
+    # "%-d" matches days with and without padding zero.
     # Tue, 03 Jan 2017 14:55:00 +0100
-    "%a, %d %b %Y %H:%M:%S %z",
+    # Wed, 8 Jan 2020 07:28:00 +0100
+    "%a, %-d %b %Y %H:%M:%S %z",
     # Sun, 13 Nov 2016 21:00:00 GMT
     "%a, %d %b %Y %H:%M:%S %Z",
     # 13 Mar 2018 00:00:00 GMT

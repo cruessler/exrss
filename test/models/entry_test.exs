@@ -5,6 +5,7 @@ defmodule ExRss.EntryTest do
 
   test "parses time" do
     assert {:ok, _} = Entry.parse_time("Tue, 03 Jan 2017 14:55:00 +0100")
+    assert {:ok, _} = Entry.parse_time("Wed, 8 Jan 2020 07:28:00 +0100")
     assert {:ok, _} = Entry.parse_time("Sun, 13 Nov 2016 21:00:00 GMT")
     assert {:ok, _} = Entry.parse_time("2018-01-13T19:05:08+00:00")
     assert {:ok, _} = Entry.parse_time("13 Mar 2018 00:00:00 GMT")
