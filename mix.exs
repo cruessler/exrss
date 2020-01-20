@@ -57,7 +57,7 @@ defmodule ExRss.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
       {:floki, "~> 0.11.0"},
-      {:feeder_ex, "~> 1.0.0"},
+      {:feeder_ex, "~> 1.1"},
       {:poison, "~> 3.0.0"},
       {:plug_cowboy, "~> 2.0"},
       {:httpoison, "~> 0.10.0"},
