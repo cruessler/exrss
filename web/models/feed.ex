@@ -9,7 +9,7 @@ defmodule ExRss.Feed do
   @base_timeout Duration.from_minutes(60) |> Duration.to_seconds()
   @max_timeout Duration.from_days(1) |> Duration.to_seconds() |> round
 
-  @derive {Poison.Encoder,
+  @derive {Jason.Encoder,
            only: [:id, :title, :url, :entries, :unread_entries_count, :read_entries_count]}
 
   @timestamps_opts [type: :utc_datetime]

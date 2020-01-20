@@ -17,7 +17,7 @@ defmodule ExRss.AppView do
 
     data_attributes = [
       "data-elm-module": module,
-      "data-elm-params": html_escape(Poison.encode!(params))
+      "data-elm-params": html_escape(Jason.encode!(params))
     ]
 
     content_tag(tag, "", Map.merge(attrs, data_attributes))

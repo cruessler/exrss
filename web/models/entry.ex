@@ -3,7 +3,7 @@ defmodule ExRss.Entry do
 
   alias ExRss.Feed
 
-  @derive {Poison.Encoder, only: [:id, :url, :title, :read, :posted_at]}
+  @derive {Jason.Encoder, only: [:id, :url, :title, :read, :posted_at]}
 
   @timestamps_opts [type: :utc_datetime]
 
