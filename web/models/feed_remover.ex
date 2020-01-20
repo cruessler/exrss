@@ -1,7 +1,4 @@
 defmodule ExRss.FeedRemover do
-  import Ecto
-  import Ecto.Changeset
-
   alias Ecto.Multi
   alias ExRss.Repo
 

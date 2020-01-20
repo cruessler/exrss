@@ -1,7 +1,6 @@
 defmodule ExRss.FeedController do
   use ExRss.Web, :controller
 
-  alias ExRss.Feed
   alias ExRss.FeedAdder
 
   def index(conn, _params) do

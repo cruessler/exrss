@@ -27,7 +27,7 @@ defmodule ExRss.Feed do
 
     has_many :entries, Entry
 
-    timestamps
+    timestamps()
   end
 
   @doc """

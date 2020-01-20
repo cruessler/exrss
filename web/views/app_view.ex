@@ -20,6 +20,6 @@ defmodule ExRss.AppView do
       "data-elm-params": html_escape(Poison.encode!(params))
     ]
 
-    content_tag(tag, "", Dict.merge(attrs, data_attributes))
+    content_tag(tag, "", Map.merge(attrs, data_attributes))
   end
 end
