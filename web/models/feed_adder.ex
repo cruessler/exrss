@@ -54,7 +54,7 @@ defmodule ExRss.FeedAdder do
          %URI{authority: authority} when not is_nil(authority) <- uri,
          {:ok, response} <- HTTPoison.get(uri, [], follow_redirect: true),
          200 <- response.status_code,
-         html <- Floki.parse(response.body) do
+         {:ok, html} <- Floki.parse_document(response.body) do
       feeds =
         for f <- extract_feeds(html) do
           Map.put(f, :url, URI.merge(uri, f.href) |> to_string)
@@ -109,14 +109,20 @@ defmodule ExRss.FeedAdder do
     end
   end
 
-  def rss_feeds(html) do
-    html
-    |> Floki.find("link[rel=alternate][type='application/rss+xml']")
+  def rss_feeds(string) do
+    with {:ok, html} <- Floki.parse_document(string) do
+      Floki.find(html, "link[rel=alternate][type='application/rss+xml']")
+    else
+      []
+    end
   end
 
-  def atom_feeds(html) do
-    html
-    |> Floki.find("link[rel=alternate][type='application/atom+xml']")
+  def atom_feeds(string) do
+    with {:ok, html} <- Floki.parse_document(string) do
+      Floki.find(html, "link[rel=alternate][type='application/atom+xml']")
+    else
+      []
+    end
   end
 
   def add_frequency_info(feed) do
