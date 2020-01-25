@@ -117,10 +117,6 @@ update msg model =
             ( { model | feeds = newFeeds }, Cmd.none )
 
         NewFeeds (Err message) ->
-            let
-                _ =
-                    Debug.log "Error getting new feeds" message
-            in
             ( model, Cmd.none )
 
         DiscoverFeeds url ->

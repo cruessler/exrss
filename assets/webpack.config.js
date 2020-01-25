@@ -41,7 +41,8 @@ module.exports = (env, options) => ({
         loader: 'elm-webpack-loader',
         options: {
           cwd: elmRoot,
-          pathToElm: '../node_modules/.bin/elm'
+          pathToElm: '../node_modules/.bin/elm',
+          optimize: true
         }
       }
     ],
