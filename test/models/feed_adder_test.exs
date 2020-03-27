@@ -83,8 +83,21 @@ defmodule ExRss.FeedAdderTest do
   </rss>
   """
 
+  test "discover feeds" do
+    url = "https://example.com/feed"
+    uri = URI.parse(url)
+    fetch = fn _ -> {:ok, @html, uri} end
+
+    feeds = FeedAdder.discover_feeds(url, fetch)
+
+    assert {:ok, [%{title: "RSS", href: "/feed/rss.xml"}, %{title: "Atom", href: "/feed/atom.xml"}]} =
+             feeds
+  end
+
   test "extracts feeds" do
-    feeds = FeedAdder.extract_feeds(@html)
+    {:ok, html} = Floki.parse_document(@html)
+
+    feeds = FeedAdder.extract_feeds(html)
 
     assert [%{title: "RSS", href: "/feed/rss.xml"}, %{title: "Atom", href: "/feed/atom.xml"}] =
              feeds
