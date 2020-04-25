@@ -20,7 +20,7 @@ matrix:
         - psql -c 'create database travis_ci_test;' -U postgres
 
     - language: node_js
-      node_js: node
+      node_js: 10
 
       cache:
         directories:
