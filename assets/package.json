@@ -6,9 +6,7 @@
     "watch": "webpack --mode development --watch",
     "test": "cd elm && npx elm-test"
   },
-  "dependencies": {
-    "elm-test": "^0.19.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.3",
@@ -17,6 +15,7 @@
     "css-loader": "^3.2.1",
     "elm": "^0.19.1-3",
     "elm-format": "^0.8.1",
+    "elm-test": "^0.19.1",
     "elm-webpack-loader": "^6.0.1",
     "mini-css-extract-plugin": "^0.4.0",
     "node-sass": "^4.13.0",
