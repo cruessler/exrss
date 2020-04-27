@@ -62,7 +62,7 @@ defmodule ExRss.Mixfile do
       {:plug_cowboy, "~> 2.0"},
       {:httpoison, "~> 0.10.0"},
       {:timex, "~> 3.1"},
-      {:comeonin, "~> 3.0"},
+      {:comeonin, "~> 5.3"},
       {:mix_test_watch, "~> 0.6", only: :dev, runtime: false}
     ]
   end
