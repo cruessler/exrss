@@ -2,12 +2,11 @@ module Feeds.Removal exposing (Error, Removal, Success, delete)
 
 import Api
 import Http
-import Json.Decode as Decode
-import Json.Encode as Encode
+import Json.Decode as D
+import Json.Encode as E
 import Paths
-import Request exposing (..)
-import Task exposing (Task)
-import Types.Feed as Feed exposing (..)
+import Request exposing (Request)
+import Types.Feed as Feed exposing (Feed)
 
 
 type alias Removal =
@@ -25,21 +24,8 @@ type alias Success =
     }
 
 
-fromApi :
-    Error
-    -> Http.Request Success
-    -> Task Error Success
-fromApi error request =
-    request
-        |> Http.toTask
-        |> Task.mapError (always error)
-
-
-delete :
-    Api.Config
-    -> Feed
-    -> Task Error Success
-delete apiConfig feed =
+delete : Api.Config -> Feed -> (Result Error Success -> msg) -> Cmd msg
+delete apiConfig feed toMsg =
     let
         message =
             "The feed at "
@@ -48,10 +34,13 @@ delete apiConfig feed =
 
         error =
             Error feed message
+
+        decoder =
+            D.succeed <| Success feed
     in
-    Api.delete apiConfig
+    Api.delete
+        apiConfig
         { url = Paths.feed feed
-        , params = Encode.null
-        , decoder = Decode.succeed <| Success feed
+        , params = E.null
+        , expect = Http.expectJson (Result.mapError (\_ -> error) >> toMsg) decoder
         }
-        |> fromApi error

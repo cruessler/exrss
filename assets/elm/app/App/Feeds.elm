@@ -2,21 +2,19 @@ module App.Feeds exposing (main)
 
 import Api
 import Browser
-import Dict exposing (Dict)
+import Dict
 import Feeds.Addition as Addition
 import Feeds.Discovery as Discovery
-import Feeds.Model as Model exposing (..)
-import Feeds.Msg as Msg exposing (..)
+import Feeds.Model as Model exposing (Model, Visibility(..))
+import Feeds.Msg as Msg exposing (Msg(..))
 import Feeds.Removal as Removal
 import Feeds.View as View
-import Html
 import Http
-import Json.Encode as Encode
+import Json.Encode as E
 import Paths
-import Request exposing (..)
+import Request exposing (Request(..))
 import String
-import Task exposing (Task)
-import Types.Feed as Feed exposing (..)
+import Types.Feed as Feed exposing (Entry, Feed, Status(..), updateEntry)
 
 
 main : Program Flags Model Msg
@@ -56,10 +54,9 @@ getFeeds apiConfig =
     Api.get
         apiConfig
         { url = Paths.feedsOnlyUnreadEntries
-        , params = Encode.null
-        , decoder = Feed.decodeFeedsOnlyUnreadEntries
+        , params = E.null
+        , expect = Http.expectJson NewFeeds Feed.decodeFeedsOnlyUnreadEntries
         }
-        |> Http.send NewFeeds
 
 
 patchEntry : Api.Config -> Entry -> Cmd Msg
@@ -68,18 +65,17 @@ patchEntry apiConfig entry =
         apiConfig
         { url = Paths.entry entry
         , params = Feed.encodeEntry entry
-        , decoder = Feed.decodeEntry
+        , expect = Http.expectJson PatchEntry Feed.decodeEntry
         }
-        |> Http.send PatchEntry
 
 
 markFeedAsRead : Api.Config -> Feed -> Cmd Msg
 markFeedAsRead apiConfig feed =
     let
         encodeFeed =
-            Encode.object
+            E.object
                 [ ( "feed"
-                  , Encode.object [ ( "read", Encode.bool True ) ]
+                  , E.object [ ( "read", E.bool True ) ]
                   )
                 ]
     in
@@ -87,9 +83,8 @@ markFeedAsRead apiConfig feed =
         apiConfig
         { url = Paths.feed feed
         , params = encodeFeed
-        , decoder = Feed.decodeFeed
+        , expect = Http.expectJson PatchFeed Feed.decodeFeed
         }
-        |> Http.send PatchFeed
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -132,8 +127,7 @@ update msg model =
                             model.requests
                 in
                 ( { model | requests = newRequests }
-                , Discovery.get model.apiConfig url
-                    |> Task.attempt Msg.Discovery
+                , Discovery.get model.apiConfig url Msg.Discovery
                 )
 
         AddFeed candidate ->
@@ -145,8 +139,7 @@ update msg model =
                         model.requests
             in
             ( { model | requests = newRequests }
-            , Addition.post model.apiConfig candidate
-                |> Task.attempt Msg.Addition
+            , Addition.post model.apiConfig candidate Msg.Addition
             )
 
         RemoveFeed feed ->
@@ -158,8 +151,7 @@ update msg model =
                         model.requests
             in
             ( { model | requests = newRequests }
-            , Removal.delete model.apiConfig feed
-                |> Task.attempt Msg.Removal
+            , Removal.delete model.apiConfig feed Msg.Removal
             )
 
         RemoveResponse url ->

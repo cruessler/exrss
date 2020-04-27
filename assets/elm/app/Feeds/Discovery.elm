@@ -2,12 +2,11 @@ module Feeds.Discovery exposing (Discovery, Error, Success, get)
 
 import Api
 import Http
-import Json.Decode as Decode
-import Json.Encode as Encode
+import Json.Decode as D
+import Json.Encode as E
 import Paths
-import Request exposing (..)
-import Task exposing (Task)
-import Types.Feed exposing (..)
+import Request exposing (Request)
+import Types.Feed exposing (Candidate)
 
 
 type alias Discovery =
@@ -26,28 +25,15 @@ type alias Success =
     }
 
 
-fromApi :
-    Error
-    -> Http.Request Success
-    -> Task Error Success
-fromApi error request =
-    request
-        |> Http.toTask
-        |> Task.mapError (always error)
-
-
-successDecoder : String -> Decode.Decoder Success
+successDecoder : String -> D.Decoder Success
 successDecoder url =
-    Decode.map2 Success
-        (Decode.succeed url)
+    D.map2 Success
+        (D.succeed url)
         Types.Feed.decodeCandidates
 
 
-get :
-    Api.Config
-    -> String
-    -> Task Error Success
-get apiConfig url =
+get : Api.Config -> String -> (Result Error Success -> msg) -> Cmd msg
+get apiConfig url toMsg =
     let
         message =
             "Feeds for url "
@@ -60,7 +46,6 @@ get apiConfig url =
     Api.get
         apiConfig
         { url = Paths.candidates url
-        , params = Encode.null
-        , decoder = successDecoder url
+        , params = E.null
+        , expect = Http.expectJson (Result.mapError (\_ -> error) >> toMsg) (successDecoder url)
         }
-        |> fromApi error

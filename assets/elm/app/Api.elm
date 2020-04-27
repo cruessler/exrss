@@ -10,19 +10,19 @@ module Api exposing
 -}
 
 import Http
-import Json.Decode as Decode
-import Json.Encode as Encode
-import Task exposing (Task, fail, succeed)
+import Json.Encode as E
 
 
-type alias Config =
-    { apiToken : String }
+type Config
+    = Config
+        { apiToken : String
+        }
 
 
-type alias Request a =
+type alias Request msg =
     { url : String
-    , params : Encode.Value
-    , decoder : Decode.Decoder a
+    , params : E.Value
+    , expect : Http.Expect msg
     }
 
 
@@ -35,7 +35,7 @@ type Method
 
 configFromToken : String -> Config
 configFromToken apiToken =
-    Config apiToken
+    Config { apiToken = apiToken }
 
 
 toString : Method -> String
@@ -56,47 +56,47 @@ toString method =
 
 {-| Create a task for sending a GET request to a url.
 -}
-get : Config -> Request a -> Http.Request a
+get : Config -> Request msg -> Cmd msg
 get =
     send Get
 
 
 {-| Create a task for sending a POST request to a url.
 -}
-post : Config -> Request a -> Http.Request a
+post : Config -> Request msg -> Cmd msg
 post =
     send Post
 
 
 {-| Create a task for sending a PATCH request to a url.
 -}
-patch : Config -> Request a -> Http.Request a
+patch : Config -> Request msg -> Cmd msg
 patch =
     send Patch
 
 
 {-| Create a task for sending a DELETE request to a url.
 -}
-delete : Config -> Request a -> Http.Request a
+delete : Config -> Request msg -> Cmd msg
 delete =
     send Delete
 
 
-{-| Create a task for sending a request to a url.
+{-| Create a `Cmd` for sending a request to a URL.
 
 The API token is sent in an "Authorization" header.
 
 -}
-send : Method -> Config -> Request a -> Http.Request a
-send method config { url, params, decoder } =
+send : Method -> Config -> Request msg -> Cmd msg
+send method (Config config_) { url, params, expect } =
     Http.request
         { method = toString method
         , headers =
-            [ Http.header "Authorization" ("Bearer " ++ config.apiToken)
+            [ Http.header "Authorization" ("Bearer " ++ config_.apiToken)
             ]
         , url = url
         , body = Http.jsonBody params
-        , expect = Http.expectJson decoder
+        , expect = expect
         , timeout = Nothing
-        , withCredentials = False
+        , tracker = Nothing
         }

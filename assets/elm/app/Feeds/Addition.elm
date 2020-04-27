@@ -2,12 +2,10 @@ module Feeds.Addition exposing (Addition, Error, Success, post)
 
 import Api
 import Http
-import Json.Decode as Decode
-import Json.Encode as Encode
+import Json.Decode as D
 import Paths
-import Request exposing (..)
-import Task exposing (Task)
-import Types.Feed exposing (..)
+import Request exposing (Request)
+import Types.Feed exposing (Candidate, Feed)
 
 
 type alias Addition =
@@ -25,21 +23,8 @@ type alias Success =
     }
 
 
-fromApi :
-    Error
-    -> Http.Request Success
-    -> Task Error Success
-fromApi error request =
-    request
-        |> Http.toTask
-        |> Task.mapError (always error)
-
-
-post :
-    Api.Config
-    -> Candidate
-    -> Task Error Success
-post apiConfig candidate =
+post : Api.Config -> Candidate -> (Result Error Success -> msg) -> Cmd msg
+post apiConfig candidate toMsg =
     let
         message =
             "The feed at "
@@ -48,10 +33,13 @@ post apiConfig candidate =
 
         error =
             Error candidate message
+
+        decoder =
+            Types.Feed.decodeFeed |> D.map Success
     in
-    Api.post apiConfig
+    Api.post
+        apiConfig
         { url = Paths.createFeed
         , params = Types.Feed.encodeCandidate candidate
-        , decoder = Types.Feed.decodeFeed |> Decode.map Success
+        , expect = Http.expectJson (Result.mapError (\_ -> error) >> toMsg) decoder
         }
-        |> fromApi error

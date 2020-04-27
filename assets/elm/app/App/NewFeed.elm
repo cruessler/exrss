@@ -6,12 +6,9 @@ import Feeds.Addition as Addition
 import Feeds.Options.Addition
 import Feeds.Options.Discovery
 import Html as H exposing (Html)
-import Html.Attributes as A
-import Html.Events as E
 import Json.Decode as Decode
-import Request exposing (..)
-import Task
-import Types.Feed exposing (..)
+import Request exposing (Request(..))
+import Types.Feed exposing (Candidate)
 
 
 type alias Flags =
@@ -75,8 +72,7 @@ update msg model =
                     Addition <| Request.InProgress candidate
             in
             ( { model | request = Just request }
-            , Addition.post model.apiConfig candidate
-                |> Task.attempt FeedAdded
+            , Addition.post model.apiConfig candidate FeedAdded
             )
 
         FeedAdded result ->
