@@ -38,7 +38,7 @@ defmodule ExRss.Session do
   defp authenticate(user, password) do
     case user do
       nil -> false
-      _ -> Comeonin.Bcrypt.checkpw(password, user.hashed_password)
+      _ -> Bcrypt.verify_pass(password, user.hashed_password)
     end
   end
 end

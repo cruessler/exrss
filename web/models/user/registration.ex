@@ -1,8 +1,6 @@
 defmodule ExRss.User.Registration do
   use ExRss.Web, :model
 
-  alias Comeonin.Bcrypt
-
   @timestamps_opts [type: :utc_datetime]
 
   schema "users" do
@@ -28,7 +26,7 @@ defmodule ExRss.User.Registration do
   end
 
   def encrypt_password(%{changes: %{password: password}} = changeset) do
-    hashed_password = Bcrypt.hashpwsalt(password)
+    hashed_password = Bcrypt.hash_pwd_salt(password)
 
     changeset
     |> delete_change(:password)
