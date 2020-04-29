@@ -1,8 +1,6 @@
 defmodule ExRss do
   use Application
 
-  import Supervisor.Spec
-
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
   def start(_type, _args) do
@@ -10,11 +8,13 @@ defmodule ExRss do
     children =
       [
         # Start the Ecto repository
-        supervisor(ExRss.Repo, []),
+        ExRss.Repo,
+        # Start the PubSub system
+        {Phoenix.PubSub, name: ExRss.PubSub},
         # Start the endpoint when the application starts
-        supervisor(ExRss.Endpoint, [])
-        # Start your own worker by calling: ExRss.Worker.start_link(arg1, arg2, arg3)
-        # worker(ExRss.Worker, [arg1, arg2, arg3]),
+        ExRss.Endpoint
+        # Start your own worker by calling: ExRss.Worker.start_link(arg)
+        # {ExRss.Worker, arg},
       ] ++ workers(Application.get_env(:ex_rss, :start_crawler))
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
@@ -30,6 +30,6 @@ defmodule ExRss do
     :ok
   end
 
-  defp workers(true), do: [worker(ExRss.Crawler.Queue, [])]
+  defp workers(true), do: [ExRss.Crawler.Queue]
   defp workers(_), do: []
 end

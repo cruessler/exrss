@@ -14,7 +14,7 @@ config :ex_rss, ExRss.Endpoint,
   url: [host: "localhost"],
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
   render_errors: [view: ExRss.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: ExRss.PubSub, adapter: Phoenix.PubSub.PG2]
+  pubsub_server: ExRss.PubSub
 
 # Configures Elixir's Logger
 config :logger, :console,
