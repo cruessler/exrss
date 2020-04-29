@@ -18,7 +18,8 @@ defmodule ExRss.ConnCase do
   using do
     quote do
       # Import conveniences for testing with connections
-      use Phoenix.ConnTest
+      import Plug.Conn
+      import Phoenix.ConnTest
 
       alias ExRss.Repo
       import Ecto
