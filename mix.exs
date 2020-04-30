@@ -59,7 +59,7 @@ defmodule ExRss.Mixfile do
       {:floki, "~> 0.24"},
       {:feeder_ex, "~> 1.1"},
       {:jason, "~> 1.0"},
-      {:httpoison, "~> 0.10.0"},
+      {:httpoison, "~> 1.6.2"},
       {:timex, "~> 3.1"},
       {:bcrypt_elixir, "~> 2.2"},
       {:mix_test_watch, "~> 0.6", only: :dev, runtime: false}
