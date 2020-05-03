@@ -12,7 +12,7 @@ defmodule ExRss do
         # Start the PubSub system
         {Phoenix.PubSub, name: ExRss.PubSub},
         # Start the endpoint when the application starts
-        ExRss.Endpoint
+        ExRssWeb.Endpoint
         # Start your own worker by calling: ExRss.Worker.start_link(arg)
         # {ExRss.Worker, arg},
       ] ++ workers(Application.get_env(:ex_rss, :start_crawler))
@@ -26,7 +26,7 @@ defmodule ExRss do
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
   def config_change(changed, _new, removed) do
-    ExRss.Endpoint.config_change(changed, removed)
+    ExRssWeb.Endpoint.config_change(changed, removed)
     :ok
   end
 

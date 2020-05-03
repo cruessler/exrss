@@ -10,10 +10,10 @@ config :ex_rss,
   ecto_repos: [ExRss.Repo]
 
 # Configures the endpoint
-config :ex_rss, ExRss.Endpoint,
+config :ex_rss, ExRssWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
-  render_errors: [view: ExRss.ErrorView, accepts: ~w(html json)],
+  render_errors: [view: ExRssWeb.ErrorView, accepts: ~w(html json)],
   pubsub_server: ExRss.PubSub
 
 # Configures Elixir's Logger

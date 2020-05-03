@@ -1,4 +1,4 @@
-defmodule ExRss.RememberUser do
+defmodule ExRssWeb.RememberUser do
   use ExUnit.Case, async: true
   use Plug.Test
 
@@ -6,7 +6,7 @@ defmodule ExRss.RememberUser do
 
   alias ExRss.Repo
   alias ExRss.{Session, User}
-  alias ExRss.Plug.RememberUser
+  alias ExRssWeb.Plug.RememberUser
 
   @user %User{id: 1}
 

@@ -1,8 +1,8 @@
-defmodule ExRss.AuthenticationTest do
+defmodule ExRssWeb.AuthenticationTest do
   use ExUnit.Case, async: true
   use Plug.Test
 
-  alias ExRss.Plug.Authentication
+  alias ExRssWeb.Plug.Authentication
   alias ExRss.Repo
   alias ExRss.User
 

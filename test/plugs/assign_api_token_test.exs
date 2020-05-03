@@ -1,10 +1,10 @@
-defmodule ExRss.AssignApiToken do
+defmodule ExRssWeb.AssignApiToken do
   use ExUnit.Case, async: true
   use Plug.Test
 
   alias ExRss.User
   alias ExRss.User.Account
-  alias ExRss.Plug.AssignApiToken
+  alias ExRssWeb.Plug.AssignApiToken
 
   @salt "user"
   @user %User{id: 1}
@@ -30,7 +30,7 @@ defmodule ExRss.AssignApiToken do
 
     assert {:ok, %Account{id: 1}} =
              Phoenix.Token.verify(
-               ExRss.Endpoint,
+               ExRssWeb.Endpoint,
                @salt,
                conn.assigns.api_token,
                max_age: @max_age

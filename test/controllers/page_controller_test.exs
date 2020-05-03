@@ -1,5 +1,5 @@
-defmodule ExRss.PageControllerTest do
-  use ExRss.ConnCase
+defmodule ExRssWeb.PageControllerTest do
+  use ExRssWeb.ConnCase
 
   test "GET /", %{conn: conn} do
     conn = get(conn, "/")
