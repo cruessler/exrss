@@ -1,4 +1,4 @@
-defmodule ExRss.ChannelCase do
+defmodule ExRssWeb.ChannelCase do
   @moduledoc """
   This module defines the test case to be used by
   channel tests.
@@ -26,7 +26,7 @@ defmodule ExRss.ChannelCase do
       import Ecto.Query
 
       # The default endpoint for testing
-      @endpoint ExRss.Endpoint
+      @endpoint ExRssWeb.Endpoint
     end
   end
 

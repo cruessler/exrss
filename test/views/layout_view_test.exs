@@ -1,3 +1,3 @@
-defmodule ExRss.LayoutViewTest do
-  use ExRss.ConnCase, async: true
+defmodule ExRssWeb.LayoutViewTest do
+  use ExRssWeb.ConnCase, async: true
 end

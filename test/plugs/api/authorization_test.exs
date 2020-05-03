@@ -1,9 +1,9 @@
-defmodule ExRss.Api.AuthorizationTest do
+defmodule ExRssWeb.Api.AuthorizationTest do
   use ExUnit.Case, async: true
   use Plug.Test
 
   alias ExRss.User.Account
-  alias ExRss.Plug.Api.Authorization
+  alias ExRssWeb.Plug.Api.Authorization
 
   @salt "user"
   @plug Authorization.init(@salt)
@@ -12,7 +12,7 @@ defmodule ExRss.Api.AuthorizationTest do
   test "sets current_user when a valid token is supplied" do
     conn = conn(:get, "/")
 
-    token = Phoenix.Token.sign(ExRss.Endpoint, @salt, @account)
+    token = Phoenix.Token.sign(ExRssWeb.Endpoint, @salt, @account)
 
     conn =
       conn

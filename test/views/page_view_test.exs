@@ -1,3 +1,3 @@
-defmodule ExRss.PageViewTest do
-  use ExRss.ConnCase, async: true
+defmodule ExRssWeb.PageViewTest do
+  use ExRssWeb.ConnCase, async: true
 end

@@ -1,5 +1,5 @@
-defmodule ExRss.UserControllerTest do
-  use ExRss.ConnCase
+defmodule ExRssWeb.UserControllerTest do
+  use ExRssWeb.ConnCase
 
   test "POST /users", %{conn: conn} do
     params = [

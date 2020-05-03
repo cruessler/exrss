@@ -6,7 +6,7 @@ use Mix.Config
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
 # with webpack to recompile .js and .css sources.
-config :ex_rss, ExRss.Endpoint,
+config :ex_rss, ExRssWeb.Endpoint,
   http: [port: 4000],
   secret_key_base: String.duplicate("abcdefgh", 8),
   debug_errors: true,
@@ -23,13 +23,13 @@ config :ex_rss, ExRss.Endpoint,
   ]
 
 # Watch static and templates for browser reloading.
-config :ex_rss, ExRss.Endpoint,
+config :ex_rss, ExRssWeb.Endpoint,
   live_reload: [
     patterns: [
       ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
       ~r{priv/gettext/.*(po)$},
-      ~r{web/views/.*(ex)$},
-      ~r{web/templates/.*(eex)$}
+      ~r{lib/ex_rss_web/views/.*(ex)$},
+      ~r{lib/ex_rss_web/templates/.*(eex)$}
     ]
   ]
 

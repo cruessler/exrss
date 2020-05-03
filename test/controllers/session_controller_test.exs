@@ -1,5 +1,5 @@
-defmodule ExRss.SessionControllerTest do
-  use ExRss.ConnCase
+defmodule ExRssWeb.SessionControllerTest do
+  use ExRssWeb.ConnCase
 
   alias ExRss.User.Registration
 

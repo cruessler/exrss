@@ -1,5 +1,5 @@
-defmodule ExRss.FeedControllerTest do
-  use ExRss.ConnCase
+defmodule ExRssWeb.FeedControllerTest do
+  use ExRssWeb.ConnCase
 
   alias ExRss.User
   alias ExRss.User.Registration

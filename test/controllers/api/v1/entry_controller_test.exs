@@ -1,5 +1,5 @@
-defmodule ExRss.Api.V1.EntryControllerTest do
-  use ExRss.ConnCase
+defmodule ExRssWeb.Api.V1.EntryControllerTest do
+  use ExRssWeb.ConnCase
 
   alias ExRss.Entry
   alias ExRss.{Feed, User}
@@ -39,7 +39,7 @@ defmodule ExRss.Api.V1.EntryControllerTest do
   test "PUT /entries/1", %{account: account, first: %{id: id}} do
     conn = build_conn()
 
-    token = Phoenix.Token.sign(ExRss.Endpoint, @salt, account)
+    token = Phoenix.Token.sign(ExRssWeb.Endpoint, @salt, account)
 
     conn =
       conn
@@ -53,7 +53,7 @@ defmodule ExRss.Api.V1.EntryControllerTest do
   test "PATCH /entries/2", %{account: account, second: %{id: id}} do
     conn = build_conn()
 
-    token = Phoenix.Token.sign(ExRss.Endpoint, @salt, account)
+    token = Phoenix.Token.sign(ExRssWeb.Endpoint, @salt, account)
 
     conn =
       conn
