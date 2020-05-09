@@ -34,8 +34,8 @@ defmodule ExRss.Web do
       import Ecto
       import Ecto.Query
 
-      import ExRssWeb.Router.Helpers
       import ExRssWeb.Gettext
+      alias ExRssWeb.Router.Helpers, as: Routes
     end
   end
 
@@ -49,9 +49,9 @@ defmodule ExRss.Web do
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
 
-      import ExRssWeb.Router.Helpers
       import ExRssWeb.ErrorHelpers
       import ExRssWeb.Gettext
+      alias ExRssWeb.Router.Helpers, as: Routes
 
       import ExRssWeb.AppView
     end
