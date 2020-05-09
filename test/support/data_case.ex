@@ -50,4 +50,4 @@ defmodule ExRss.DataCase do
       end)
     end)
   end
-end 
+end

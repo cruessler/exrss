@@ -90,7 +90,8 @@ defmodule ExRss.FeedAdderTest do
 
     feeds = FeedAdder.discover_feeds(url, fetch)
 
-    assert {:ok, [%{title: "RSS", href: "/feed/rss.xml"}, %{title: "Atom", href: "/feed/atom.xml"}]} =
+    assert {:ok,
+            [%{title: "RSS", href: "/feed/rss.xml"}, %{title: "Atom", href: "/feed/atom.xml"}]} =
              feeds
   end
 

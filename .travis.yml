@@ -19,6 +19,10 @@ matrix:
         - cp config/test.travis.exs config/test.exs
         - psql -c 'create database travis_ci_test;' -U postgres
 
+      script:
+        - mix format --check-formatted
+        - mix test
+
     - language: node_js
       node_js: 10
 
