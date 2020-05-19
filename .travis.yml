@@ -39,5 +39,6 @@ matrix:
 
       script:
         - npm run deploy
-        - cd elm && npx elm-format --validate app tests
+        - npx elm-format --elm-version=0.19 --validate elm
         - npm test
+        - npx prettier --check "js/**/*.js" "*.js"

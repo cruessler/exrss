@@ -10,15 +10,12 @@ import css from '../css/app.scss';
 // Import dependencies
 //
 
-import Feeds from '../elm/app/App/Feeds.elm'
-import NewFeed from '../elm/app/App/NewFeed.elm'
+import Feeds from '../elm/app/App/Feeds.elm';
+import NewFeed from '../elm/app/App/NewFeed.elm';
 
-const Elm =
-  { App:
-    { Feeds: Feeds.Elm.App.Feeds,
-      NewFeed: NewFeed.Elm.App.NewFeed
-    }
-  }
+const Elm = {
+  App: { Feeds: Feeds.Elm.App.Feeds, NewFeed: NewFeed.Elm.App.NewFeed },
+};
 
 // Import local files
 //
@@ -29,26 +26,24 @@ const Elm =
 
 class App {
   static mountElmModules() {
-    const nodes = document.querySelectorAll("[data-elm-module]")
+    const nodes = document.querySelectorAll('[data-elm-module]');
 
-    for(const node of nodes) {
+    for (const node of nodes) {
       // The module name may be `App` or `App.Feeds`. `modulePath` would be
       // ["App"] or ["App", "Feeds"], then.
-      const moduleName = node.dataset.elmModule
-      const modulePath = moduleName.split(".")
-      const elmModule  = modulePath.reduce(
-        (acc, part) => acc[part],
-        Elm)
+      const moduleName = node.dataset.elmModule;
+      const modulePath = moduleName.split('.');
+      const elmModule = modulePath.reduce((acc, part) => acc[part], Elm);
 
-      const params = JSON.parse(node.dataset.elmParams) || {}
+      const params = JSON.parse(node.dataset.elmParams) || {};
 
-      if(elmModule != undefined) {
+      if (elmModule != undefined) {
         elmModule.init({ node, flags: params });
       } else {
-        console.error(`No module named ‘${moduleName}’ could be found`)
+        console.error(`No module named ‘${moduleName}’ could be found`);
       }
     }
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => App.mountElmModules())
+document.addEventListener('DOMContentLoaded', () => App.mountElmModules());
