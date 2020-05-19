@@ -1,12 +1,12 @@
-defmodule ExRss.Web do
+defmodule ExRssWeb do
   @moduledoc """
   A module that keeps using definitions for controllers,
   views and so on.
 
   This can be used in your application as:
 
-      use ExRss.Web, :controller
-      use ExRss.Web, :view
+      use ExRssWeb, :controller
+      use ExRssWeb, :view
 
   The definitions below will be executed for every view,
   controller, etc, so keep them short and clean, focused

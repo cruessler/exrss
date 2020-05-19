@@ -1,5 +1,5 @@
 defmodule ExRssWeb.SessionController do
-  use ExRss.Web, :controller
+  use ExRssWeb, :controller
 
   alias ExRss.Session
   alias ExRss.User

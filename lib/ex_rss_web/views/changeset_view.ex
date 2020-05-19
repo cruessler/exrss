@@ -1,5 +1,5 @@
 defmodule ExRssWeb.ChangesetView do
-  use ExRss.Web, :view
+  use ExRssWeb, :view
 
   @doc """
   Traverses and translates changeset errors.

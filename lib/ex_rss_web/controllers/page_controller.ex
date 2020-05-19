@@ -1,5 +1,5 @@
 defmodule ExRssWeb.PageController do
-  use ExRss.Web, :controller
+  use ExRssWeb, :controller
 
   def index(conn, _params) do
     render(conn, "index.html")

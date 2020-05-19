@@ -1,5 +1,5 @@
 defmodule ExRssWeb.Api.V1.FeedController do
-  use ExRss.Web, :controller
+  use ExRssWeb, :controller
 
   require Logger
 

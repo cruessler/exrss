@@ -1,5 +1,5 @@
 defmodule ExRssWeb.ErrorView do
-  use ExRss.Web, :view
+  use ExRssWeb, :view
 
   def render("404.html", _assigns) do
     "Page not found"

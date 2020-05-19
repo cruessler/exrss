@@ -1,3 +1,3 @@
 defmodule ExRssWeb.LayoutView do
-  use ExRss.Web, :view
+  use ExRssWeb, :view
 end

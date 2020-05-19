@@ -1,5 +1,5 @@
 defmodule ExRss.Feed do
-  use ExRss.Web, :model
+  use ExRssWeb, :model
 
   alias Ecto.Changeset
   alias ExRss.Entry

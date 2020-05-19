@@ -1,5 +1,5 @@
 defmodule ExRssWeb.UserController do
-  use ExRss.Web, :controller
+  use ExRssWeb, :controller
 
   alias ExRss.User.Registration
 

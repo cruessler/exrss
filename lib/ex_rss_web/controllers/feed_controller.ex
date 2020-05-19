@@ -1,5 +1,5 @@
 defmodule ExRssWeb.FeedController do
-  use ExRss.Web, :controller
+  use ExRssWeb, :controller
 
   alias ExRss.FeedAdder
 

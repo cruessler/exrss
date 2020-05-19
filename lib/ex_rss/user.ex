@@ -1,5 +1,5 @@
 defmodule ExRss.User do
-  use ExRss.Web, :model
+  use ExRssWeb, :model
 
   alias Ecto.Changeset
 

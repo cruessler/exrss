@@ -1,5 +1,5 @@
 defmodule ExRssWeb.Api.V1.EntryController do
-  use ExRss.Web, :controller
+  use ExRssWeb, :controller
 
   alias ExRss.Entry
   alias ExRss.Repo

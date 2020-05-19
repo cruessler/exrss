@@ -1,3 +1,3 @@
 defmodule ExRssWeb.FeedView do
-  use ExRss.Web, :view
+  use ExRssWeb, :view
 end

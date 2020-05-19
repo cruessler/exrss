@@ -1,5 +1,5 @@
 defmodule ExRssWeb.Router do
-  use ExRss.Web, :router
+  use ExRssWeb, :router
 
   @api_token_salt "user"
 

@@ -1,5 +1,5 @@
 defmodule ExRss.Entry do
-  use ExRss.Web, :model
+  use ExRssWeb, :model
 
   alias ExRss.Feed
 

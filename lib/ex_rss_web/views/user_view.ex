@@ -1,3 +1,3 @@
 defmodule ExRssWeb.UserView do
-  use ExRss.Web, :view
+  use ExRssWeb, :view
 end

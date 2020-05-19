@@ -1,5 +1,5 @@
 defmodule ExRss.User.Registration do
-  use ExRss.Web, :model
+  use ExRssWeb, :model
 
   @timestamps_opts [type: :utc_datetime]
 

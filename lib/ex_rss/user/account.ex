@@ -1,5 +1,5 @@
 defmodule ExRss.User.Account do
-  use ExRss.Web, :model
+  use ExRssWeb, :model
 
   schema "users" do
     field :email, :string
