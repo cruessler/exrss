@@ -13,5 +13,7 @@ config :logger, level: :warn
 # Configure your database
 config :ex_rss, ExRss.Repo,
   adapter: Ecto.Adapters.Postgres,
-  database: "travis_ci_test",
+  username: "ex_rss_test",
+  password: "ex_rss_test",
+  database: "ex_rss_test",
   pool: Ecto.Adapters.SQL.Sandbox

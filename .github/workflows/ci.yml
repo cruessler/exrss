@@ -1,0 +1,76 @@
+on: [push]
+name: build
+jobs:
+  build:
+    # PostgreSQL setup according to [postgres-setup].
+    #
+    # [postgres-setup]: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-postgresql-service-containers
+    runs-on: ubuntu-18.04
+
+    services:
+      postgres:
+        image: postgres
+
+        env:
+          POSTGRES_USER: ex_rss_test
+          POSTGRES_PASSWORD: ex_rss_test
+          # We prefer to explicitly set `POSTGRES_DB`.
+          #
+          # “If it is not specified, then the value of POSTGRES_USER will be
+          # used.”
+          #
+          # https://hub.docker.com/_/postgres
+          POSTGRES_DB: ex_rss_test
+
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+        ports:
+          - 5432:5432
+
+    strategy:
+      matrix:
+        otp: [ '20.3' ]
+        elixir: [ '1.8.2' ]
+        node: [ '10.x' ]
+
+    name: OTP ${{matrix.otp}}, Elixir ${{matrix.elixir}}, Node.js ${{ matrix.node }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Elixir [OTP ${{ matrix.otp }}, Elixir ${{ matrix.elixir }}]
+        uses: actions/setup-elixir@v1
+        with:
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
+
+      - name: Set up Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Copy test configuration
+        run: |
+          cp config/test.ci.exs config/test.exs
+
+      - run: mix deps.get
+      - run: npm ci
+        working-directory: assets
+
+      - name: Run tests
+        run: mix test
+
+      - run: mix format --check-formatted
+      - run: |
+          npx prettier --check "js/**/*.js" "*.js"
+          npx elm-format --elm-version=0.19 --validate elm
+        working-directory: assets
+
+      - name: Build and test [Node.js ${{ matrix.node }}]
+        run: |
+          npm run deploy
+          npm test
+        working-directory: assets

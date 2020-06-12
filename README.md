@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/cruessler/exrss.svg?branch=master)](https://travis-ci.org/cruessler/exrss)
+[![Build Status](https://github.com/cruessler/exrss/workflows/build/badge.svg)](https://github.com/cruessler/exrss/actions?query=workflow%3Abuild)
 
 # ExRss
 
