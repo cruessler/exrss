@@ -67,6 +67,8 @@ defmodule ExRss.Entry do
     "%d %b %Y %H:%M %z",
     # 2018-08-22T10:07:06.121Z
     "%Y-%m-%dT%H:%M:%S.%LZ",
+    # 2020-05-03T13:10:00.000-06:00
+    "%Y-%m-%dT%H:%M:%S.%L%:z",
     # 2019-01-17T00:00:00Z
     "%Y-%m-%dT%H:%M:%SZ",
     # Internet date/time format as specified by RFC 3339
