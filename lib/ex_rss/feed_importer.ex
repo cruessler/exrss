@@ -10,6 +10,9 @@ defmodule ExRss.FeedImporter do
       {feeds_imported, _} = Repo.insert_all(Feed, feeds)
 
       {:ok, feeds_imported}
+    else
+      x ->
+        x
     end
   end
 
@@ -29,7 +32,8 @@ defmodule ExRss.FeedImporter do
       end)
       |> Enum.reject(&is_nil(&1))
     else
-      []
+      _ ->
+        []
     end
   end
 end
