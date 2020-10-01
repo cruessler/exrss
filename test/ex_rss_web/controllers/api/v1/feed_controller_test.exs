@@ -143,7 +143,7 @@ defmodule ExRssWeb.Api.V1.FeedControllerTest do
     assert_raise Ecto.NoResultsError, fn ->
       conn
       |> with_authorization(user)
-      |> delete("/api/v1/feeds/2")
+      |> delete("/api/v1/feeds/20201001")
     end
   end
 end
