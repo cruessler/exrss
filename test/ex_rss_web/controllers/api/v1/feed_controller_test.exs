@@ -76,7 +76,8 @@ defmodule ExRssWeb.Api.V1.FeedControllerTest do
              %{
                "entries" => [%{"url" => "http://example.com/1"}],
                "unread_entries_count" => 1,
-               "read_entries_count" => 2
+               "read_entries_count" => 2,
+               "has_error" => false
              }
            ] = response
   end

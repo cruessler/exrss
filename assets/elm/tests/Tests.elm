@@ -37,12 +37,12 @@ unreadEntries =
 
 feed : Feed
 feed =
-    Feed.createWithEntries 0 "https://example.com" "Title" entries
+    Feed.createWithEntries 0 "https://example.com" "Title" False entries
 
 
 feedWithCounts : Feed
 feedWithCounts =
-    Feed.createWithCounts 0 "https://example.com" "Title" unreadEntries 2 3
+    Feed.createWithCounts 0 "https://example.com" "Title" False unreadEntries 2 3
 
 
 feeds : Dict Int Feed
@@ -59,6 +59,7 @@ suite =
                 Expect.all
                     [ Feed.unreadEntriesCount >> Expect.equal 1
                     , Feed.readEntriesCount >> Expect.equal 1
+                    , Feed.hasError >> Expect.equal False
                     ]
                     feed
         , test "markAsRead updates counts" <|
