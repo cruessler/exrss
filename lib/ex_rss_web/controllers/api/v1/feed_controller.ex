@@ -38,7 +38,8 @@ defmodule ExRssWeb.Api.V1.FeedController do
         select: %{
           f
           | unread_entries_count: filter(count(e.id), e.read == false),
-            read_entries_count: filter(count(e.id), e.read == true)
+            read_entries_count: filter(count(e.id), e.read == true),
+            has_error: f.retries > 0
         }
       )
 

@@ -10,7 +10,15 @@ defmodule ExRss.Feed do
   @max_timeout Duration.from_days(1) |> Duration.to_seconds() |> round
 
   @derive {Jason.Encoder,
-           only: [:id, :title, :url, :entries, :unread_entries_count, :read_entries_count]}
+           only: [
+             :id,
+             :title,
+             :url,
+             :entries,
+             :unread_entries_count,
+             :read_entries_count,
+             :has_error
+           ]}
 
   @timestamps_opts [type: :utc_datetime]
 
@@ -22,6 +30,7 @@ defmodule ExRss.Feed do
 
     field :unread_entries_count, :integer, virtual: true
     field :read_entries_count, :integer, virtual: true
+    field :has_error, :boolean, virtual: true
 
     belongs_to :user, User
 

@@ -21,6 +21,7 @@ module Types.Feed exposing
     , encodeEntry
     , entries
     , entry
+    , hasError
     , id
     , markAsRead
     , open
@@ -49,6 +50,7 @@ type Feed
         , open : Bool
         , unreadEntriesCount : Int
         , readEntriesCount : Int
+        , hasError : Bool
         }
 
 
@@ -81,8 +83,8 @@ type alias Candidate =
     }
 
 
-createWithEntries : Int -> String -> String -> Dict Int Entry -> Feed
-createWithEntries id_ url_ title_ entries_ =
+createWithEntries : Int -> String -> String -> Bool -> Dict Int Entry -> Feed
+createWithEntries id_ url_ title_ hasError_ entries_ =
     Feed
         { id = id_
         , url = url_
@@ -91,11 +93,12 @@ createWithEntries id_ url_ title_ entries_ =
         , open = False
         , unreadEntriesCount = numberOfUnreadEntries entries_
         , readEntriesCount = numberOfReadEntries entries_
+        , hasError = hasError_
         }
 
 
-createWithCounts : Int -> String -> String -> Dict Int Entry -> Int -> Int -> Feed
-createWithCounts id_ url_ title_ entries_ unreadEntriesCount_ readEntriesCount_ =
+createWithCounts : Int -> String -> String -> Bool -> Dict Int Entry -> Int -> Int -> Feed
+createWithCounts id_ url_ title_ hasError_ entries_ unreadEntriesCount_ readEntriesCount_ =
     Feed
         { id = id_
         , url = url_
@@ -104,6 +107,7 @@ createWithCounts id_ url_ title_ entries_ unreadEntriesCount_ readEntriesCount_ 
         , open = False
         , unreadEntriesCount = unreadEntriesCount_
         , readEntriesCount = readEntriesCount_
+        , hasError = hasError_
         }
 
 
@@ -192,6 +196,11 @@ markAsRead e =
                     { feed | entries = newEntries }
     in
     Dict.map updateFeed
+
+
+hasError : Feed -> Bool
+hasError (Feed feed) =
+    feed.hasError
 
 
 updateEntry : Int -> (Entry -> Entry) -> Dict Int Feed -> Dict Int Feed
@@ -297,10 +306,11 @@ decodeFeedsOnlyUnreadEntries =
 
 countEntries : Dict Int Entry -> Decode.Decoder Feed
 countEntries entries_ =
-    map3 createWithEntries
+    map4 createWithEntries
         (field "id" int)
         (field "url" string)
         (oneOf [ null "", field "title" string ])
+        (field "has_error" bool)
         |> Decode.map (\f -> f entries_)
 
 
@@ -340,7 +350,7 @@ decodeFeed =
 
 decodeFeedOnlyUnreadEntries : Decode.Decoder Feed
 decodeFeedOnlyUnreadEntries =
-    map7 (\a b c d e f g -> Feed { id = a, url = b, title = c, entries = d, open = e, unreadEntriesCount = f, readEntriesCount = g })
+    map8 (\a b c d e f g h -> Feed { id = a, url = b, title = c, entries = d, open = e, unreadEntriesCount = f, readEntriesCount = g, hasError = h })
         (field "id" int)
         (field "url" string)
         (oneOf [ null "", field "title" string ])
@@ -348,6 +358,7 @@ decodeFeedOnlyUnreadEntries =
         (succeed False)
         (field "unread_entries_count" int)
         (field "read_entries_count" int)
+        (field "has_error" bool)
 
 
 decodeEntries : Decode.Decoder (Dict Int Entry)
