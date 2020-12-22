@@ -86,10 +86,18 @@ additionalInfo feed =
 
             else
                 String.fromInt numberOfUnreadEntries ++ " unread"
+
+        infoTextError =
+            if Feed.hasError feed then
+                "there were errors when the feed was last updated"
+
+            else
+                ""
     in
     H.ul [ A.class "additional-info" ]
         [ H.li [] [ H.text infoText ]
         , H.li [] [ H.text infoTextUnread ]
+        , H.li [] [ H.text infoTextError ]
         ]
 
 
