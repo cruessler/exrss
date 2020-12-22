@@ -6,7 +6,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const elmRoot = path.resolve(__dirname, 'elm');
 
-module.exports = (env, options) => ({
+module.exports = () => ({
   optimization: {
     minimizer: [
       new TerserPlugin({ cache: true, parallel: true, sourceMap: false }),
@@ -42,7 +42,7 @@ module.exports = (env, options) => ({
         options: {
           cwd: elmRoot,
           pathToElm: '../node_modules/.bin/elm',
-          optimize: true,
+          optimize: process.env.NODE_ENV === 'production',
         },
       },
     ],
@@ -52,4 +52,7 @@ module.exports = (env, options) => ({
     new MiniCssExtractPlugin({ filename: '../css/app.css' }),
     new CopyWebpackPlugin({ patterns: [{ from: 'static/', to: '../' }] }),
   ],
+  watchOptions: {
+    aggregateTimeout: 1000,
+  },
 });
