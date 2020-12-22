@@ -35,7 +35,15 @@ defmodule ExRssWeb.Api.V1.FeedControllerTest do
       |> get("/api/v1/feeds")
 
     response = json_response(conn, 200)
-    assert [%{"entries" => [%{"id" => ^entry_id}]}] = response
+
+    assert [
+             %{
+               "entries" => [%{"id" => ^entry_id}],
+               "unread_entries_count" => nil,
+               "read_entries_count" => nil,
+               "has_error" => nil
+             }
+           ] = response
   end
 
   test "GET /feeds/only_unread_entries", %{conn: conn, user: user, feed: feed} do
