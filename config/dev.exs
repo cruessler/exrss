@@ -7,7 +7,7 @@ use Mix.Config
 # watchers to your application. For example, we use it
 # with webpack to recompile .js and .css sources.
 config :ex_rss, ExRssWeb.Endpoint,
-  http: [port: 4000],
+  http: [port: 4000, protocol_options: [max_header_value_length: 8192]],
   secret_key_base: String.duplicate("abcdefgh", 8),
   debug_errors: true,
   code_reloader: true,
@@ -17,7 +17,7 @@ config :ex_rss, ExRssWeb.Endpoint,
       "node_modules/webpack/bin/webpack.js",
       "--mode",
       "development",
-      "--watch-stdin",
+      "--watch",
       cd: Path.expand("../assets", __DIR__)
     ]
   ]
