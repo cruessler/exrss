@@ -12,7 +12,7 @@
     "babel-loader": "^7.1.5",
     "babel-preset-env": "^1.6.1",
     "copy-webpack-plugin": "^6.4.1",
-    "css-loader": "^5.0.2",
+    "css-loader": "^5.1.0",
     "elm": "^0.19.1-5",
     "elm-format": "^0.8.5",
     "elm-test": "^0.19.1-revision6",
