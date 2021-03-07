@@ -12,9 +12,9 @@ import Time
 import Types.Feed as Feed exposing (..)
 
 
-formatPostedAt : Time.Posix -> String
-formatPostedAt =
-    F.format [ F.monthNameFull, F.text " ", F.dayOfMonthNumber, F.text ", ", F.yearNumber, F.text ", ", F.hourMilitaryFixed, F.text ":", F.minuteFixed ] Time.utc
+formatTimestamp : Time.Posix -> String
+formatTimestamp =
+    F.format [ F.monthNameFull, F.text " ", F.dayOfMonthNumber, F.text ", ", F.yearNumber, F.text ", ", F.hourMilitaryFixed, F.text ":", F.minuteFixed, F.text " (UTC)" ] Time.utc
 
 
 viewEntry : Entry -> Html Msg
@@ -22,7 +22,7 @@ viewEntry entry =
     let
         postedAt =
             entry.postedAt
-                |> Maybe.map formatPostedAt
+                |> Maybe.map formatTimestamp
                 |> Maybe.withDefault "unknown"
 
         maybeButton =
@@ -93,11 +93,20 @@ additionalInfo feed =
 
             else
                 ""
+
+        infoTextLastUpdate =
+            case Feed.lastSuccessfulUpdateAt feed of
+                Just updateAt ->
+                    "last successful update at " ++ formatTimestamp updateAt
+
+                Nothing ->
+                    "last successful update at n/a"
     in
     H.ul [ A.class "additional-info" ]
         [ H.li [] [ H.text infoText ]
         , H.li [] [ H.text infoTextUnread ]
         , H.li [] [ H.text infoTextError ]
+        , H.li [] [ H.text infoTextLastUpdate ]
         ]
 
 
