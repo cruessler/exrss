@@ -36,8 +36,9 @@ module Types.Feed exposing
 
 import Dict exposing (Dict)
 import Iso8601
-import Json.Decode as Decode exposing (..)
-import Json.Encode as Encode
+import Json.Decode as D exposing (bool, field, int, list, map, nullable, string)
+import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import Json.Encode as E
 import Time
 
 
@@ -294,30 +295,30 @@ compareByPostedAt a b =
             EQ
 
 
-decodeFeeds : Decode.Decoder (List Feed)
+decodeFeeds : D.Decoder (List Feed)
 decodeFeeds =
     list decodeFeed
 
 
-decodeFeedsOnlyUnreadEntries : Decode.Decoder (List Feed)
+decodeFeedsOnlyUnreadEntries : D.Decoder (List Feed)
 decodeFeedsOnlyUnreadEntries =
     list decodeFeedOnlyUnreadEntries
 
 
-countEntries : Dict Int Entry -> Decode.Decoder Feed
+countEntries : Dict Int Entry -> D.Decoder Feed
 countEntries entries_ =
-    map4 createWithEntries
-        (field "id" int)
-        (field "url" string)
-        (oneOf [ null "", field "title" string ])
-        (field "has_error" bool)
-        |> Decode.map (\f -> f entries_)
+    D.succeed createWithEntries
+        |> required "id" int
+        |> required "url" string
+        |> optional "title" string ""
+        |> required "has_error" bool
+        |> D.map (\f -> f entries_)
 
 
 numberOfUnreadEntries : Dict Int Entry -> Int
 numberOfUnreadEntries entries_ =
     Dict.foldl
-        (\k v acc ->
+        (\_ v acc ->
             if v.read then
                 acc
 
@@ -331,7 +332,7 @@ numberOfUnreadEntries entries_ =
 numberOfReadEntries : Dict Int Entry -> Int
 numberOfReadEntries entries_ =
     Dict.foldl
-        (\k v acc ->
+        (\_ v acc ->
             if v.read then
                 acc + 1
 
@@ -342,26 +343,26 @@ numberOfReadEntries entries_ =
         entries_
 
 
-decodeFeed : Decode.Decoder Feed
+decodeFeed : D.Decoder Feed
 decodeFeed =
     field "entries" decodeEntries
-        |> andThen countEntries
+        |> D.andThen countEntries
 
 
-decodeFeedOnlyUnreadEntries : Decode.Decoder Feed
+decodeFeedOnlyUnreadEntries : D.Decoder Feed
 decodeFeedOnlyUnreadEntries =
-    map8 (\a b c d e f g h -> Feed { id = a, url = b, title = c, entries = d, open = e, unreadEntriesCount = f, readEntriesCount = g, hasError = h })
-        (field "id" int)
-        (field "url" string)
-        (oneOf [ null "", field "title" string ])
-        (field "entries" decodeEntries)
-        (succeed False)
-        (field "unread_entries_count" int)
-        (field "read_entries_count" int)
-        (field "has_error" bool)
+    D.succeed (\a b c d e f g h -> Feed { id = a, url = b, title = c, entries = d, open = e, unreadEntriesCount = f, readEntriesCount = g, hasError = h })
+        |> required "id" int
+        |> required "url" string
+        |> optional "title" string ""
+        |> required "entries" decodeEntries
+        |> hardcoded False
+        |> required "unread_entries_count" int
+        |> required "read_entries_count" int
+        |> required "has_error" bool
 
 
-decodeEntries : Decode.Decoder (Dict Int Entry)
+decodeEntries : D.Decoder (Dict Int Entry)
 decodeEntries =
     let
         toDict list =
@@ -372,65 +373,64 @@ decodeEntries =
         |> map toDict
 
 
-decodeCandidates : Decode.Decoder (List Candidate)
+decodeCandidates : D.Decoder (List Candidate)
 decodeCandidates =
     list decodeCandidate
 
 
-decodeCandidate : Decode.Decoder Candidate
+decodeCandidate : D.Decoder Candidate
 decodeCandidate =
-    map4 Candidate
-        (field "url" string)
-        (field "title" string)
-        (field "href" string)
-        (field "frequency" <| nullable decodeFrequency)
+    D.succeed Candidate
+        |> required "url" string
+        |> required "title" string
+        |> required "href" string
+        |> required "frequency" (nullable decodeFrequency)
 
 
-decodeFrequency : Decode.Decoder Frequency
+decodeFrequency : D.Decoder Frequency
 decodeFrequency =
-    map2 Frequency (field "posts" int) (field "seconds" int)
+    D.succeed Frequency
+        |> required "posts" int
+        |> required "seconds" int
 
 
-encodeCandidate : Candidate -> Encode.Value
+encodeCandidate : Candidate -> E.Value
 encodeCandidate candidate =
-    Encode.object
+    E.object
         [ ( "feed"
-          , Encode.object
-                [ ( "title", Encode.string candidate.title )
-                , ( "url", Encode.string candidate.url )
+          , E.object
+                [ ( "title", E.string candidate.title )
+                , ( "url", E.string candidate.url )
                 ]
           )
         ]
 
 
-encodeEntry : Entry -> Encode.Value
+encodeEntry : Entry -> E.Value
 encodeEntry e =
-    Encode.object
+    E.object
         [ ( "entry"
-          , Encode.object [ ( "read", Encode.bool e.read ) ]
+          , E.object [ ( "read", E.bool e.read ) ]
           )
         ]
 
 
-decodePostedAt : Decode.Decoder (Maybe Time.Posix)
-decodePostedAt =
+postedAt : D.Decoder (Maybe Time.Posix)
+postedAt =
     let
+        parseDate : Maybe String -> Maybe Time.Posix
         parseDate =
-            Iso8601.toTime
-                >> Result.toMaybe
-
-        date =
-            oneOf [ null Nothing, string |> Decode.map parseDate ]
+            Maybe.andThen (Iso8601.toTime >> Result.toMaybe)
     in
-    field "posted_at" date
+    nullable string |> D.map parseDate
 
 
-decodeEntry : Decode.Decoder Entry
+decodeEntry : D.Decoder Entry
 decodeEntry =
-    map6 Entry
-        (field "id" int)
-        (field "url" string)
-        (field "title" <| nullable string)
-        (field "read" bool)
-        decodePostedAt
-        (succeed NoChange)
+    D.succeed Entry
+        |> required "id" int
+        |> required "url" string
+        |> required "title" (nullable string)
+        |> required "read" bool
+        |> required "posted_at" postedAt
+        |> hardcoded NoChange
