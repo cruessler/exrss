@@ -23,6 +23,7 @@ module Types.Feed exposing
     , entry
     , hasError
     , id
+    , lastSuccessfulUpdateAt
     , markAsRead
     , open
     , readEntriesCount
@@ -52,6 +53,7 @@ type Feed
         , unreadEntriesCount : Int
         , readEntriesCount : Int
         , hasError : Bool
+        , lastSuccessfulUpdateAt : Maybe Time.Posix
         }
 
 
@@ -84,8 +86,8 @@ type alias Candidate =
     }
 
 
-createWithEntries : Int -> String -> String -> Bool -> Dict Int Entry -> Feed
-createWithEntries id_ url_ title_ hasError_ entries_ =
+createWithEntries : Int -> String -> String -> Bool -> Maybe Time.Posix -> Dict Int Entry -> Feed
+createWithEntries id_ url_ title_ hasError_ lastSuccessfulUpdateAt_ entries_ =
     Feed
         { id = id_
         , url = url_
@@ -95,11 +97,12 @@ createWithEntries id_ url_ title_ hasError_ entries_ =
         , unreadEntriesCount = numberOfUnreadEntries entries_
         , readEntriesCount = numberOfReadEntries entries_
         , hasError = hasError_
+        , lastSuccessfulUpdateAt = lastSuccessfulUpdateAt_
         }
 
 
-createWithCounts : Int -> String -> String -> Bool -> Dict Int Entry -> Int -> Int -> Feed
-createWithCounts id_ url_ title_ hasError_ entries_ unreadEntriesCount_ readEntriesCount_ =
+createWithCounts : Int -> String -> String -> Dict Int Entry -> Int -> Int -> Feed
+createWithCounts id_ url_ title_ entries_ unreadEntriesCount_ readEntriesCount_ =
     Feed
         { id = id_
         , url = url_
@@ -108,7 +111,23 @@ createWithCounts id_ url_ title_ hasError_ entries_ unreadEntriesCount_ readEntr
         , open = False
         , unreadEntriesCount = unreadEntriesCount_
         , readEntriesCount = readEntriesCount_
+        , hasError = False
+        , lastSuccessfulUpdateAt = Nothing
+        }
+
+
+create : Int -> String -> String -> Dict Int Entry -> Bool -> Int -> Int -> Bool -> Maybe Time.Posix -> Feed
+create id_ url_ title_ entries_ open_ unreadEntriesCount_ readEntriesCount_ hasError_ lastSuccessfulUpdateAt_ =
+    Feed
+        { id = id_
+        , url = url_
+        , title = title_
+        , entries = entries_
+        , open = open_
+        , unreadEntriesCount = unreadEntriesCount_
+        , readEntriesCount = readEntriesCount_
         , hasError = hasError_
+        , lastSuccessfulUpdateAt = lastSuccessfulUpdateAt_
         }
 
 
@@ -164,6 +183,11 @@ unreadEntriesCount (Feed feed) =
 readEntriesCount : Feed -> Int
 readEntriesCount (Feed feed) =
     feed.readEntriesCount
+
+
+lastSuccessfulUpdateAt : Feed -> Maybe Time.Posix
+lastSuccessfulUpdateAt (Feed feed) =
+    feed.lastSuccessfulUpdateAt
 
 
 markAsRead : Entry -> Dict Int Feed -> Dict Int Feed
@@ -312,6 +336,7 @@ countEntries entries_ =
         |> required "url" string
         |> optional "title" string ""
         |> required "has_error" bool
+        |> required "last_successful_update_at" timestampOrNull
         |> D.map (\f -> f entries_)
 
 
@@ -351,7 +376,7 @@ decodeFeed =
 
 decodeFeedOnlyUnreadEntries : D.Decoder Feed
 decodeFeedOnlyUnreadEntries =
-    D.succeed (\a b c d e f g h -> Feed { id = a, url = b, title = c, entries = d, open = e, unreadEntriesCount = f, readEntriesCount = g, hasError = h })
+    D.succeed create
         |> required "id" int
         |> required "url" string
         |> optional "title" string ""
@@ -360,6 +385,7 @@ decodeFeedOnlyUnreadEntries =
         |> required "unread_entries_count" int
         |> required "read_entries_count" int
         |> required "has_error" bool
+        |> required "last_successful_update_at" timestampOrNull
 
 
 decodeEntries : D.Decoder (Dict Int Entry)
@@ -415,8 +441,8 @@ encodeEntry e =
         ]
 
 
-postedAt : D.Decoder (Maybe Time.Posix)
-postedAt =
+timestampOrNull : D.Decoder (Maybe Time.Posix)
+timestampOrNull =
     let
         parseDate : Maybe String -> Maybe Time.Posix
         parseDate =
@@ -432,5 +458,5 @@ decodeEntry =
         |> required "url" string
         |> required "title" (nullable string)
         |> required "read" bool
-        |> required "posted_at" postedAt
+        |> required "posted_at" timestampOrNull
         |> hardcoded NoChange

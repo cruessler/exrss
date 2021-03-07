@@ -1,8 +1,7 @@
 module Tests exposing (suite)
 
 import Dict exposing (Dict)
-import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, int, list, string)
+import Expect
 import Test exposing (..)
 import Types.Feed as Feed exposing (Entry, Feed, Status(..))
 
@@ -37,12 +36,12 @@ unreadEntries =
 
 feed : Feed
 feed =
-    Feed.createWithEntries 0 "https://example.com" "Title" False entries
+    Feed.createWithEntries 0 "https://example.com" "Title" False Nothing entries
 
 
 feedWithCounts : Feed
 feedWithCounts =
-    Feed.createWithCounts 0 "https://example.com" "Title" False unreadEntries 2 3
+    Feed.createWithCounts 0 "https://example.com" "Title" unreadEntries 2 3
 
 
 feeds : Dict Int Feed

@@ -17,7 +17,8 @@ defmodule ExRss.Feed do
              :entries,
              :unread_entries_count,
              :read_entries_count,
-             :has_error
+             :has_error,
+             :last_successful_update_at
            ]}
 
   @timestamps_opts [type: :utc_datetime]
@@ -26,6 +27,7 @@ defmodule ExRss.Feed do
     field :title, :string
     field :url, :string
     field :next_update_at, :utc_datetime
+    field :last_successful_update_at, :utc_datetime
     field :retries, :integer
 
     field :unread_entries_count, :integer, virtual: true
@@ -87,6 +89,7 @@ defmodule ExRss.Feed do
   def schedule_update_on_success(changeset, now \\ now_with_seconds_precision()) do
     changeset
     |> Changeset.put_change(:retries, 0)
+    |> Changeset.put_change(:last_successful_update_at, now)
     |> schedule_update(now)
   end
 
