@@ -1,5 +1,6 @@
 module Feeds.Model exposing
-    ( Model
+    ( FilterBy(..)
+    , Model
     , Request(..)
     , SortBy(..)
     , Visibility(..)
@@ -10,7 +11,12 @@ import Dict exposing (Dict)
 import Feeds.Addition exposing (Addition)
 import Feeds.Discovery exposing (Discovery)
 import Feeds.Removal exposing (Removal)
-import Types.Feed exposing (..)
+import Types.Feed exposing (Feed)
+
+
+type FilterBy
+    = DontFilter
+    | FilterByErrorStatus
 
 
 type Visibility
@@ -33,6 +39,7 @@ type Request
 type alias Model =
     { apiConfig : Api.Config
     , visibility : Visibility
+    , filterBy : FilterBy
     , sortBy : SortBy
     , feeds : Dict Int Feed
     , showOptions : Bool

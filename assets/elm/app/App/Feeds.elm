@@ -5,7 +5,7 @@ import Browser
 import Dict exposing (Dict)
 import Feeds.Addition as Addition
 import Feeds.Discovery as Discovery
-import Feeds.Model as Model exposing (Model, SortBy(..), Visibility(..))
+import Feeds.Model as Model exposing (FilterBy(..), Model, SortBy(..), Visibility(..))
 import Feeds.Msg as Msg exposing (Msg(..))
 import Feeds.Removal as Removal
 import Feeds.View as View
@@ -40,6 +40,7 @@ init flags =
     in
     ( { apiConfig = apiConfig
       , visibility = AlwaysShowUnreadEntries
+      , filterBy = DontFilter
       , sortBy = SortByNewestUnread
       , feeds = Dict.empty
       , showOptions = False
@@ -93,6 +94,9 @@ update msg model =
     case msg of
         SetVisibility visibility ->
             ( { model | visibility = visibility }, Cmd.none )
+
+        SetFilterBy filterBy ->
+            ( { model | filterBy = filterBy }, Cmd.none )
 
         SetSortBy sortBy ->
             ( { model | sortBy = sortBy }, Cmd.none )

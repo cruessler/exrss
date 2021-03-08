@@ -164,6 +164,16 @@ viewFeed visibility feed =
         children
 
 
+filterBy : FilterBy -> List Feed -> List Feed
+filterBy filterBy_ feeds =
+    case filterBy_ of
+        DontFilter ->
+            feeds
+
+        FilterByErrorStatus ->
+            List.filter (\feed -> Feed.hasError feed) feeds
+
+
 sortWith : SortBy -> (Feed -> Feed -> Order)
 sortWith sortBy =
     case sortBy of
@@ -180,6 +190,7 @@ view model =
         feeds =
             model.feeds
                 |> Dict.values
+                |> filterBy model.filterBy
                 |> List.sortWith (sortWith model.sortBy)
                 |> List.reverse
                 |> List.sortWith Feed.compareByStatus

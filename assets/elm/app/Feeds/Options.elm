@@ -67,6 +67,24 @@ visibilityFieldset visibility =
         ]
 
 
+filterByRadio : FilterBy -> FilterBy -> String -> Html Msg
+filterByRadio currentFilterBy filterBy text =
+    radio (SetFilterBy filterBy) currentFilterBy filterBy text
+
+
+filterByFieldset : FilterBy -> Html Msg
+filterByFieldset filterBy =
+    H.fieldset []
+        [ H.legend [] [ H.text "Filter feeds by" ]
+        , filterByRadio filterBy
+            DontFilter
+            "Don’t filter feeds"
+        , filterByRadio filterBy
+            FilterByErrorStatus
+            "Only show feeds with error"
+        ]
+
+
 sortByRadio : SortBy -> SortBy -> String -> Html Msg
 sortByRadio currentSortBy sortBy text =
     radio (SetSortBy sortBy) currentSortBy sortBy text
@@ -189,6 +207,7 @@ view model =
             model.showOptions
             [ actionsFieldset
             , visibilityFieldset model.visibility
+            , filterByFieldset model.filterBy
             , sortByFieldset model.sortBy
             , Discovery.discoverFeedsFieldset model.discoveryUrl
             , Discovery.discoverFeedFieldset
