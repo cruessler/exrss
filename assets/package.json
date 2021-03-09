@@ -6,7 +6,6 @@
     "watch": "webpack --mode development --watch",
     "test": "cd elm && npx elm-test"
   },
-  "dependencies": {},
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.5",
