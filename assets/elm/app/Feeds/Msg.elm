@@ -5,6 +5,7 @@ import Feeds.Discovery as Discovery
 import Feeds.Model exposing (..)
 import Feeds.Removal as Removal
 import Http
+import Time
 import Types.Feed exposing (..)
 
 
@@ -14,6 +15,7 @@ type Msg
     | SetSortBy SortBy
     | ToggleOptions
     | SetDiscoveryUrl String
+    | SetTimezone Time.Zone
     | GetFeeds
     | NewFeeds (Result Http.Error (List Feed))
     | DiscoverFeeds String

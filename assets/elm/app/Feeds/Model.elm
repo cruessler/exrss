@@ -11,6 +11,7 @@ import Dict exposing (Dict)
 import Feeds.Addition exposing (Addition)
 import Feeds.Discovery exposing (Discovery)
 import Feeds.Removal exposing (Removal)
+import Time
 import Types.Feed exposing (Feed)
 
 
@@ -45,4 +46,5 @@ type alias Model =
     , showOptions : Bool
     , discoveryUrl : String
     , requests : Dict String Request
+    , timezone : Time.Zone
     }
