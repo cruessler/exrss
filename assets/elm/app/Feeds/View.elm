@@ -12,17 +12,25 @@ import Time
 import Types.Feed as Feed exposing (..)
 
 
-formatTimestamp : Time.Posix -> String
-formatTimestamp =
-    F.format [ F.monthNameFull, F.text " ", F.dayOfMonthNumber, F.text ", ", F.yearNumber, F.text ", ", F.hourMilitaryFixed, F.text ":", F.minuteFixed, F.text " (UTC)" ] Time.utc
+formatTimestamp : Time.Zone -> Time.Posix -> String
+formatTimestamp timezone =
+    let
+        suffix =
+            if timezone == Time.utc then
+                F.text " (UTC)"
+
+            else
+                F.text ""
+    in
+    F.format [ F.monthNameFull, F.text " ", F.dayOfMonthNumber, F.text ", ", F.yearNumber, F.text ", ", F.hourMilitaryFixed, F.text ":", F.minuteFixed, suffix ] timezone
 
 
-viewEntry : Entry -> Html Msg
-viewEntry entry =
+viewEntry : Time.Zone -> Entry -> Html Msg
+viewEntry timezone entry =
     let
         postedAt =
             entry.postedAt
-                |> Maybe.map formatTimestamp
+                |> Maybe.map (formatTimestamp timezone)
                 |> Maybe.withDefault "unknown"
 
         maybeButton =
@@ -64,8 +72,8 @@ viewEntry entry =
         ]
 
 
-additionalInfo : Feed -> Html Msg
-additionalInfo feed =
+additionalInfo : Time.Zone -> Feed -> Html Msg
+additionalInfo timezone feed =
     let
         numberOfEntries =
             Feed.unreadEntriesCount feed + Feed.readEntriesCount feed
@@ -97,7 +105,7 @@ additionalInfo feed =
         infoTextLastUpdate =
             case Feed.lastSuccessfulUpdateAt feed of
                 Just updateAt ->
-                    "last successful update at " ++ formatTimestamp updateAt
+                    "last successful update at " ++ formatTimestamp timezone updateAt
 
                 Nothing ->
                     "last successful update at n/a"
@@ -110,8 +118,8 @@ additionalInfo feed =
         ]
 
 
-viewFeed : Visibility -> Feed -> Html Msg
-viewFeed visibility feed =
+viewFeed : Model -> Feed -> Html Msg
+viewFeed model feed =
     let
         sortedEntries =
             feed
@@ -121,7 +129,7 @@ viewFeed visibility feed =
                 |> List.reverse
 
         entries =
-            case visibility of
+            case model.visibility of
                 HideReadEntries ->
                     if Feed.open feed then
                         List.filter (not << .read) <| sortedEntries
@@ -144,7 +152,7 @@ viewFeed visibility feed =
                         []
 
         feed_ =
-            H.ul [ A.class "feed" ] (List.map viewEntry entries)
+            H.ul [ A.class "feed" ] (List.map (viewEntry model.timezone) entries)
 
         actions =
             H.div [ A.class "actions" ]
@@ -154,7 +162,7 @@ viewFeed visibility feed =
 
         children =
             [ H.h1 [ E.onClick (ToggleFeed feed) ] [ H.text <| Feed.title feed ]
-            , additionalInfo feed
+            , additionalInfo model.timezone feed
             , actions
             , feed_
             ]
@@ -194,7 +202,7 @@ view model =
                 |> List.sortWith (sortWith model.sortBy)
                 |> List.reverse
                 |> List.sortWith Feed.compareByStatus
-                |> List.map (viewFeed model.visibility)
+                |> List.map (viewFeed model)
     in
     H.main_ [ A.attribute "role" "main" ]
         [ Options.view model

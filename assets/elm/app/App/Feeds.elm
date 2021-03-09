@@ -14,6 +14,8 @@ import Json.Encode as E
 import Paths
 import Request exposing (Request(..))
 import String
+import Task
+import Time
 import Types.Feed as Feed exposing (Entry, Feed, Status(..), updateEntry)
 
 
@@ -46,8 +48,9 @@ init flags =
       , showOptions = False
       , discoveryUrl = ""
       , requests = Dict.empty
+      , timezone = Time.utc
       }
-    , getFeeds apiConfig
+    , Cmd.batch [ getFeeds apiConfig, Task.perform SetTimezone Time.here ]
     )
 
 
@@ -106,6 +109,9 @@ update msg model =
 
         SetDiscoveryUrl url ->
             ( { model | discoveryUrl = url }, Cmd.none )
+
+        SetTimezone timezone ->
+            ( { model | timezone = timezone }, Cmd.none )
 
         GetFeeds ->
             ( model, getFeeds model.apiConfig )
