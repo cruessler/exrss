@@ -7,9 +7,9 @@
     "test": "cd elm && npx elm-test"
   },
   "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.5",
-    "babel-preset-env": "^1.6.1",
+    "@babel/core": "^7.13.10",
+    "@babel/preset-env": "^7.13.10",
+    "babel-loader": "^8.2.2",
     "copy-webpack-plugin": "^6.4.1",
     "css-loader": "^5.1.2",
     "elm": "^0.19.1-5",
