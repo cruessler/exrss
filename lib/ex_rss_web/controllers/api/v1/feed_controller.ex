@@ -72,7 +72,13 @@ defmodule ExRssWeb.Api.V1.FeedController do
 
     case Repo.transaction(multi) do
       {:ok, %{feed: feed}} ->
-        feed = feed |> Map.take([:id, :url, :title]) |> Map.put(:entries, [])
+        feed =
+          feed
+          # This has to be manually kept in sync with `Types.Feed.decodeFeed`
+          # as long as there is no automated process.
+          |> Map.take([:id, :url, :title, :last_successful_update_at])
+          |> Map.put(:has_error, false)
+          |> Map.put(:entries, [])
 
         json(conn, feed)
 

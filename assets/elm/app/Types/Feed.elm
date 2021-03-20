@@ -368,6 +368,9 @@ numberOfReadEntries entries_ =
         entries_
 
 
+{-| This has to be manually kept in sync with `ExRssWeb.Api.V1.FeedController`
+as long as there is no automated process.
+-}
 decodeFeed : D.Decoder Feed
 decodeFeed =
     field "entries" decodeEntries
