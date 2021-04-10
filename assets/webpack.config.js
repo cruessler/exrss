@@ -9,7 +9,7 @@ const elmRoot = path.resolve(__dirname, 'elm');
 module.exports = () => ({
   optimization: {
     minimizer: [
-      new TerserPlugin({ cache: true, parallel: true, sourceMap: false }),
+      new TerserPlugin({ parallel: true }),
       new OptimizeCSSAssetsPlugin({}),
     ],
   },
