@@ -4,7 +4,7 @@ defmodule ExRss.Crawler.Updater do
   alias ExRss.Feed
   alias ExRss.FeedUpdater
   alias ExRss.Repo
-  alias HTTPoison.Response
+  alias HTTPoison.{Error, Response}
 
   def update(feed) do
     with {:ok, %Response{body: body}} <- HTTPoison.get(feed.url, [], follow_redirect: true),
@@ -12,7 +12,14 @@ defmodule ExRss.Crawler.Updater do
          {:ok, %{feed: new_feed}} <- FeedUpdater.update(feed, raw_feed) |> Repo.transaction() do
       {:ok, new_feed}
     else
-      _ -> {:error, feed}
+      {:error, %Error{reason: reason}} ->
+        {:error, reason}
+
+      {:error, error} ->
+        {:error, error}
+
+      {:error, failed_operation, _, _} ->
+        {:error, "error at step #{failed_operation}"}
     end
   end
 end
