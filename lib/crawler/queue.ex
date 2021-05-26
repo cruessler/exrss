@@ -33,7 +33,7 @@ defmodule ExRss.Crawler.Queue do
   end
 
   def handle_info(:timeout, %{feeds: [first | rest], refs: refs, opts: opts} = state) do
-    Logger.info("Handling feed #{first.title} (#{first.url})")
+    Logger.info("Handling feed", title: first.title, url: first.url)
 
     %{ref: ref} = Task.async(opts[:updater], :update, [first])
 
@@ -46,7 +46,7 @@ defmodule ExRss.Crawler.Queue do
 
   # Handle regular success and error cases: Add the feed back to the queue.
   def handle_info({_ref, {:ok, feed}}, %{feeds: feeds} = state) do
-    Logger.info("Updated feed #{feed.title} (#{feed.url})")
+    Logger.info("Updated feed", title: feed.title, url: feed.url)
 
     new_feed =
       feed
@@ -59,8 +59,10 @@ defmodule ExRss.Crawler.Queue do
     {:noreply, %{state | feeds: new_queue}, timeout(new_queue)}
   end
 
-  def handle_info({_ref, {:error, feed}}, %{feeds: feeds} = state) do
-    Logger.info("Error while updating #{feed.title} (#{feed.url})")
+  def handle_info({ref, {:error, error}}, %{feeds: feeds, refs: refs} = state) do
+    feed = Map.get(refs, ref)
+
+    Logger.error("Error updating feed", title: feed.title, url: feed.url, error: error)
 
     new_feed =
       feed
@@ -88,7 +90,7 @@ defmodule ExRss.Crawler.Queue do
   def handle_info({:DOWN, ref, :process, _, _}, %{feeds: feeds, refs: refs} = state) do
     {feed, refs} = Map.pop(refs, ref)
 
-    Logger.info("Uncaught error while updating #{feed.title} (#{feed.url})")
+    Logger.error("Uncaught error while updating feed", title: feed.title, url: feed.url)
 
     new_feed =
       feed
@@ -106,7 +108,7 @@ defmodule ExRss.Crawler.Queue do
   end
 
   def handle_cast({:add_feed, feed}, %{feeds: feeds} = state) do
-    Logger.info("Adding feed #{feed.title} (#{feed.url})")
+    Logger.info("Adding feed", title: feed.title, url: feed.url)
 
     new_queue = insert(feeds, feed)
 
@@ -114,7 +116,7 @@ defmodule ExRss.Crawler.Queue do
   end
 
   def handle_cast({:remove_feed, feed}, %{feeds: feeds} = state) do
-    Logger.info("Removing feed #{feed.title} (#{feed.url})")
+    Logger.info("Removing feed", title: feed.title, url: feed.url)
 
     new_queue = remove(feeds, feed)
 

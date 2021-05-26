@@ -57,7 +57,7 @@ defmodule ExRssWeb.Api.V1.FeedController do
         json(conn, feeds)
 
       {:error, error} ->
-        Logger.info("Could not discover feeds on #{url}: #{inspect(error)}")
+        Logger.error("Could not discover feeds", url: url, error: error)
 
         conn
         |> resp(:bad_request, "")

@@ -129,7 +129,7 @@ defmodule ExRss.FeedAdder do
       Map.put(feed, :frequency, extract_frequency_info(raw_feed))
     else
       {:error, error} ->
-        Logger.info("Could not add frequency info for #{feed.url}: #{inspect(error)}")
+        Logger.error("Could not add frequency info", url: feed.url, error: error)
 
         Map.put(feed, :frequency, nil)
     end

@@ -1,6 +1,4 @@
 defmodule ExRss.DateParser do
-  require Logger
-
   import Ecto.Query
 
   alias Ecto.Changeset
