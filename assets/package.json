@@ -17,7 +17,7 @@
     "elm-test": "^0.19.1-revision6",
     "elm-webpack-loader": "^8.0.0",
     "mini-css-extract-plugin": "^1.4.0",
-    "node-sass": "^5.0.0",
+    "node-sass": "^6.0.0",
     "optimize-css-assets-webpack-plugin": "^5.0.4",
     "prettier": "^2.2.1",
     "sass-loader": "^11.0.1",
