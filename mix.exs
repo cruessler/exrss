@@ -61,7 +61,7 @@ defmodule ExRss.Mixfile do
       {:jason, "~> 1.0"},
       {:httpoison, "~> 1.8.0"},
       {:timex, "~> 3.1"},
-      {:bcrypt_elixir, "~> 2.2"},
+      {:bcrypt_elixir, "~> 3.0"},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false}
     ]
   end
