@@ -74,7 +74,11 @@ defmodule ExRss.Entry do
     # Internet date/time format as specified by RFC 3339
     # See https://tools.ietf.org/html/rfc3339
     # 2018-01-13T19:05:08+00:00
-    "%Y-%m-%dT%H:%M:%S%:z"
+    "%Y-%m-%dT%H:%M:%S%:z",
+    # 2021-11-06
+    # Make sure this comes after other formats that this format is a substring
+    # of.
+    "%Y-%m-%d"
   ]
 
   def parse_time(time) do
