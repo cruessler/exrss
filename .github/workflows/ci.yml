@@ -35,7 +35,7 @@ jobs:
       matrix:
         otp: [ '22.3' ]
         elixir: [ '1.12.3', '1.13.4' ]
-        node: [ 14.x, 16.x ]
+        node: [ 12.x, 14.x ]
 
     name: OTP ${{matrix.otp}}, Elixir ${{matrix.elixir}}, Node.js ${{ matrix.node }}
     steps:
