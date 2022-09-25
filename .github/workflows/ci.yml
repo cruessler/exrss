@@ -5,7 +5,7 @@ jobs:
     # PostgreSQL setup according to [postgres-setup].
     #
     # [postgres-setup]: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-postgresql-service-containers
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     services:
       postgres:
@@ -34,8 +34,8 @@ jobs:
     strategy:
       matrix:
         otp: [ '22.3' ]
-        elixir: [ '1.11.4', '1.12.3' ]
-        node: [ 12.x, 14.x ]
+        elixir: [ '1.12.3', '1.13.4' ]
+        node: [ 14.x, 16.x ]
 
     name: OTP ${{matrix.otp}}, Elixir ${{matrix.elixir}}, Node.js ${{ matrix.node }}
     steps:
