@@ -34,6 +34,13 @@ defmodule ExRss.Mixfile do
         :httpoison,
         :telemetry,
         :timex
+      ],
+      extra_applications: [
+        :bcrypt_elixir,
+        :ecto_sql,
+        :feeder_ex,
+        :floki,
+        :jason
       ]
     ]
   end
