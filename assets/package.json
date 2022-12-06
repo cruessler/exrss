@@ -15,7 +15,7 @@
     "css-minimizer-webpack-plugin": "^4.2.2",
     "elm": "^0.19.1-5",
     "elm-format": "^0.8.5",
-    "elm-test": "^0.19.1-revision7",
+    "elm-test": "^0.19.1-revision10",
     "elm-webpack-loader": "^8.0.0",
     "mini-css-extract-plugin": "^2.7.2",
     "node-sass": "^8.0.0",
