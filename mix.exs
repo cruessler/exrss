@@ -7,7 +7,6 @@ defmodule ExRss.Mixfile do
       version: "0.0.1",
       elixir: "~> 1.2",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:phoenix] ++ Mix.compilers(),
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -54,8 +53,9 @@ defmodule ExRss.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.6.2"},
+      {:phoenix, "~> 1.7.0"},
       {:phoenix_pubsub, "~> 2.0"},
+      {:phoenix_view, "~> 2.0"},
       {:plug_cowboy, "~> 2.1"},
       {:phoenix_ecto, "~> 4.0"},
       {:ecto_sql, "~> 3.0"},
