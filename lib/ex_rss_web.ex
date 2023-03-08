@@ -16,6 +16,11 @@ defmodule ExRssWeb do
   below.
   """
 
+  # `exrss` has not been set up to use verified routes yet. To change that,
+  # follow [the guide][1].
+  #
+  # [1]: https://gist.github.com/chrismccord/00a6ea2a96bc57df0cce526bd20af8a7
+
   def model do
     quote do
       use Ecto.Schema
