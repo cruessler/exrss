@@ -65,7 +65,7 @@ jobs:
 
       - run: mix format --check-formatted
       - run: |
-          npx prettier --check "js/**/*.js" "*.js"
+          npx prettier --check "js/**/*.js" "*.mjs"
           npx elm-format --elm-version=0.19 --validate elm
         working-directory: assets
 
