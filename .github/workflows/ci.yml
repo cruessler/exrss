@@ -57,7 +57,7 @@ jobs:
           cp config/test.ci.exs config/test.exs
 
       - run: mix deps.get
-      - run: npm ci --install-links=false
+      - run: npm install
         working-directory: assets
 
       - name: Run tests
