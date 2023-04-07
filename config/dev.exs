@@ -5,7 +5,7 @@ import Config
 #
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
-# with webpack to recompile .js and .css sources.
+# with esbuild to recompile .js and .css sources.
 config :ex_rss, ExRssWeb.Endpoint,
   http: [port: 4000, protocol_options: [max_header_value_length: 8192]],
   secret_key_base: String.duplicate("abcdefgh", 8),

@@ -1,14 +1,4 @@
-// We need to import the CSS so that webpack will load it.
-// The ExtractTextPlugin is used to separate it out into
-// its own CSS file.
-import css from '../css/app.scss';
-
-// webpack automatically concatenates all files in your
-// watched paths. Those paths can be configured as
-// endpoints in "webpack.config.js".
-//
-// Import dependencies
-//
+import _css from '../css/app.scss';
 
 import Feeds from '../elm/app/App/Feeds.elm';
 import NewFeed from '../elm/app/App/NewFeed.elm';

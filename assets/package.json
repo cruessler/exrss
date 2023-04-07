@@ -2,31 +2,16 @@
   "repository": {},
   "license": "MIT",
   "scripts": {
-    "deploy": "webpack --mode production",
-    "watch": "webpack --mode development --watch",
     "test": "cd elm && npx elm-test"
   },
   "devDependencies": {
-    "@babel/core": "^7.21.0",
-    "@babel/preset-env": "^7.21.4",
-    "babel-loader": "^9.1.2",
-    "copy-webpack-plugin": "^11.0.0",
-    "css-loader": "^6.7.3",
-    "css-minimizer-webpack-plugin": "^4.2.2",
     "elm": "^0.19.1-5",
     "elm-format": "^0.8.5",
     "elm-test": "^0.19.1-revision12",
-    "elm-webpack-loader": "^8.0.0",
     "esbuild": "^0.16.17",
     "esbuild-plugin-elm": "^0.0.12",
     "esbuild-sass-plugin": "2.5",
-    "mini-css-extract-plugin": "^2.7.5",
-    "node-sass": "^8.0.0",
-    "prettier": "^2.8.7",
-    "sass-loader": "^13.2.0",
-    "terser-webpack-plugin": "^5.3.7",
-    "webpack": "^5.77.0",
-    "webpack-cli": "^5.0.1"
+    "prettier": "^2.8.7"
   },
   "dependencies": {
     "phoenix": "file:../deps/phoenix",
