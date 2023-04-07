@@ -2,6 +2,7 @@
   "repository": {},
   "license": "MIT",
   "scripts": {
+    "deploy": "node build.mjs --deploy",
     "test": "cd elm && npx elm-test"
   },
   "devDependencies": {

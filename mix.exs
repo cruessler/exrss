@@ -87,7 +87,7 @@ defmodule ExRss.Mixfile do
       test: ["ecto.create --quiet", "ecto.migrate", "test"],
       "test.elm": ["cmd cd assets && npm test"],
       "test.elm.watch": ["cmd cd assets && npm test -- --watch"],
-      "assets.deploy": ["cmd --cd assets node build.mjs --deploy", "phx.digest"]
+      "assets.deploy": ["cmd --cd assets npm run deploy", "phx.digest"]
     ]
   end
 end
