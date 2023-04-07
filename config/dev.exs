@@ -13,13 +13,7 @@ config :ex_rss, ExRssWeb.Endpoint,
   code_reloader: true,
   check_origin: false,
   watchers: [
-    node: [
-      "node_modules/webpack/bin/webpack.js",
-      "--mode",
-      "development",
-      "--watch-options-stdin",
-      cd: Path.expand("../assets", __DIR__)
-    ]
+    node: ["build.mjs", "--watch", cd: Path.expand("../assets", __DIR__)]
   ]
 
 # Watch static and templates for browser reloading.

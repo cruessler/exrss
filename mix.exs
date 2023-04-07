@@ -81,12 +81,13 @@ defmodule ExRss.Mixfile do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "ecto.setup", "cmd npm install --prefix assets"],
+      setup: ["deps.get", "ecto.setup", "cmd --cd assets npm install"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate", "test"],
       "test.elm": ["cmd cd assets && npm test"],
-      "test.elm.watch": ["cmd cd assets && npm test -- --watch"]
+      "test.elm.watch": ["cmd cd assets && npm test -- --watch"],
+      "assets.deploy": ["cmd --cd assets node build.mjs --deploy", "phx.digest"]
     ]
   end
 end
