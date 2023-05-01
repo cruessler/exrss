@@ -12,6 +12,6 @@
     "esbuild": "^0.17.18",
     "esbuild-plugin-elm": "^0.0.12",
     "esbuild-sass-plugin": "2.9",
-    "prettier": "^2.8.7"
+    "prettier": "^2.8.8"
   }
 }
