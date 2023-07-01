@@ -9,9 +9,9 @@
     "elm": "^0.19.1-5",
     "elm-format": "^0.8.7",
     "elm-test": "^0.19.1-revision12",
-    "esbuild": "^0.17.19",
+    "esbuild": "^0.18.10",
     "esbuild-plugin-elm": "^0.0.12",
-    "esbuild-sass-plugin": "2.9",
+    "esbuild-sass-plugin": "2.10",
     "prettier": "^2.8.8"
   }
 }
