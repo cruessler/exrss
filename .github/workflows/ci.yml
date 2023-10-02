@@ -39,7 +39,7 @@ jobs:
 
     name: OTP ${{matrix.otp}}, Elixir ${{matrix.elixir}}, Node.js ${{ matrix.node }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Elixir [OTP ${{ matrix.otp }}, Elixir ${{ matrix.elixir }}]
         uses: erlef/setup-beam@v1
