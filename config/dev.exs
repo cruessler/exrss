@@ -13,7 +13,16 @@ config :ex_rss, ExRssWeb.Endpoint,
   code_reloader: true,
   check_origin: false,
   watchers: [
-    node: ["build.mjs", "--watch", cd: Path.expand("../assets", __DIR__)]
+    node: ["build.mjs", "--watch", cd: Path.expand("../assets", __DIR__)],
+    npx: [
+      "tailwindcss",
+      "-i",
+      "./css/app.css",
+      "-o",
+      "../priv/static/assets/app.css",
+      "--watch",
+      cd: Path.expand("../assets", __DIR__)
+    ]
   ]
 
 # Watch static and templates for browser reloading.

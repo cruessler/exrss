@@ -1,5 +1,3 @@
-import _css from '../css/app.scss';
-
 import Feeds from '../elm/app/App/Feeds.elm';
 import NewFeed from '../elm/app/App/NewFeed.elm';
 
