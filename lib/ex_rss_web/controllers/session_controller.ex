@@ -15,7 +15,7 @@ defmodule ExRssWeb.SessionController do
       |> put_session(:current_user, user)
       |> Session.renew_remember_me_cookie()
       |> put_flash(:info, "You are now logged in.")
-      |> redirect(to: Routes.feed_path(conn, :index))
+      |> redirect(to: ~p"/feeds")
     else
       :error ->
         conn
@@ -28,6 +28,6 @@ defmodule ExRssWeb.SessionController do
     conn
     |> delete_session(:current_user)
     |> put_flash(:info, "You are now logged out.")
-    |> redirect(to: Routes.page_path(conn, :index))
+    |> redirect(to: ~p"/")
   end
 end

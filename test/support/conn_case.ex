@@ -17,6 +17,8 @@ defmodule ExRssWeb.ConnCase do
 
   using do
     quote do
+      use ExRssWeb, :verified_routes
+
       # Import conveniences for testing with connections
       import Plug.Conn
       import Phoenix.ConnTest
@@ -26,7 +28,6 @@ defmodule ExRssWeb.ConnCase do
       import Ecto.Changeset
       import Ecto.Query
 
-      import ExRssWeb.Router.Helpers
       import ExRssWeb.Api.Helpers
 
       # The default endpoint for testing

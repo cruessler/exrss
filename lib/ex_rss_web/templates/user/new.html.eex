@@ -1,6 +1,6 @@
 <div class="container">
   <%= form_for @changeset,
-    Routes.user_path(@conn, :create),
+    ~p"/users",
     [class: :"user-new"],
     fn f -> %>
     <h1>Register</h1>

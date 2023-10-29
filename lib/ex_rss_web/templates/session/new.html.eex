@@ -1,5 +1,5 @@
 <%= form_for @conn,
-      Routes.session_path(@conn, :create),
+      ~p"/session",
       [as: "session", class: :"session-new"],
       fn f -> %>
   <h2>Log in</h2>

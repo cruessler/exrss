@@ -16,7 +16,7 @@ defmodule ExRssWeb.UserController do
       {:ok, _} ->
         conn
         |> put_flash(:info, "Your account has been registered.")
-        |> redirect(to: Routes.page_path(conn, :index))
+        |> redirect(to: ~p"/")
 
       {:error, changeset} ->
         render(conn, "new.html", changeset: changeset)
