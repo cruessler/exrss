@@ -8,14 +8,14 @@
     Hello <%= @current_user.email %>!
   </p>
   <p>
-    Your feeds can be found at <a href="<%= Routes.feed_path(@conn, :index) %>">
-      <%= Routes.feed_path(@conn, :index) %></a>.
+    Your feeds can be found at <a href="<%= ~p"/feeds" %>">
+      <%= ~p"/feeds" %></a>.
   </p>
 <% else %>
   <p>
     Right now, there is not much you can do. Maybe you want to
-    <a href="<%= Routes.user_path(@conn, :new) %>">register</a>?
+    <a href="<%= ~p"/users/new" %>">register</a>?
     If you are already registered you can of course
-    <a href="<%= Routes.session_path(@conn, :new) %>">log in</a>.
+    <a href="<%= ~p"/session/new" %>">log in</a>.
   </p>
 <% end %>
