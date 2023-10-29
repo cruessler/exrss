@@ -8,7 +8,8 @@
     <meta name="author" content="">
 
     <title>Hello ExRss!</title>
-    <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>">
+    <link phx-track-static rel="stylesheet" href="<%= Routes.static_path(@conn, "/assets/app.css") %>">
+    <script phx-track-static src="<%= Routes.static_path(@conn, "/assets/app.js") %>"></script>
   </head>
 
   <body>
@@ -19,6 +20,5 @@
       <%= @inner_content %>
 
     </div> <!-- /container -->
-    <script src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
   </body>
 </html>
