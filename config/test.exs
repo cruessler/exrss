@@ -8,7 +8,7 @@ config :ex_rss, ExRssWeb.Endpoint,
   secret_key_base: String.duplicate("a", 64)
 
 # Print only warnings and errors during test
-config :logger, level: :warn
+config :logger, level: :warning
 
 # Configure your database
 config :ex_rss, ExRss.Repo,

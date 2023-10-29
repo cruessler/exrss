@@ -2,16 +2,20 @@
   "repository": {},
   "license": "MIT",
   "scripts": {
-    "deploy": "node build.mjs --deploy",
+    "deploy": "npm run deploy:esbuild && npm run deploy:tailwind",
+    "deploy:esbuild": "node build.mjs --deploy",
+    "deploy:tailwind": "npx tailwindcss -i ./css/app.css -o ../priv/static/assets/app.css --minify",
     "test": "cd elm && npx elm-test"
   },
   "devDependencies": {
+    "@tailwindcss/forms": "^0.5.6",
     "elm": "^0.19.1-5",
     "elm-format": "^0.8.7",
     "elm-test": "^0.19.1-revision12",
     "esbuild": "^0.19.4",
     "esbuild-plugin-elm": "^0.0.12",
     "esbuild-sass-plugin": "2.15",
-    "prettier": "^3.0.3"
+    "prettier": "^3.0.3",
+    "tailwindcss": "^3.3.5"
   }
 }
