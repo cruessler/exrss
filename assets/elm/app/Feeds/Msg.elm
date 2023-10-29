@@ -22,6 +22,8 @@ type Msg
     | AddFeed Candidate
     | RemoveResponse String
     | ToggleFeed Feed
+    | ConfirmRemoveFeed Feed
+    | CancelRemoveFeed Feed
     | RemoveFeed Feed
     | MarkAsRead Entry
     | MarkFeedAsRead Feed

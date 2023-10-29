@@ -36,6 +36,7 @@ type Msg
     | RemoveRequest
 
 
+main : Program Flags Model Msg
 main =
     Browser.element
         { init = init

@@ -8,6 +8,7 @@ import Feeds.Options as Options
 import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
+import Set
 import Time
 import Types.Feed as Feed exposing (..)
 
@@ -154,11 +155,25 @@ viewFeed model feed =
         feed_ =
             H.ul [ A.class "feed" ] (List.map (viewEntry model.timezone) entries)
 
+        id =
+            Feed.id feed
+
+        removeAction =
+            if Set.member id model.confirmRemoveFeeds then
+                [ H.button [ E.onClick (RemoveFeed feed) ] [ H.text "Confirm removal" ]
+                , H.button [ E.onClick (CancelRemoveFeed feed) ] [ H.text "Cancel" ]
+                ]
+
+            else
+                [ H.button [ E.onClick (ConfirmRemoveFeed feed) ] [ H.text "Remove" ] ]
+
         actions =
             H.div [ A.class "actions" ]
-                [ H.button [ E.onClick (RemoveFeed feed) ] [ H.text "Remove" ]
-                , H.button [ E.onClick (MarkFeedAsRead feed) ] [ H.text "Mark as read" ]
-                ]
+                (List.concat
+                    [ removeAction
+                    , [ H.button [ E.onClick (MarkFeedAsRead feed) ] [ H.text "Mark as read" ] ]
+                    ]
+                )
 
         children =
             [ H.h1 [ E.onClick (ToggleFeed feed) ] [ H.text <| Feed.title feed ]

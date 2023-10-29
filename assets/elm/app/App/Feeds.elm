@@ -13,6 +13,7 @@ import Http
 import Json.Encode as E
 import Paths
 import Request exposing (Request(..))
+import Set
 import String
 import Task
 import Time
@@ -45,6 +46,7 @@ init flags =
       , filterBy = DontFilter
       , sortBy = SortByNewestUnread
       , feeds = Dict.empty
+      , confirmRemoveFeeds = Set.empty
       , showOptions = False
       , discoveryUrl = ""
       , requests = Dict.empty
@@ -156,6 +158,20 @@ update msg model =
             , Addition.post model.apiConfig candidate Msg.Addition
             )
 
+        ConfirmRemoveFeed feed ->
+            let
+                id =
+                    Feed.id feed
+            in
+            ( { model | confirmRemoveFeeds = Set.insert id model.confirmRemoveFeeds }, Cmd.none )
+
+        CancelRemoveFeed feed ->
+            let
+                id =
+                    Feed.id feed
+            in
+            ( { model | confirmRemoveFeeds = Set.remove id model.confirmRemoveFeeds }, Cmd.none )
+
         RemoveFeed feed ->
             let
                 newRequests =
@@ -163,8 +179,14 @@ update msg model =
                         (Feed.url feed)
                         (Model.Removal <| Request.InProgress feed)
                         model.requests
+
+                id =
+                    Feed.id feed
             in
-            ( { model | requests = newRequests }
+            ( { model
+                | requests = newRequests
+                , confirmRemoveFeeds = Set.remove id model.confirmRemoveFeeds
+              }
             , Removal.delete model.apiConfig feed Msg.Removal
             )
 
