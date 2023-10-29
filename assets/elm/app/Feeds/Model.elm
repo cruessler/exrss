@@ -11,6 +11,7 @@ import Dict exposing (Dict)
 import Feeds.Addition exposing (Addition)
 import Feeds.Discovery exposing (Discovery)
 import Feeds.Removal exposing (Removal)
+import Set exposing (Set)
 import Time
 import Types.Feed exposing (Feed)
 
@@ -43,6 +44,7 @@ type alias Model =
     , filterBy : FilterBy
     , sortBy : SortBy
     , feeds : Dict Int Feed
+    , confirmRemoveFeeds : Set Int
     , showOptions : Bool
     , discoveryUrl : String
     , requests : Dict String Request
