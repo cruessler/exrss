@@ -20,7 +20,8 @@ type alias Config msg =
 close : Config msg -> String -> Html msg
 close { onRemove } url =
     H.button
-        [ A.type_ "button"
+        [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
+        , A.type_ "button"
         , E.onClick <| onRemove url
         ]
         [ H.text "×" ]
@@ -28,7 +29,7 @@ close { onRemove } url =
 
 inProgressFieldset : Candidate -> Html msg
 inProgressFieldset candidate =
-    H.fieldset []
+    H.fieldset [ A.class "border-2 p-2" ]
         [ H.legend [] [ H.text "This feed is being added" ]
         , H.p []
             [ H.text "Waiting for answer for "
@@ -40,7 +41,7 @@ inProgressFieldset candidate =
 
 successFieldset : Config msg -> Addition.Success -> Html msg
 successFieldset config success =
-    H.fieldset []
+    H.fieldset [ A.class "border-2 p-2" ]
         [ H.legend [] [ H.text "This feed has been added" ]
         , H.code [] [ H.text <| Feed.url success.feed ]
         , close config <| Feed.url success.feed
@@ -49,7 +50,7 @@ successFieldset config success =
 
 errorFieldset : Config msg -> Addition.Error -> Html msg
 errorFieldset ({ onAdd } as config) error =
-    H.fieldset []
+    H.fieldset [ A.class "border-2 p-2" ]
         [ H.legend [] [ H.text "This feed could not be added" ]
         , H.p []
             [ H.text "It was not possible to add the feed at "
@@ -58,7 +59,9 @@ errorFieldset ({ onAdd } as config) error =
             ]
         , close config error.candidate.url
         , H.button
-            [ E.onClick <| onAdd error.candidate ]
+            [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
+            , E.onClick <| onAdd error.candidate
+            ]
             [ H.text "Retry" ]
         ]
 

@@ -21,7 +21,8 @@ import Types.Feed exposing (..)
 close : String -> Html Msg
 close url =
     H.button
-        [ A.type_ "button"
+        [ A.class "mr-2 px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
+        , A.type_ "button"
         , E.onClick <| RemoveResponse url
         ]
         [ H.text "×" ]
@@ -42,7 +43,7 @@ onEnter msg =
 
 discoverFeedsFieldset : String -> Html Msg
 discoverFeedsFieldset discoveryUrl =
-    H.fieldset []
+    H.fieldset [ A.class "border-2 p-2" ]
         [ H.legend [] [ H.text "Discover feeds on a site" ]
         , H.label
             [ A.for "feed-url" ]
@@ -56,7 +57,9 @@ discoverFeedsFieldset discoveryUrl =
             ]
             []
         , H.button
-            [ E.onClick <| DiscoverFeeds discoveryUrl ]
+            [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
+            , E.onClick <| DiscoverFeeds discoveryUrl
+            ]
             [ H.text "Discover" ]
         , H.p
             []
@@ -72,7 +75,7 @@ discoverFeedsFieldset discoveryUrl =
 
 discoverFeedFieldset : Html Msg
 discoverFeedFieldset =
-    H.fieldset []
+    H.fieldset [ A.class "border-2 p-2" ]
         [ H.legend [] [ H.text "Add feed by address" ]
         , H.form [ A.method "GET", A.action "/feeds/new/" ]
             [ H.label [ A.for "add-feed-url" ] [ H.text "Address of the feed" ]
@@ -83,7 +86,10 @@ discoverFeedFieldset =
                 ]
                 []
             , H.input
-                [ A.type_ "submit", A.value "Discover" ]
+                [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
+                , A.type_ "submit"
+                , A.value "Discover"
+                ]
                 []
             ]
         , H.p []
@@ -99,7 +105,7 @@ discoverFeedFieldset =
 
 inProgressFieldset : String -> Html Msg
 inProgressFieldset url =
-    H.fieldset []
+    H.fieldset [ A.class "border-2 p-2" ]
         [ H.legend [] [ H.text "This url is being looked up" ]
         , H.p []
             [ H.text "Waiting for answer for "
@@ -132,7 +138,7 @@ addableFeed { onAdd } candidate =
     H.li
         []
         [ H.text candidate.title
-        , H.small [ A.class "frequency-info" ]
+        , H.small [ A.class "inline-block ml-6" ]
             [ candidate.frequency
                 |> Maybe.map frequencyInfo
                 |> Maybe.withDefault
@@ -140,7 +146,8 @@ addableFeed { onAdd } candidate =
             ]
         , H.p [] [ H.code [] [ H.text candidate.url ] ]
         , H.button
-            [ A.type_ "button"
+            [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
+            , A.type_ "button"
             , E.onClick <| onAdd candidate
             ]
             [ H.text "Add" ]
@@ -150,7 +157,7 @@ addableFeed { onAdd } candidate =
 successFieldset : Discovery.Success -> Html Msg
 successFieldset success =
     if List.isEmpty success.candidates then
-        H.fieldset []
+        H.fieldset [ A.class "border-2 p-2" ]
             [ H.legend [] [ H.text "No feeds found" ]
             , H.p []
                 [ H.text "The page at "
@@ -165,16 +172,16 @@ successFieldset success =
             children =
                 List.map (addableFeed { onAdd = AddFeed }) success.candidates
         in
-        H.fieldset []
+        H.fieldset [ A.class "border-2 p-2" ]
             [ H.legend [] [ H.text "These feeds can be added" ]
-            , H.ul [] children
+            , H.ul [ A.class "mb-2" ] children
             , close success.url
             ]
 
 
 errorFieldset : Discovery.Error -> Html Msg
 errorFieldset error =
-    H.fieldset []
+    H.fieldset [ A.class "border-2 p-2" ]
         [ H.legend [] [ H.text "The lookup for a url failed" ]
         , H.p []
             [ H.text "It was not possible to discover feeds on "
@@ -183,7 +190,9 @@ errorFieldset error =
             ]
         , close error.url
         , H.button
-            [ E.onClick <| DiscoverFeeds error.url ]
+            [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
+            , E.onClick <| DiscoverFeeds error.url
+            ]
             [ H.text "Retry" ]
         ]
 

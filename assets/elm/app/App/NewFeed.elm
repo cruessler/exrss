@@ -6,6 +6,7 @@ import Feeds.Addition as Addition
 import Feeds.Options.Addition
 import Feeds.Options.Discovery
 import Html as H exposing (Html)
+import Html.Attributes as A
 import Json.Decode as Decode
 import Request exposing (Request(..))
 import Types.Feed exposing (Candidate)
@@ -91,7 +92,7 @@ addFeedFieldset : Model -> Html Msg
 addFeedFieldset { url, candidate } =
     case candidate of
         Just c ->
-            H.fieldset []
+            H.fieldset [ A.class "border-2 p-2" ]
                 [ H.legend [] [ H.text "This feed can be added" ]
                 , H.ul []
                     [ Feeds.Options.Discovery.addableFeed
@@ -101,7 +102,7 @@ addFeedFieldset { url, candidate } =
                 ]
 
         Nothing ->
-            H.fieldset []
+            H.fieldset [ A.class "border-2 p-2" ]
                 [ H.legend [] [ H.text "No feed found" ]
                 , H.p []
                     [ H.text "The page at "

@@ -12,10 +12,10 @@
     <script phx-track-static src="<%= ~p"/assets/app.js" %>"></script>
   </head>
 
-  <body>
-    <div class="container">
-      <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
-      <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+  <body class="m-6">
+    <div>
+      <p role="alert"><%= get_flash(@conn, :info) %></p>
+      <p role="alert"><%= get_flash(@conn, :error) %></p>
 
       <%= @inner_content %>
 
