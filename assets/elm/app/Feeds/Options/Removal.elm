@@ -22,7 +22,7 @@ close url =
 
 inProgressFieldset : Feed -> Html Msg
 inProgressFieldset feed =
-    H.fieldset []
+    H.fieldset [ A.class "border-2 p-2" ]
         [ H.legend [] [ H.text "This feed is being deleted" ]
         , H.p []
             [ H.text "Waiting for answer for "
@@ -45,12 +45,14 @@ successFieldset success =
             , frequency = Nothing
             }
     in
-    H.fieldset []
+    H.fieldset [ A.class "border-2 p-2" ]
         [ H.legend [] [ H.text "This feed has been deleted" ]
         , H.code [] [ H.text <| Feed.url feed ]
         , H.text ". You can undo the removal by clicking "
         , H.button
-            [ E.onClick <| AddFeed candidate ]
+            [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
+            , E.onClick <| AddFeed candidate
+            ]
             [ H.text "Undo" ]
         , close <| Feed.url feed
         ]
@@ -58,7 +60,7 @@ successFieldset success =
 
 errorFieldset : Removal.Error -> Html Msg
 errorFieldset error =
-    H.fieldset []
+    H.fieldset [ A.class "border-2 p-2" ]
         [ H.legend [] [ H.text "This feed could not be deleted" ]
         , H.p []
             [ H.text "It was not possible to delete the feed at "

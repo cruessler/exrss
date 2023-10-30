@@ -39,9 +39,13 @@ collapsible show children =
 
 actionsFieldset : Html Msg
 actionsFieldset =
-    H.fieldset []
+    H.fieldset [ A.class "border-2 p-2" ]
         [ H.legend [] [ H.text "Actions" ]
-        , H.button [ A.type_ "button", E.onClick GetFeeds ]
+        , H.button
+            [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
+            , A.type_ "button"
+            , E.onClick GetFeeds
+            ]
             [ H.text "Update feeds" ]
         ]
 
@@ -53,7 +57,7 @@ visibilityRadio currentVisibility visibility text =
 
 visibilityFieldset : Visibility -> Html Msg
 visibilityFieldset visibility =
-    H.fieldset []
+    H.fieldset [ A.class "border-2 p-4" ]
         [ H.legend [] [ H.text "Visibility" ]
         , visibilityRadio visibility
             ShowAllEntries
@@ -74,7 +78,7 @@ filterByRadio currentFilterBy filterBy text =
 
 filterByFieldset : FilterBy -> Html Msg
 filterByFieldset filterBy =
-    H.fieldset []
+    H.fieldset [ A.class "border-2 p-4" ]
         [ H.legend [] [ H.text "Filter feeds by" ]
         , filterByRadio filterBy
             DontFilter
@@ -92,7 +96,7 @@ sortByRadio currentSortBy sortBy text =
 
 sortByFieldset : SortBy -> Html Msg
 sortByFieldset sortBy =
-    H.fieldset []
+    H.fieldset [ A.class "border-2 p-4" ]
         [ H.legend [] [ H.text "Sort feeds by" ]
         , sortByRadio sortBy
             SortByNewest
@@ -179,10 +183,10 @@ additionalInfo feeds =
             else
                 ""
     in
-    H.ul [ A.class "additional-info" ]
-        [ H.li [] [ H.text infoText ]
-        , H.li [] [ H.text infoTextUnread ]
-        , H.li [] [ H.text infoTextError ]
+    H.ul [ A.class "my-2" ]
+        [ H.li [ A.class "inline-block mr-2" ] [ H.text infoText ]
+        , H.li [ A.class "inline-block mr-2" ] [ H.text infoTextUnread ]
+        , H.li [ A.class "inline-block mr-2" ] [ H.text infoTextError ]
         ]
 
 
@@ -198,7 +202,8 @@ view model =
     in
     H.div []
         [ H.button
-            [ A.type_ "button"
+            [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
+            , A.type_ "button"
             , E.onClick ToggleOptions
             ]
             [ H.text buttonText ]

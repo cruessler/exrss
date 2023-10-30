@@ -40,15 +40,15 @@ viewEntry timezone entry =
 
             else
                 H.button
-                    [ E.onClick (MarkAsRead entry) ]
+                    [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white", E.onClick (MarkAsRead entry) ]
                     [ H.text "Mark as read" ]
 
         actions =
-            H.div [ A.class "actions" ]
+            H.div [ A.class "flex justify-end mt-1 space-x-4" ]
                 [ H.a
                     [ A.href entry.url
                     , A.target "_blank"
-                    , A.class "button"
+                    , A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
                     , E.onClick (MarkAsRead entry)
                     ]
                     [ H.text "View" ]
@@ -57,9 +57,9 @@ viewEntry timezone entry =
     in
     H.li
         [ A.classList
-            [ ( "entry", True )
-            , ( "read", entry.read )
-            , ( "update-pending", entry.status == UpdatePending )
+            [ ( "flex flex-col mt-5", True )
+            , ( "opacity-50", entry.read )
+            , ( "text-gray-300", entry.status == UpdatePending )
             ]
         ]
         [ H.a
@@ -111,11 +111,11 @@ additionalInfo timezone feed =
                 Nothing ->
                     "last successful update at n/a"
     in
-    H.ul [ A.class "additional-info" ]
-        [ H.li [] [ H.text infoText ]
-        , H.li [] [ H.text infoTextUnread ]
-        , H.li [] [ H.text infoTextError ]
-        , H.li [] [ H.text infoTextLastUpdate ]
+    H.ul []
+        [ H.li [ A.class "inline-block mr-2" ] [ H.text infoText ]
+        , H.li [ A.class "inline-block mr-2" ] [ H.text infoTextUnread ]
+        , H.li [ A.class "inline-block mr-2" ] [ H.text infoTextError ]
+        , H.li [ A.class "inline-block mr-2" ] [ H.text infoTextLastUpdate ]
         ]
 
 
@@ -153,38 +153,41 @@ viewFeed model feed =
                         []
 
         feed_ =
-            H.ul [ A.class "feed" ] (List.map (viewEntry model.timezone) entries)
+            H.ul [ A.class "flex flex-col" ] (List.map (viewEntry model.timezone) entries)
 
         id =
             Feed.id feed
 
         removeAction =
             if Set.member id model.confirmRemoveFeeds then
-                [ H.button [ E.onClick (RemoveFeed feed) ] [ H.text "Confirm removal" ]
-                , H.button [ E.onClick (CancelRemoveFeed feed) ] [ H.text "Cancel" ]
+                [ H.button [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white", E.onClick (RemoveFeed feed) ] [ H.text "Confirm removal" ]
+                , H.button [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white", E.onClick (CancelRemoveFeed feed) ] [ H.text "Cancel" ]
                 ]
 
             else
-                [ H.button [ E.onClick (ConfirmRemoveFeed feed) ] [ H.text "Remove" ] ]
+                [ H.button
+                    [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
+                    , E.onClick (ConfirmRemoveFeed feed)
+                    ]
+                    [ H.text "Remove" ]
+                ]
 
         actions =
-            H.div [ A.class "actions" ]
+            H.div [ A.class "flex justify-end mt-1 space-x-4" ]
                 (List.concat
                     [ removeAction
-                    , [ H.button [ E.onClick (MarkFeedAsRead feed) ] [ H.text "Mark as read" ] ]
+                    , [ H.button [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white", E.onClick (MarkFeedAsRead feed) ] [ H.text "Mark as read" ] ]
                     ]
                 )
 
         children =
-            [ H.h1 [ E.onClick (ToggleFeed feed) ] [ H.text <| Feed.title feed ]
+            [ H.h1 [ A.class "mb-2 font-bold", E.onClick (ToggleFeed feed) ] [ H.text <| Feed.title feed ]
             , additionalInfo model.timezone feed
             , actions
             , feed_
             ]
     in
-    H.li
-        [ A.class "feed" ]
-        children
+    H.li [ A.class "flex flex-col mt-4" ] children
 
 
 filterBy : FilterBy -> List Feed -> List Feed
@@ -221,5 +224,5 @@ view model =
     in
     H.main_ [ A.attribute "role" "main" ]
         [ Options.view model
-        , H.ul [ A.class "feeds" ] feeds
+        , H.ul [] feeds
         ]
