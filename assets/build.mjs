@@ -1,6 +1,5 @@
 import esbuild from 'esbuild';
 import ElmPlugin from 'esbuild-plugin-elm';
-import { sassPlugin } from 'esbuild-sass-plugin';
 
 const args = process.argv.slice(2);
 const watch = args.includes('--watch');
@@ -13,7 +12,6 @@ const plugins = [
     optimize: deploy,
     clearOnWatch: watch,
   }),
-  sassPlugin(),
 ];
 
 let opts = {
