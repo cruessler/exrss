@@ -1,13 +1,13 @@
 defmodule ExRssWeb.AppView do
   use Phoenix.HTML
 
-  def form_group(form, field, fun) when is_function(fun, 1) do
-    class =
-      if Keyword.has_key?(form.errors, field) do
-        "form-group row has-warning"
-      else
-        "form-group row"
-      end
+  def form_group(form, field, attrs, fun) when is_function(fun, 1) do
+    {class, _attrs} = Keyword.pop(attrs, :class, "")
+
+    if Keyword.has_key?(form.errors, field) do
+      # TODO
+      # Append class indicating error.
+    end
 
     content_tag(:div, fun.(form), class: class)
   end

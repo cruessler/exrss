@@ -1,28 +1,26 @@
 <%= form_for @conn,
       ~p"/session",
-      [as: "session", class: :"session-new"],
+      [as: "session", class: :"grid grid-cols-12 items-center space-y-4"],
       fn f -> %>
-  <h2>Log in</h2>
+  <h1 class="col-span-12 md:col-start-5 md:col-span-4 font-extrabold">Log in</h1>
 
-  <%= form_group f, :email, fn f -> %>
-    <label for="registration_email" class="col-md-3 col-form-label">Email</label>
-    <div class="col-md-9">
-      <%= email_input f, :email, class: "form-control" %>
+  <%= form_group f, :email, [class: "col-span-12 md:col-start-5 md:col-span-4"], fn f -> %>
+    <label for="registration_email">Email</label>
+    <div>
+      <%= email_input f, :email %>
       <%= error_tag f, :email %>
     </div>
   <% end %>
 
-  <%= form_group f, :password, fn f -> %>
-    <label for="registration_password" class="col-md-3 col-form-label">Password</label>
-    <div class="col-md-9">
-      <%= password_input f, :password, class: "form-control" %>
+  <%= form_group f, :password, [class: "col-span-12 md:col-start-5 md:col-span-4"], fn f -> %>
+    <label for="registration_password">Password</label>
+    <div>
+      <%= password_input f, :password %>
       <%= error_tag f, :password %>
     </div>
   <% end %>
 
-  <div class="form-group row">
-    <div class="col-md-12">
-      <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-    </div>
+  <div class="col-span-12 md:col-start-5 md:col-span-4">
+    <button class="px-4 py-2 text-sm font-extrabold bg-blue-700 text-white rounded-lg" type="submit">Sign in</button>
   </div>
 <% end %>
