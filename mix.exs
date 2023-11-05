@@ -19,28 +19,8 @@ defmodule ExRss.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {ExRss, []},
-      applications: [
-        :phoenix,
-        :phoenix_pubsub,
-        :phoenix_html,
-        :cowboy,
-        :logger,
-        :gettext,
-        :phoenix_ecto,
-        :postgrex,
-        :tzdata,
-        :httpoison,
-        :telemetry,
-        :timex
-      ],
-      extra_applications: [
-        :bcrypt_elixir,
-        :ecto_sql,
-        :feeder_ex,
-        :floki,
-        :jason
-      ]
+      mod: {ExRss.Application, []},
+      extra_applications: [:logger, :runtime_tools]
     ]
   end
 
