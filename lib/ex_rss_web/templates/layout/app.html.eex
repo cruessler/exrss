@@ -14,8 +14,8 @@
 
   <body class="m-6">
     <div>
-      <p role="alert"><%= get_flash(@conn, :info) %></p>
-      <p role="alert"><%= get_flash(@conn, :error) %></p>
+      <p role="alert"><%= Phoenix.Flash.get(@flash, :info) %></p>
+      <p role="alert"><%= Phoenix.Flash.get(@flash, :error) %></p>
 
       <%= @inner_content %>
 
