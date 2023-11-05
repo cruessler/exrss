@@ -19,7 +19,8 @@ defmodule ExRssWeb.Api.V1.EntryController do
       {:error, changeset} ->
         conn
         |> put_status(:bad_request)
-        |> render(ExRssWeb.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(ExRssWeb.ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 
