@@ -12,26 +12,24 @@ const Elm = {
 
 // import socket from "./socket"
 
-class App {
-  static mountElmModules() {
-    const nodes = document.querySelectorAll('[data-elm-module]');
+const mountElmModules = () => {
+  const nodes = document.querySelectorAll('[data-elm-module]');
 
-    for (const node of nodes) {
-      // The module name may be `App` or `App.Feeds`. `modulePath` would be
-      // ["App"] or ["App", "Feeds"], then.
-      const moduleName = node.dataset.elmModule;
-      const modulePath = moduleName.split('.');
-      const elmModule = modulePath.reduce((acc, part) => acc[part], Elm);
+  for (const node of nodes) {
+    // The module name may be `App` or `App.Feeds`. `modulePath` would be
+    // ["App"] or ["App", "Feeds"], then.
+    const moduleName = node.dataset.elmModule;
+    const modulePath = moduleName.split('.');
+    const elmModule = modulePath.reduce((acc, part) => acc[part], Elm);
 
-      const params = JSON.parse(node.dataset.elmParams) || {};
+    const params = JSON.parse(node.dataset.elmParams) || {};
 
-      if (elmModule != undefined) {
-        elmModule.init({ node, flags: params });
-      } else {
-        console.error(`No module named ‘${moduleName}’ could be found`);
-      }
+    if (elmModule != undefined) {
+      elmModule.init({ node, flags: params });
+    } else {
+      console.error(`No module named ‘${moduleName}’ could be found`);
     }
   }
-}
+};
 
-document.addEventListener('DOMContentLoaded', () => App.mountElmModules());
+document.addEventListener('DOMContentLoaded', () => mountElmModules());
