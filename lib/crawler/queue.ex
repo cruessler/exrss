@@ -10,12 +10,14 @@ defmodule ExRss.Crawler.Queue do
 
   @store ExRss.Crawler.Store
   @updater ExRss.Crawler.Updater
+  @update_broadcaster ExRss.Crawler.UpdateBroadcaster
 
   def start_link(opts \\ []) do
     opts =
       opts
       |> Keyword.put_new(:store, @store)
       |> Keyword.put_new(:updater, @updater)
+      |> Keyword.put_new(:update_broadcaster, @update_broadcaster)
 
     state = %{opts: opts, feeds: [], refs: %{}}
 
@@ -45,7 +47,7 @@ defmodule ExRss.Crawler.Queue do
   end
 
   # Handle regular success and error cases: Add the feed back to the queue.
-  def handle_info({_ref, {:ok, feed}}, %{feeds: feeds} = state) do
+  def handle_info({_ref, {:ok, feed}}, %{feeds: feeds, opts: opts} = state) do
     Logger.info("Updated feed", title: feed.title, url: feed.url)
 
     new_feed =
@@ -53,6 +55,13 @@ defmodule ExRss.Crawler.Queue do
       |> Changeset.change()
       |> Feed.schedule_update_on_success()
       |> Repo.update!()
+
+    Task.Supervisor.start_child(
+      ExRss.TaskSupervisor,
+      opts[:update_broadcaster],
+      :broadcast_update,
+      [new_feed]
+    )
 
     new_queue = insert(feeds, new_feed)
 
