@@ -9,6 +9,7 @@
 
     <title>Hello ExRss!</title>
     <link phx-track-static rel="stylesheet" href="<%= ~p"/assets/app.css" %>">
+    <script>window.userToken = "<%= assigns[:user_token] %>";</script>
     <script phx-track-static src="<%= ~p"/assets/app.js" %>"></script>
   </head>
 
