@@ -1,7 +1,9 @@
 defmodule ExRssWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :ex_rss
 
-  socket "/socket", ExRssWeb.UserSocket
+  socket "/socket", ExRssWeb.UserSocket,
+    websocket: true,
+    longpolling: false
 
   # Serve at "/" the static files from "priv/static" directory.
   #
