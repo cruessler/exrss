@@ -5,6 +5,7 @@ defmodule ExRss.Application do
   def start(_type, _args) do
     children =
       [
+        {Task.Supervisor, name: ExRss.TaskSupervisor},
         ExRss.Repo,
         {Phoenix.PubSub, name: ExRss.PubSub},
         ExRssWeb.Endpoint
