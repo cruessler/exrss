@@ -1,4 +1,4 @@
-module App.Feeds exposing (main)
+port module App.Feeds exposing (main)
 
 import Api
 import Browser
@@ -10,6 +10,7 @@ import Feeds.Msg as Msg exposing (Msg(..))
 import Feeds.Removal as Removal
 import Feeds.View as View
 import Http
+import Json.Decode as D
 import Json.Encode as E
 import Paths
 import Request exposing (Request(..))
@@ -20,13 +21,16 @@ import Time
 import Types.Feed as Feed exposing (Entry, Feed, Status(..), updateEntry)
 
 
+port unreadEntriesReceiver : (D.Value -> msg) -> Sub msg
+
+
 main : Program Flags Model Msg
 main =
     Browser.element
         { init = init
         , update = update
         , view = View.view
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = subscriptions
         }
 
 
@@ -128,6 +132,16 @@ update msg model =
             ( { model | feeds = newFeeds }, Cmd.none )
 
         NewFeeds (Err message) ->
+            ( model, Cmd.none )
+
+        NewFeed (Ok feed) ->
+            let
+                newFeeds =
+                    Dict.insert (Feed.id feed) feed model.feeds
+            in
+            ( { model | feeds = newFeeds }, Cmd.none )
+
+        NewFeed (Err _) ->
             ( model, Cmd.none )
 
         DiscoverFeeds url ->
@@ -337,3 +351,9 @@ update msg model =
                             model.feeds
             in
             ( { model | feeds = newFeeds, requests = newRequests }, Cmd.none )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    unreadEntriesReceiver
+        (D.decodeValue Feed.decodeFeedOnlyUnreadEntries >> NewFeed)
