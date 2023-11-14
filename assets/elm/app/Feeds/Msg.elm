@@ -5,6 +5,7 @@ import Feeds.Discovery as Discovery
 import Feeds.Model exposing (..)
 import Feeds.Removal as Removal
 import Http
+import Json.Decode as D
 import Time
 import Types.Feed exposing (..)
 
@@ -18,6 +19,7 @@ type Msg
     | SetTimezone Time.Zone
     | GetFeeds
     | NewFeeds (Result Http.Error (List Feed))
+    | NewFeed (Result D.Error Feed)
     | DiscoverFeeds String
     | AddFeed Candidate
     | RemoveResponse String
