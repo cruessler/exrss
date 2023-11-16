@@ -4,10 +4,6 @@ defmodule ExRss.Crawler.Queue do
   require Ecto.Query
   require Logger
 
-  alias Ecto.Changeset
-  alias ExRss.Feed
-  alias ExRss.Repo
-
   @store ExRss.Crawler.Store
   @updater ExRss.Crawler.Updater
   @update_broadcaster ExRss.Crawler.UpdateBroadcaster
@@ -50,11 +46,7 @@ defmodule ExRss.Crawler.Queue do
   def handle_info({_ref, {:ok, feed}}, %{feeds: feeds, opts: opts} = state) do
     Logger.info("Updated feed", title: feed.title, url: feed.url)
 
-    new_feed =
-      feed
-      |> Changeset.change()
-      |> Feed.schedule_update_on_success()
-      |> Repo.update!()
+    new_feed = opts[:store].update_on_success!(feed)
 
     Task.Supervisor.start_child(
       ExRss.TaskSupervisor,
@@ -68,16 +60,12 @@ defmodule ExRss.Crawler.Queue do
     {:noreply, %{state | feeds: new_queue}, timeout(new_queue)}
   end
 
-  def handle_info({ref, {:error, error}}, %{feeds: feeds, refs: refs} = state) do
+  def handle_info({ref, {:error, error}}, %{feeds: feeds, refs: refs, opts: opts} = state) do
     feed = Map.get(refs, ref)
 
     Logger.error("Error updating feed", title: feed.title, url: feed.url, error: error)
 
-    new_feed =
-      feed
-      |> Changeset.change()
-      |> Feed.schedule_update_on_error()
-      |> Repo.update!()
+    new_feed = opts[:store].update_on_error!(feed)
 
     new_queue = insert(feeds, new_feed)
 
@@ -96,16 +84,12 @@ defmodule ExRss.Crawler.Queue do
   # Whenever a child exits for a reason other than :normal, the reference to
   # that process is removed and the corresponding feed is reinserted into the
   # queue.
-  def handle_info({:DOWN, ref, :process, _, _}, %{feeds: feeds, refs: refs} = state) do
+  def handle_info({:DOWN, ref, :process, _, _}, %{feeds: feeds, refs: refs, opts: opts} = state) do
     {feed, refs} = Map.pop(refs, ref)
 
     Logger.error("Uncaught error while updating feed", title: feed.title, url: feed.url)
 
-    new_feed =
-      feed
-      |> Changeset.change()
-      |> Feed.schedule_update_on_error()
-      |> Repo.update!()
+    new_feed = opts[:store].update_on_error!(feed)
 
     new_queue = insert(feeds, new_feed)
 
