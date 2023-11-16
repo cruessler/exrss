@@ -6,11 +6,23 @@ defmodule ExRss.Crawler.QueueTest do
 
   defmodule TestStore do
     def load(), do: []
+
+    def update_on_success!(feed) do
+      send(feed.pid, :update_on_success)
+
+      feed
+    end
   end
 
   defmodule TestUpdater do
     def update(feed) do
       send(feed.pid, :update)
+    end
+  end
+
+  defmodule TestBroadcaster do
+    def broadcast_update(feed) do
+      send(feed.pid, :broadcast_update)
     end
   end
 
@@ -58,5 +70,22 @@ defmodule ExRss.Crawler.QueueTest do
     GenServer.cast(pid, {:add_feed, feed})
 
     assert_receive :update, 100
+  end
+
+  test "sends message to update_broadcaster" do
+    feed = %{title: "Test feed", url: "http://example.com", next_update_at: nil, pid: self()}
+    feeds = []
+
+    opts = %{
+      store: TestStore,
+      update_broadcaster: TestBroadcaster
+    }
+
+    state = %{feeds: feeds, opts: opts}
+
+    Queue.handle_info({nil, {:ok, feed}}, state)
+
+    assert_receive :update_on_success
+    assert_receive :broadcast_update
   end
 end
