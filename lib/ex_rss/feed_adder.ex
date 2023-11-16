@@ -7,7 +7,6 @@ defmodule ExRss.FeedAdder do
   alias Ecto.Multi
   alias ExRss.Entry
   alias ExRss.Feed
-  alias HTTPoison.Response
 
   @no_title "feed does not have a title"
 
@@ -55,7 +54,7 @@ defmodule ExRss.FeedAdder do
       feeds =
         for f <- extract_feeds(html) do
           Map.put(f, :url, URI.merge(uri, f.href) |> to_string)
-          |> add_frequency_info
+          |> add_frequency_info(fetch)
         end
 
       {:ok, feeds}
@@ -123,8 +122,8 @@ defmodule ExRss.FeedAdder do
     Floki.find(html, "link[rel=alternate][type='application/atom+xml']")
   end
 
-  def add_frequency_info(feed) do
-    with {:ok, %Response{body: body}} <- HTTPoison.get(feed.url, [], follow_redirect: true),
+  def add_frequency_info(feed, fetch \\ &fetch_url/1) do
+    with {:ok, body, _} <- fetch.(feed.url),
          {:ok, raw_feed} <- Feed.parse(body) do
       Map.put(feed, :frequency, extract_frequency_info(raw_feed))
     else
