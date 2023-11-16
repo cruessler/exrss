@@ -86,13 +86,28 @@ defmodule ExRss.FeedAdderTest do
   test "discover feeds" do
     url = "https://example.com/feed"
     uri = URI.parse(url)
-    fetch = fn _ -> {:ok, @html, uri} end
+    rss_url = "https://example.com/feed/rss.xml"
+    rss_uri = URI.parse(rss_url)
+    atom_url = "https://example.com/feed/atom.xml"
+    atom_uri = URI.parse(atom_url)
+
+    fetch = fn
+      ^url -> {:ok, @html, uri}
+      ^rss_url -> {:ok, @rss, rss_uri}
+      ^atom_url -> {:ok, @rss, atom_uri}
+    end
 
     feeds = FeedAdder.discover_feeds(url, fetch)
 
     assert {:ok,
-            [%{title: "RSS", href: "/feed/rss.xml"}, %{title: "Atom", href: "/feed/atom.xml"}]} =
-             feeds
+            [
+              %{title: "RSS", href: "/feed/rss.xml", frequency: %{seconds: 29_736_240, posts: 3}},
+              %{
+                title: "Atom",
+                href: "/feed/atom.xml",
+                frequency: %{seconds: 29_736_240, posts: 3}
+              }
+            ]} = feeds
   end
 
   test "extracts feeds" do
