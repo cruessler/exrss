@@ -2,6 +2,7 @@ defmodule ExRssWeb.Api.V1.EntryController do
   use ExRssWeb, :controller
 
   alias ExRss.Entry
+  alias ExRss.Feed
   alias ExRss.Repo
   alias ExRss.User
 
@@ -14,6 +15,15 @@ defmodule ExRssWeb.Api.V1.EntryController do
 
     case Repo.update(changeset) do
       {:ok, entry} ->
+        updated_feed = Repo.get!(Feed, entry.feed_id)
+
+        Task.Supervisor.start_child(
+          ExRss.TaskSupervisor,
+          ExRss.Crawler.UpdateBroadcaster,
+          :broadcast_update,
+          [updated_feed]
+        )
+
         json(conn, entry)
 
       {:error, changeset} ->
