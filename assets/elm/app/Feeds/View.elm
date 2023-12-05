@@ -119,6 +119,36 @@ additionalInfo timezone feed =
         ]
 
 
+viewEntries : Time.Zone -> List Entry -> Html Msg
+viewEntries timezone entries =
+    let
+        numberOfEntries =
+            List.length entries
+    in
+    if numberOfEntries > 5 then
+        let
+            head =
+                List.take 2 entries
+                    |> List.map (viewEntry timezone)
+
+            numberOfEntriesNotShown =
+                numberOfEntries - 4
+
+            middle =
+                H.li
+                    [ A.class "flex flex-col my-10" ]
+                    [ H.text (String.fromInt numberOfEntriesNotShown ++ " entries not shown") ]
+
+            tail =
+                List.drop (numberOfEntries - 2) entries
+                    |> List.map (viewEntry timezone)
+        in
+        H.ul [ A.class "flex flex-col" ] (List.append head (middle :: tail))
+
+    else
+        H.ul [ A.class "flex flex-col" ] (List.map (viewEntry timezone) entries)
+
+
 viewFeed : Model -> Feed -> Html Msg
 viewFeed model feed =
     let
@@ -153,7 +183,7 @@ viewFeed model feed =
                         []
 
         feed_ =
-            H.ul [ A.class "flex flex-col" ] (List.map (viewEntry model.timezone) entries)
+            viewEntries model.timezone entries
 
         id =
             Feed.id feed
