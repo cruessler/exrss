@@ -13,8 +13,8 @@
     <script phx-track-static src="<%= ~p"/assets/app.js" %>"></script>
   </head>
 
-  <body class="m-6">
-    <div>
+  <body class="m-6 grid grid-cols-12">
+    <div class="col-span-12 md:col-start-3 md:col-span-8">
       <p role="alert"><%= Phoenix.Flash.get(@flash, :info) %></p>
       <p role="alert"><%= Phoenix.Flash.get(@flash, :error) %></p>
 
