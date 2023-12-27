@@ -43,12 +43,23 @@ viewEntry timezone entry =
                     [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white", E.onClick (MarkAsRead entry) ]
                     [ H.text "Mark as read" ]
 
-        actions =
-            H.div [ A.class "flex justify-end mt-1 space-x-4" ]
+        title =
+            H.div [ A.class "flex flex-col" ]
                 [ H.a
                     [ A.href entry.url
                     , A.target "_blank"
-                    , A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
+                    , E.onClick (MarkAsRead entry)
+                    ]
+                    [ entry.title |> Maybe.withDefault "[no title]" |> H.text ]
+                , H.span [] [ H.text postedAt ]
+                ]
+
+        actions =
+            H.div [ A.class "md:shrink-0 flex self-start mt-1 ml-auto space-x-4" ]
+                [ H.a
+                    [ A.href entry.url
+                    , A.target "_blank"
+                    , A.class "self-start px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
                     , E.onClick (MarkAsRead entry)
                     ]
                     [ H.text "View" ]
@@ -57,18 +68,12 @@ viewEntry timezone entry =
     in
     H.li
         [ A.classList
-            [ ( "flex flex-col mt-5", True )
+            [ ( "flex flex-col md:flex-row mt-6", True )
             , ( "opacity-50", entry.read )
             , ( "text-gray-300", entry.status == UpdatePending )
             ]
         ]
-        [ H.a
-            [ A.href entry.url
-            , A.target "_blank"
-            , E.onClick (MarkAsRead entry)
-            ]
-            [ entry.title |> Maybe.withDefault "[no title]" |> H.text ]
-        , H.span [] [ H.text postedAt ]
+        [ title
         , actions
         ]
 
