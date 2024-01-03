@@ -43,8 +43,14 @@ defmodule ExRssWeb.Api.V1.EntryControllerTest do
 
     token = Phoenix.Token.sign(ExRssWeb.Endpoint, @salt, account)
 
+    pid = self()
+
     ExRss.TestBroadcaster
-    |> expect(:broadcast_update, fn _feed -> {:ok, nil} end)
+    |> expect(:broadcast_update, fn _feed ->
+      send(pid, :broadcast_update)
+
+      {:ok, nil}
+    end)
 
     conn =
       conn
@@ -53,6 +59,7 @@ defmodule ExRssWeb.Api.V1.EntryControllerTest do
 
     json = json_response(conn, 200)
     assert %{"id" => ^id, "read" => true} = json
+    assert_receive :broadcast_update
 
     verify!()
   end
@@ -62,8 +69,14 @@ defmodule ExRssWeb.Api.V1.EntryControllerTest do
 
     token = Phoenix.Token.sign(ExRssWeb.Endpoint, @salt, account)
 
+    pid = self()
+
     ExRss.TestBroadcaster
-    |> expect(:broadcast_update, fn _feed -> {:ok, nil} end)
+    |> expect(:broadcast_update, fn _feed ->
+      send(pid, :broadcast_update)
+
+      {:ok, nil}
+    end)
 
     conn =
       conn
@@ -72,6 +85,7 @@ defmodule ExRssWeb.Api.V1.EntryControllerTest do
 
     json = json_response(conn, 200)
     assert %{"id" => ^id, "read" => true} = json
+    assert_receive :broadcast_update
 
     verify!()
   end
