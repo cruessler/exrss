@@ -27,11 +27,7 @@ defmodule ExRss.Crawler.QueueTest do
   end
 
   setup do
-    # Explicitly get a connection before each test
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
-
-    # Allow the queue to access the tests’ db connection
-    Ecto.Adapters.SQL.Sandbox.mode(Repo, {:shared, self()})
 
     :ok
   end
