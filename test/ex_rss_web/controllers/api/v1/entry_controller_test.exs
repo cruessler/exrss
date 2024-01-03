@@ -5,6 +5,8 @@ defmodule ExRssWeb.Api.V1.EntryControllerTest do
   alias ExRss.{Feed, User}
   alias ExRss.User.Account
 
+  import Mox
+
   @salt "user"
 
   setup do
@@ -41,6 +43,9 @@ defmodule ExRssWeb.Api.V1.EntryControllerTest do
 
     token = Phoenix.Token.sign(ExRssWeb.Endpoint, @salt, account)
 
+    ExRss.TestBroadcaster
+    |> expect(:broadcast_update, fn _feed -> {:ok, nil} end)
+
     conn =
       conn
       |> put_req_header("authorization", "Bearer #{token}")
@@ -48,12 +53,17 @@ defmodule ExRssWeb.Api.V1.EntryControllerTest do
 
     json = json_response(conn, 200)
     assert %{"id" => ^id, "read" => true} = json
+
+    verify!()
   end
 
   test "PATCH /entries/2", %{account: account, second: %{id: id}} do
     conn = build_conn()
 
     token = Phoenix.Token.sign(ExRssWeb.Endpoint, @salt, account)
+
+    ExRss.TestBroadcaster
+    |> expect(:broadcast_update, fn _feed -> {:ok, nil} end)
 
     conn =
       conn
@@ -62,5 +72,7 @@ defmodule ExRssWeb.Api.V1.EntryControllerTest do
 
     json = json_response(conn, 200)
     assert %{"id" => ^id, "read" => true} = json
+
+    verify!()
   end
 end
