@@ -17,9 +17,11 @@ defmodule ExRssWeb.Api.V1.EntryController do
       {:ok, entry} ->
         updated_feed = Repo.get!(Feed, entry.feed_id)
 
+        update_broadcaster = Application.get_env(:ex_rss, :update_broadcaster, ExRss.Crawler.UpdateBroadcaster)
+
         Task.Supervisor.start_child(
           ExRss.TaskSupervisor,
-          ExRss.Crawler.UpdateBroadcaster,
+          update_broadcaster,
           :broadcast_update,
           [updated_feed]
         )
