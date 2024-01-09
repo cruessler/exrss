@@ -141,17 +141,17 @@ viewEntries timezone entries =
 
             middle =
                 H.li
-                    [ A.class "flex flex-col my-10" ]
+                    [ A.class "flex flex-col mt-6" ]
                     [ H.text (String.fromInt numberOfEntriesNotShown ++ " entries not shown") ]
 
             tail =
                 List.drop (numberOfEntries - 2) entries
                     |> List.map (viewEntry timezone)
         in
-        H.ul [ A.class "flex flex-col" ] (List.append head (middle :: tail))
+        H.ul [ A.class "mb-6 flex flex-col" ] (List.append head (middle :: tail))
 
     else
-        H.ul [ A.class "flex flex-col" ] (List.map (viewEntry timezone) entries)
+        H.ul [ A.class "mb-6 flex flex-col" ] (List.map (viewEntry timezone) entries)
 
 
 viewFeed : Model -> Feed -> Html Msg
