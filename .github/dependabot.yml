@@ -1,26 +1,29 @@
 version: 2
 updates:
-- package-ecosystem: elm
-  directory: "/assets/elm"
-  schedule:
-    interval: monthly
-    time: "02:00"
-  open-pull-requests-limit: 2
-- package-ecosystem: mix
-  directory: "/"
-  schedule:
-    interval: monthly
-    time: "02:00"
-  open-pull-requests-limit: 2
-- package-ecosystem: npm
-  directory: "/assets"
-  schedule:
-    interval: monthly
-    time: "02:00"
-  open-pull-requests-limit: 5
-- package-ecosystem: github-actions
-  directory: "/"
-  schedule:
-    interval: monthly
-    time: "02:00"
-  open-pull-requests-limit: 2
+  - package-ecosystem: elm
+    directory: '/assets/elm'
+    schedule:
+      interval: monthly
+      time: '02:00'
+    open-pull-requests-limit: 2
+
+  - package-ecosystem: mix
+    directory: '/'
+    schedule:
+      interval: monthly
+      time: '02:00'
+    open-pull-requests-limit: 2
+
+  - package-ecosystem: npm
+    directory: '/assets'
+    schedule:
+      interval: monthly
+      time: '02:00'
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: '/'
+    schedule:
+      interval: monthly
+      time: '02:00'
+    open-pull-requests-limit: 2
