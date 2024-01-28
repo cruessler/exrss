@@ -208,17 +208,22 @@ viewFeed model feed =
                 ]
 
         actions =
-            H.div [ A.class "flex justify-end mt-1 space-x-4" ]
+            H.div [ A.class "md:shrink-0 flex self-start justify-end mt-1 ml-auto space-x-4" ]
                 (List.concat
                     [ removeAction
                     , [ H.button [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white", E.onClick (MarkFeedAsRead feed) ] [ H.text "Mark as read" ] ]
                     ]
                 )
 
+        subHeader =
+            H.div [ A.class "flex flex-col md:flex-row" ]
+                [ additionalInfo model.timezone feed
+                , actions
+                ]
+
         children =
             [ H.h1 [ A.class "mb-2 font-bold", E.onClick (ToggleFeed feed) ] [ H.text <| Feed.title feed ]
-            , additionalInfo model.timezone feed
-            , actions
+            , subHeader
             , feed_
             ]
     in
