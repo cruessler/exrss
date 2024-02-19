@@ -101,9 +101,15 @@ defmodule ExRss.Feed do
     retries = Changeset.get_field(changeset, :retries)
 
     new_timeout =
-      (:math.pow(1.5, retries) * @base_timeout)
-      |> round
-      |> min(@max_timeout)
+      try do
+        (:math.pow(1.5, retries) * @base_timeout)
+        |> round
+        |> min(@max_timeout)
+      rescue
+        # `:math.pow` throws an `ArithmeticError` once `retries` crosses a
+        # certain threshold.
+        ArithmeticError -> @max_timeout
+      end
 
     next_update_at =
       changeset

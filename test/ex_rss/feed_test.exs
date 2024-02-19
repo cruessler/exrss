@@ -42,6 +42,18 @@ defmodule ExRss.FeedTest do
     assert Timex.compare(changeset.changes.next_update_at, @now) == 1
   end
 
+  test "schedule_update_on_error with retries that cause an ArithmeticError" do
+    changeset =
+      %Feed{retries: 2000, next_update_at: @now}
+      |> Changeset.change()
+      |> Feed.schedule_update_on_error(@now)
+
+    diff = Timex.diff(changeset.changes.next_update_at, @now, :seconds)
+
+    assert %{retries: 2001} = changeset.changes
+    assert diff == @max_timeout
+  end
+
   test "schedule_update has a maximum timeout" do
     changeset =
       %Feed{retries: 20, next_update_at: @now}
