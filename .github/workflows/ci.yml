@@ -94,3 +94,8 @@ jobs:
           npm run deploy
           npm test
         working-directory: assets
+
+      - name: Build release [OTP ${{ matrix.otp }}, Elixir ${{ matrix.elixir }}]
+        run: |
+          env MIX_ENV=prod mix assets.deploy
+          env MIX_ENV=prod mix release
