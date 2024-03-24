@@ -23,11 +23,6 @@ erl_crash.dump
 # variables.
 /config/prod.secret.exs
 
-# config/prod.exs is specific to each installation because it
-# contains the host configuration. The repository only has an
-# example file that can be adapted to your setup.
-/config/prod.exs
-
 # config/config.exs is specific to each installation as it contains the
 # `secret_key_base` which is supposed to be generated via `mix
 # phoenix.gen.secret`.
