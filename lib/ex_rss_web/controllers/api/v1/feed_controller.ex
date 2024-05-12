@@ -114,6 +114,25 @@ defmodule ExRssWeb.Api.V1.FeedController do
     end
   end
 
+  def update(conn, %{"id" => id, "feed" => feed_params}) do
+    changeset =
+      Repo.get!(User, conn.assigns.current_account.id)
+      |> assoc(:feeds)
+      |> Repo.get!(id)
+      |> Repo.preload(:entries)
+      |> Feed.api_changeset(feed_params)
+
+    case Repo.update(changeset) do
+      {:ok, feed} ->
+        json(conn, feed)
+
+      _ ->
+        conn
+        |> resp(:bad_request, "")
+        |> halt
+    end
+  end
+
   def update(conn, _) do
     conn
     |> resp(:bad_request, "")
