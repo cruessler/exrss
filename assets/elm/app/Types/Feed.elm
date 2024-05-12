@@ -6,6 +6,7 @@ module Types.Feed exposing
     , Status(..)
     , compareByNewestEntry
     , compareByNewestUnreadEntry
+    , compareByPinned
     , compareByPostedAt
     , compareByStatus
     , createWithCounts
@@ -26,9 +27,12 @@ module Types.Feed exposing
     , lastSuccessfulUpdateAt
     , markAsRead
     , open
+    , pin
+    , position
     , readEntriesCount
     , title
     , toggle
+    , unpin
     , unreadEntriesCount
     , updateEntries
     , updateEntry
@@ -53,6 +57,7 @@ type Feed
         , unreadEntriesCount : Int
         , readEntriesCount : Int
         , hasError : Bool
+        , position : Maybe Int
         , lastSuccessfulUpdateAt : Maybe Time.Posix
         }
 
@@ -97,6 +102,7 @@ createWithEntries id_ url_ title_ hasError_ lastSuccessfulUpdateAt_ entries_ =
         , unreadEntriesCount = numberOfUnreadEntries entries_
         , readEntriesCount = numberOfReadEntries entries_
         , hasError = hasError_
+        , position = Nothing
         , lastSuccessfulUpdateAt = lastSuccessfulUpdateAt_
         }
 
@@ -112,12 +118,13 @@ createWithCounts id_ url_ title_ entries_ unreadEntriesCount_ readEntriesCount_ 
         , unreadEntriesCount = unreadEntriesCount_
         , readEntriesCount = readEntriesCount_
         , hasError = False
+        , position = Nothing
         , lastSuccessfulUpdateAt = Nothing
         }
 
 
-create : Int -> String -> String -> Dict Int Entry -> Bool -> Int -> Int -> Bool -> Maybe Time.Posix -> Feed
-create id_ url_ title_ entries_ open_ unreadEntriesCount_ readEntriesCount_ hasError_ lastSuccessfulUpdateAt_ =
+create : Int -> String -> String -> Dict Int Entry -> Bool -> Int -> Int -> Bool -> Maybe Int -> Maybe Time.Posix -> Feed
+create id_ url_ title_ entries_ open_ unreadEntriesCount_ readEntriesCount_ hasError_ position_ lastSuccessfulUpdateAt_ =
     Feed
         { id = id_
         , url = url_
@@ -127,6 +134,7 @@ create id_ url_ title_ entries_ open_ unreadEntriesCount_ readEntriesCount_ hasE
         , unreadEntriesCount = unreadEntriesCount_
         , readEntriesCount = readEntriesCount_
         , hasError = hasError_
+        , position = position_
         , lastSuccessfulUpdateAt = lastSuccessfulUpdateAt_
         }
 
@@ -190,6 +198,11 @@ lastSuccessfulUpdateAt (Feed feed) =
     feed.lastSuccessfulUpdateAt
 
 
+position : Feed -> Maybe Int
+position (Feed feed) =
+    feed.position
+
+
 markAsRead : Entry -> Dict Int Feed -> Dict Int Feed
 markAsRead e =
     let
@@ -221,6 +234,16 @@ markAsRead e =
                     { feed | entries = newEntries }
     in
     Dict.map updateFeed
+
+
+pin : Feed -> Feed
+pin (Feed feed) =
+    Feed { feed | position = Just 0 }
+
+
+unpin : Feed -> Feed
+unpin (Feed feed) =
+    Feed { feed | position = Nothing }
 
 
 hasError : Feed -> Bool
@@ -300,6 +323,22 @@ compareByStatus (Feed a) (Feed b) =
             GT
 
         _ ->
+            EQ
+
+
+compareByPinned : Feed -> Feed -> Order
+compareByPinned (Feed a) (Feed b) =
+    case ( a.position, b.position ) of
+        ( Just aPosition, Just bPosition ) ->
+            compare aPosition bPosition
+
+        ( Just _, Nothing ) ->
+            LT
+
+        ( Nothing, Just _ ) ->
+            GT
+
+        ( Nothing, Nothing ) ->
             EQ
 
 
@@ -388,6 +427,7 @@ decodeFeedOnlyUnreadEntries =
         |> required "unread_entries_count" int
         |> required "read_entries_count" int
         |> required "has_error" bool
+        |> optional "position" (D.nullable int) Nothing
         |> required "last_successful_update_at" timestampOrNull
 
 

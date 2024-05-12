@@ -29,6 +29,8 @@ type Msg
     | RemoveFeed Feed
     | MarkAsRead Entry
     | MarkFeedAsRead Feed
+    | PinFeed Feed
+    | UnPinFeed Feed
     | PatchEntry (Result Http.Error Entry)
     | PatchFeed (Result Http.Error Feed)
     | Discovery (Result Discovery.Error Discovery.Success)

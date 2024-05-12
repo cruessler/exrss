@@ -193,6 +193,13 @@ viewFeed model feed =
         id =
             Feed.id feed
 
+        pinAction =
+            if Feed.position feed == Nothing then
+                [ H.button [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white", E.onClick (PinFeed feed) ] [ H.text "Pin feed" ] ]
+
+            else
+                [ H.button [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white", E.onClick (UnPinFeed feed) ] [ H.text "Unpin feed" ] ]
+
         removeAction =
             if Set.member id model.confirmRemoveFeeds then
                 [ H.button [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white", E.onClick (RemoveFeed feed) ] [ H.text "Confirm removal" ]
@@ -211,6 +218,7 @@ viewFeed model feed =
             H.div [ A.class "md:shrink-0 flex self-start justify-end mt-1 ml-auto space-x-4" ]
                 (List.concat
                     [ removeAction
+                    , pinAction
                     , [ H.button [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white", E.onClick (MarkFeedAsRead feed) ] [ H.text "Mark as read" ] ]
                     ]
                 )
@@ -260,6 +268,7 @@ view model =
                 |> List.sortWith (sortWith model.sortBy)
                 |> List.reverse
                 |> List.sortWith Feed.compareByStatus
+                |> List.sortWith Feed.compareByPinned
                 |> List.map (viewFeed model)
     in
     H.main_ [ A.attribute "role" "main" ]

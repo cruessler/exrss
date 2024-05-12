@@ -98,6 +98,36 @@ markFeedAsRead apiConfig feed =
         }
 
 
+updatePosition : Api.Config -> Feed -> Cmd Msg
+updatePosition apiConfig feed =
+    let
+        encodePosition =
+            let
+                position =
+                    Feed.position feed
+            in
+            case position of
+                Just position_ ->
+                    E.int position_
+
+                Nothing ->
+                    E.null
+
+        encodeFeed =
+            E.object
+                [ ( "feed"
+                  , E.object [ ( "position", encodePosition ) ]
+                  )
+                ]
+    in
+    Api.patch
+        apiConfig
+        { url = Paths.feed feed
+        , params = encodeFeed
+        , expect = Http.expectJson PatchFeed Feed.decodeFeed
+        }
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -256,6 +286,34 @@ update msg model =
                 cmd =
                     feed
                         |> markFeedAsRead model.apiConfig
+            in
+            ( { model | feeds = newFeeds }, cmd )
+
+        PinFeed feed ->
+            let
+                newFeed =
+                    Feed.pin feed
+
+                newFeeds =
+                    Dict.insert (Feed.id feed) newFeed model.feeds
+
+                cmd =
+                    newFeed
+                        |> updatePosition model.apiConfig
+            in
+            ( { model | feeds = newFeeds }, cmd )
+
+        UnPinFeed feed ->
+            let
+                newFeed =
+                    Feed.unpin feed
+
+                newFeeds =
+                    Dict.insert (Feed.id feed) newFeed model.feeds
+
+                cmd =
+                    newFeed
+                        |> updatePosition model.apiConfig
             in
             ( { model | feeds = newFeeds }, cmd )
 
