@@ -18,6 +18,7 @@ defmodule ExRss.Feed do
              :unread_entries_count,
              :read_entries_count,
              :has_error,
+             :position,
              :last_successful_update_at
            ]}
 
@@ -33,6 +34,7 @@ defmodule ExRss.Feed do
     field :unread_entries_count, :integer, virtual: true
     field :read_entries_count, :integer, virtual: true
     field :has_error, :boolean, virtual: true
+    field :position, :integer
 
     belongs_to :user, User
 
