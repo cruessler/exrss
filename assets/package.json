@@ -14,7 +14,7 @@
     "elm-test": "^0.19.1-revision12",
     "esbuild": "^0.22.0",
     "esbuild-plugin-elm": "^0.0.12",
-    "prettier": "^3.2.5",
+    "prettier": "^3.3.2",
     "tailwindcss": "^3.4.4"
   }
 }
