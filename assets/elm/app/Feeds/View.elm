@@ -68,7 +68,7 @@ viewEntry timezone entry =
     in
     H.li
         [ A.classList
-            [ ( "flex flex-col md:flex-row mt-6", True )
+            [ ( "flex flex-col md:flex-row mt-4", True )
             , ( "opacity-50", entry.read )
             , ( "text-gray-300", entry.status == UpdatePending )
             ]
@@ -223,17 +223,18 @@ viewFeed model feed =
                     ]
                 )
 
-        subHeader =
-            H.div [ A.class "flex flex-col md:flex-row" ]
-                [ additionalInfo model.timezone feed
-                , actions
+        header =
+            H.div []
+                [ H.h1
+                    [ A.class "mb-2 font-bold"
+                    , E.onClick (ToggleFeed feed)
+                    ]
+                    [ H.text <| Feed.title feed ]
+                , additionalInfo model.timezone feed
                 ]
 
         children =
-            [ H.h1 [ A.class "mb-2 font-bold", E.onClick (ToggleFeed feed) ] [ H.text <| Feed.title feed ]
-            , subHeader
-            , feed_
-            ]
+            [ H.div [ A.class "flex" ] [ header, actions ], feed_ ]
     in
     H.li [ A.class "flex flex-col mt-4" ] children
 
