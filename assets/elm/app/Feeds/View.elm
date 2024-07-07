@@ -2,7 +2,7 @@ module Feeds.View exposing (view)
 
 import DateFormat as F
 import Dict
-import Feeds.Icons exposing (bookmarkSlashSolid)
+import Feeds.Icons exposing (arrowTopRightOnSquareSolid, bookmarkSlashSolid)
 import Feeds.Model exposing (..)
 import Feeds.Msg exposing (..)
 import Feeds.Options as Options
@@ -42,8 +42,11 @@ viewEntry timezone entry =
 
             else
                 H.button
-                    [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white", E.onClick (MarkAsRead entry) ]
-                    [ H.text "Mark as read" ]
+                    [ A.class "size-6"
+                    , A.attribute "aria-label" "Mark as read"
+                    , E.onClick (MarkAsRead entry)
+                    ]
+                    [ checkCircle [] ]
 
         title =
             H.div [ A.class "flex flex-col" ]
@@ -56,15 +59,22 @@ viewEntry timezone entry =
                 , H.span [] [ H.text postedAt ]
                 ]
 
+        label =
+            "View entry "
+                ++ (entry.title
+                        |> Maybe.withDefault "n/a"
+                   )
+
         actions =
             H.div [ A.class "md:shrink-0 flex self-start mt-1 ml-auto space-x-4" ]
                 [ H.a
                     [ A.href entry.url
                     , A.target "_blank"
-                    , A.class "self-start px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
+                    , A.class "size-6"
+                    , A.attribute "aria-label" label
                     , E.onClick (MarkAsRead entry)
                     ]
-                    [ H.text "View" ]
+                    [ arrowTopRightOnSquareSolid ]
                 , maybeButton
                 ]
     in
