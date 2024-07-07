@@ -2,9 +2,11 @@ module Feeds.View exposing (view)
 
 import DateFormat as F
 import Dict
+import Feeds.Icons exposing (bookmarkSlashSolid)
 import Feeds.Model exposing (..)
 import Feeds.Msg exposing (..)
 import Feeds.Options as Options
+import Heroicons.Solid exposing (bookmark, checkCircle, trash)
 import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
@@ -195,10 +197,23 @@ viewFeed model feed =
 
         pinAction =
             if Feed.position feed == Nothing then
-                [ H.button [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white", E.onClick (PinFeed feed) ] [ H.text "Pin feed" ] ]
+                [ H.button
+                    [ A.class "size-6"
+                    , A.attribute "aria-label" "Pin feed"
+                    , E.onClick (PinFeed feed)
+                    ]
+                    [ bookmark [] ]
+                ]
 
             else
-                [ H.button [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white", E.onClick (UnPinFeed feed) ] [ H.text "Unpin feed" ] ]
+                [ H.button
+                    [ A.class "size-6"
+                    , A.attribute "aria-label" "Unpin feed"
+                    , E.onClick (UnPinFeed feed)
+                    ]
+                    [ bookmarkSlashSolid
+                    ]
+                ]
 
         removeAction =
             if Set.member id model.confirmRemoveFeeds then
@@ -208,10 +223,11 @@ viewFeed model feed =
 
             else
                 [ H.button
-                    [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
+                    [ A.class "size-6"
+                    , A.attribute "aria-label" "Remove feed"
                     , E.onClick (ConfirmRemoveFeed feed)
                     ]
-                    [ H.text "Remove" ]
+                    [ trash [] ]
                 ]
 
         actions =
@@ -219,7 +235,13 @@ viewFeed model feed =
                 (List.concat
                     [ removeAction
                     , pinAction
-                    , [ H.button [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white", E.onClick (MarkFeedAsRead feed) ] [ H.text "Mark as read" ] ]
+                    , [ H.button
+                            [ A.class "size-6"
+                            , A.attribute "aria-label" "Mark as read"
+                            , E.onClick (MarkFeedAsRead feed)
+                            ]
+                            [ checkCircle [] ]
+                      ]
                     ]
                 )
 
