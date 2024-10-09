@@ -28,6 +28,7 @@ config :ex_rss, ExRssWeb.Endpoint,
 # Watch static and templates for browser reloading.
 config :ex_rss, ExRssWeb.Endpoint,
   live_reload: [
+    web_console_logger: true,
     patterns: [
       ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
       ~r{priv/gettext/.*(po)$},
