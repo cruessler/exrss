@@ -60,3 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
     joinChannels(feedsModule);
   }
 });
+
+window.addEventListener('phx:live_reload:attached', ({ detail: reloader }) => {
+  reloader.enableServerLogs();
+  window.liveReloader = reloader;
+});
