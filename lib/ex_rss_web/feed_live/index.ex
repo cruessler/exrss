@@ -1,8 +1,21 @@
 defmodule ExRssWeb.FeedLive.Index do
   use ExRssWeb, :live_view
 
-  def mount(_params, %{"api_token" => api_token} = _session, socket) do
-    {:ok, assign(socket, :api_token, api_token)}
+  alias ExRss.User
+
+  def mount(
+        _params,
+        %{"api_token" => api_token, "current_user" => current_user} = _session,
+        socket
+      ) do
+    oldest_unread_entry = User.oldest_unread_entry(current_user.id)
+
+    socket =
+      socket
+      |> assign(:api_token, api_token)
+      |> assign(:oldest_unread_entry, oldest_unread_entry)
+
+    {:ok, socket}
   end
 
   # 2024-12-03
