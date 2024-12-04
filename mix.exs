@@ -51,7 +51,14 @@ defmodule ExRss.Mixfile do
       {:timex, "~> 3.1"},
       {:bcrypt_elixir, "~> 3.0"},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
-      {:mox, "~> 1.1", only: [:dev, :test]}
+      {:mox, "~> 1.1", only: [:dev, :test]},
+      {:heroicons,
+       github: "tailwindlabs/heroicons",
+       tag: "v2.2.0",
+       sparse: "optimized",
+       app: false,
+       compile: false,
+       depth: 1}
     ]
   end
 
