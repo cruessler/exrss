@@ -7,6 +7,7 @@ defmodule ExRssWeb.Router do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_flash
+    plug :put_root_layout, {ExRssWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
 
@@ -44,7 +45,7 @@ defmodule ExRssWeb.Router do
       pipe_through :authenticated
 
       scope "/feeds" do
-        resources "/", FeedController, only: [:index]
+        live "/", FeedLive.Index, :index
 
         get "/new", FeedController, :new
       end
