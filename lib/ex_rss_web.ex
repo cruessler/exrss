@@ -113,10 +113,8 @@ defmodule ExRssWeb do
     quote do
       # HTML escaping functionality
       import Phoenix.HTML
-      # TODO
-      # Phoenix 1.7 would also generate `import ExRssWeb.CoreComponents`. I did
-      # not add this import to keep the initial migration to `LiveView` small.
-      # Translation
+
+      import ExRssWeb.CoreComponents
       import ExRssWeb.Gettext
 
       # Shortcut for generating JS commands
