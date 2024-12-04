@@ -4,6 +4,7 @@ defmodule ExRss.User do
   alias Ecto.Changeset
 
   alias ExRss.Feed
+  alias ExRss.Repo
   alias ExRss.User
 
   @timestamps_opts [type: :utc_datetime]
@@ -32,5 +33,17 @@ defmodule ExRss.User do
 
   def verify_remember_me_token(token) do
     Phoenix.Token.verify(@context, @salt, token, max_age: @max_age)
+  end
+
+  def oldest_unread_entry(user_id) do
+    user = Repo.get!(User, user_id)
+
+    from(e in assoc(user, :entries),
+      where: e.read == false,
+      order_by: [asc: :posted_at],
+      limit: 1
+    )
+    |> Repo.all()
+    |> List.first()
   end
 end
