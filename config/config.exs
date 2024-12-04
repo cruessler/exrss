@@ -12,7 +12,11 @@ config :ex_rss,
 # Configures the endpoint
 config :ex_rss, ExRssWeb.Endpoint,
   url: [host: "localhost"],
+  # TODO
+  # `secret_key_base` seems to have been removed by Phoenix 1.7 or an earlier
+  # version.
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
+  live_view: [signing_salt: "abcdefgh"],
   render_errors: [view: ExRssWeb.ErrorView, accepts: ~w(html json)],
   pubsub_server: ExRss.PubSub
 

@@ -14,7 +14,14 @@ defmodule ExRssWeb.Plug.AssignApiToken do
     if %User{id: id} = conn.assigns[:current_user] do
       token = Phoenix.Token.sign(@context, salt, %Account{id: id})
 
-      assign(conn, :api_token, token)
+      conn
+      # 2024-12-03
+      # `assign` is used to assign to `conn.assigns` in order to have the token
+      # available in regular templates.
+      |> assign(:api_token, token)
+      # `put_session` is used to have the token available in LiveViews’
+      # `mount`.
+      |> put_session(:api_token, token)
     else
       conn
     end

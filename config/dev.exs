@@ -8,6 +8,9 @@ import Config
 # with esbuild to recompile .js and .css sources.
 config :ex_rss, ExRssWeb.Endpoint,
   http: [port: 4000, protocol_options: [max_header_value_length: 8192]],
+  # TODO
+  # `secret_key_base` seems to have been removed by Phoenix 1.7 or an earlier
+  # version.
   secret_key_base: String.duplicate("abcdefgh", 8),
   debug_errors: true,
   code_reloader: true,
@@ -40,6 +43,12 @@ config :ex_rss, ExRssWeb.Endpoint,
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
 config :phoenix, :stacktrace_depth, 20
+
+config :phoenix_live_view,
+  # Include HEEx debug annotations as HTML comments in rendered markup
+  debug_heex_annotations: true,
+  # Enable helpful, but potentially expensive runtime checks
+  enable_expensive_runtime_checks: true
 
 # Configure your database
 config :ex_rss, ExRss.Repo,
