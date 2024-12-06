@@ -12,7 +12,7 @@
         <a href={@oldest_unread_entry.url} target="_blank" aria-label={"View entry #{@oldest_unread_entry.title}"}>
           <.icon name="hero-arrow-top-right-on-square-solid" />
         </a>
-        <button aria-label="Mark as read">
+        <button aria-label="Mark as read" phx-click="mark_as_read" phx-value-entry-id={@oldest_unread_entry.id}>
           <.icon name="hero-check-circle-solid" />
         </button>
       </div>

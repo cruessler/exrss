@@ -1,7 +1,7 @@
 defmodule ExRssWeb.FeedLive.Index do
   use ExRssWeb, :live_view
 
-  alias ExRss.User
+  alias ExRss.{Entry, Feed, Repo, User}
 
   def mount(
         _params,
@@ -12,10 +12,42 @@ defmodule ExRssWeb.FeedLive.Index do
 
     socket =
       socket
+      |> assign(:current_user, current_user)
       |> assign(:api_token, api_token)
       |> assign(:oldest_unread_entry, oldest_unread_entry)
 
     {:ok, socket}
+  end
+
+  def handle_event("mark_as_read", %{"entry-id" => entry_id}, socket) do
+    changeset =
+      Repo.get!(User, socket.assigns.current_user.id)
+      |> Ecto.assoc(:entries)
+      |> Repo.get!(entry_id)
+      |> Entry.changeset(%{"read" => true})
+
+    case Repo.update(changeset) do
+      {:ok, entry} ->
+        updated_feed = Repo.get!(Feed, entry.feed_id)
+
+        update_broadcaster =
+          Application.get_env(:ex_rss, :update_broadcaster, ExRss.Crawler.UpdateBroadcaster)
+
+        Task.Supervisor.start_child(
+          ExRss.TaskSupervisor,
+          update_broadcaster,
+          :broadcast_update,
+          [updated_feed]
+        )
+
+        oldest_unread_entry =
+          User.oldest_unread_entry(socket.assigns.current_user.id)
+
+        {:noreply, assign(socket, :oldest_unread_entry, oldest_unread_entry)}
+
+      _ ->
+        {:noreply, socket}
+    end
   end
 
   # 2024-12-03
