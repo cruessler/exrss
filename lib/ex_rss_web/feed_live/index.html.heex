@@ -24,6 +24,6 @@
 
 <div id="elm-app-feeds" phx-update="ignore">
   <%=
-    elm_module("App.Feeds", %{apiToken: @api_token})
+    elm_module("App.Feeds", %{apiToken: @api_token}, id: "elm-module-app-feeds")
   %>
 </div>
