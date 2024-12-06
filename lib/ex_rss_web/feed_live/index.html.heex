@@ -22,6 +22,8 @@
   <div class="mb-6">No entry found</div>
 <% end %>
 
-<%=
-  elm_module("App.Feeds", %{apiToken: @api_token})
-%>
+<div id="elm-app-feeds" phx-update="ignore">
+  <%=
+    elm_module("App.Feeds", %{apiToken: @api_token})
+  %>
+</div>

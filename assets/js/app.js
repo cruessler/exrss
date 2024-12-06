@@ -1,6 +1,39 @@
 import Feeds from '../elm/app/App/Feeds.elm';
 import NewFeed from '../elm/app/App/NewFeed.elm';
+
 import { Socket } from '../../deps/phoenix';
+import { LiveSocket } from '../../deps/phoenix_live_view';
+
+const hooks = {
+  ElmModules: {
+    mounted() {
+      const elmModules = mountElmModules();
+
+      const feedsModule = elmModules['App.Feeds'];
+
+      if (feedsModule !== undefined) {
+        joinChannels(feedsModule);
+      }
+    },
+  },
+};
+
+const csrfToken = document
+  .querySelector("meta[name='csrf-token']")
+  .getAttribute('content');
+const liveSocket = new LiveSocket('/live', Socket, {
+  hooks,
+  longPollFallbackMs: 2500,
+  params: { _csrf_token: csrfToken },
+});
+
+liveSocket.connect();
+
+// expose liveSocket on window for web console debug logs and latency simulation:
+// >> liveSocket.enableDebug()
+// >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
+// >> liveSocket.disableLatencySim()
+window.liveSocket = liveSocket;
 
 const Elm = {
   App: { Feeds: Feeds.Elm.App.Feeds, NewFeed: NewFeed.Elm.App.NewFeed },
@@ -50,16 +83,6 @@ const joinChannels = (feedsModule) => {
     }
   });
 };
-
-document.addEventListener('DOMContentLoaded', () => {
-  const elmModules = mountElmModules();
-
-  const feedsModule = elmModules['App.Feeds'];
-
-  if (feedsModule !== undefined) {
-    joinChannels(feedsModule);
-  }
-});
 
 window.addEventListener('phx:live_reload:attached', ({ detail: reloader }) => {
   reloader.enableServerLogs();
