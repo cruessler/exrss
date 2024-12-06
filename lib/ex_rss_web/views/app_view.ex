@@ -17,7 +17,8 @@ defmodule ExRssWeb.AppView do
 
     data_attributes = [
       "data-elm-module": module,
-      "data-elm-params": html_escape(Jason.encode!(params))
+      "data-elm-params": html_escape(Jason.encode!(params)),
+      "phx-hook": "ElmModules"
     ]
 
     content_tag(tag, "", Keyword.merge(attrs, data_attributes))
