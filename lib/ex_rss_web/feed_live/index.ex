@@ -102,6 +102,61 @@ defmodule ExRssWeb.FeedLive.Index do
     end
   end
 
+  def handle_event("mark_as_read", %{"feed-id" => feed_id}, socket) do
+    changeset =
+      Repo.get!(User, socket.assigns.current_user.id)
+      |> Ecto.assoc(:feeds)
+      |> Repo.get!(feed_id)
+      |> Repo.preload(:entries)
+      |> Feed.mark_as_read()
+
+    case Repo.update(changeset) do
+      {:ok, feed} ->
+        feed_with_counts_query =
+          from(
+            f in Feed,
+            join: e in Entry,
+            on: f.id == e.feed_id,
+            group_by: f.id,
+            select: %{
+              f
+              | unread_entries_count: filter(count(e.id), e.read == false),
+                read_entries_count: filter(count(e.id), e.read == true),
+                has_error: f.retries > 0
+            }
+          )
+
+        updated_feed =
+          Repo.get!(feed_with_counts_query, feed.id)
+          |> Repo.preload(
+            entries: from(e in Entry, where: e.read == false, order_by: [desc: e.posted_at])
+          )
+
+        update_broadcaster =
+          Application.get_env(:ex_rss, :update_broadcaster, ExRss.Crawler.UpdateBroadcaster)
+
+        Task.Supervisor.start_child(
+          ExRss.TaskSupervisor,
+          update_broadcaster,
+          :broadcast_update,
+          [updated_feed]
+        )
+
+        oldest_unread_entry =
+          User.oldest_unread_entry(socket.assigns.current_user.id)
+
+        socket =
+          socket
+          |> assign(:oldest_unread_entry, oldest_unread_entry)
+          |> stream_insert(:feeds, updated_feed)
+
+        {:noreply, socket}
+
+      _ ->
+        {:noreply, socket}
+    end
+  end
+
   def handle_event("pin_feed", %{"feed-id" => feed_id}, socket) do
     update_feed_position(feed_id, 0, socket)
   end
