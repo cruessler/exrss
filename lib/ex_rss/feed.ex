@@ -34,6 +34,7 @@ defmodule ExRss.Feed do
     field :unread_entries_count, :integer, virtual: true
     field :read_entries_count, :integer, virtual: true
     field :has_error, :boolean, virtual: true
+    field :newest_unread_entry_posted_at, :utc_datetime, virtual: true
     field :position, :integer
 
     belongs_to :user, User

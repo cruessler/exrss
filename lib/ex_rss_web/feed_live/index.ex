@@ -22,11 +22,17 @@ defmodule ExRssWeb.FeedLive.Index do
         join: e in Entry,
         on: f.id == e.feed_id,
         group_by: f.id,
-        order_by: [desc_nulls_last: f.position],
+        order_by: [
+          desc_nulls_last: f.position,
+          desc_nulls_last: selected_as(:newest_unread_entry_posted_at)
+        ],
         select: %{
           f
           | unread_entries_count: filter(count(e.id), e.read == false),
             read_entries_count: filter(count(e.id), e.read == true),
+            newest_unread_entry_posted_at:
+              filter(max(e.posted_at), e.read == false)
+              |> selected_as(:newest_unread_entry_posted_at),
             has_error: f.retries > 0
         }
       )
@@ -49,14 +55,47 @@ defmodule ExRssWeb.FeedLive.Index do
   end
 
   def handle_event("mark_as_read", %{"entry-id" => entry_id}, socket) do
-    changeset =
+    current_user =
       Repo.get!(User, socket.assigns.current_user.id)
+
+    changeset =
+      current_user
       |> Ecto.assoc(:entries)
       |> Repo.get!(entry_id)
       |> Entry.changeset(%{"read" => true})
 
     case Repo.update(changeset) do
       {:ok, entry} ->
+        feeds_of_current_user = current_user |> Ecto.assoc(:feeds)
+
+        feeds_with_counts =
+          from(
+            f in feeds_of_current_user,
+            join: e in Entry,
+            on: f.id == e.feed_id,
+            group_by: f.id,
+            order_by: [
+              desc_nulls_last: f.position,
+              desc_nulls_last: selected_as(:newest_unread_entry_posted_at)
+            ],
+            select: %{
+              f
+              | unread_entries_count: filter(count(e.id), e.read == false),
+                read_entries_count: filter(count(e.id), e.read == true),
+                newest_unread_entry_posted_at:
+                  filter(max(e.posted_at), e.read == false)
+                  |> selected_as(:newest_unread_entry_posted_at),
+                has_error: f.retries > 0
+            }
+          )
+
+        feeds =
+          feeds_with_counts
+          |> Repo.all()
+          |> Repo.preload(
+            entries: from(e in Entry, where: e.read == false, order_by: [desc: e.posted_at])
+          )
+
         feed_with_counts_query =
           from(
             f in Feed,
@@ -93,7 +132,7 @@ defmodule ExRssWeb.FeedLive.Index do
         socket =
           socket
           |> assign(:oldest_unread_entry, oldest_unread_entry)
-          |> stream_insert(:feeds, updated_feed)
+          |> stream(:feeds, feeds, reset: true)
 
         {:noreply, socket}
 
@@ -103,8 +142,11 @@ defmodule ExRssWeb.FeedLive.Index do
   end
 
   def handle_event("mark_as_read", %{"feed-id" => feed_id}, socket) do
-    changeset =
+    current_user =
       Repo.get!(User, socket.assigns.current_user.id)
+
+    changeset =
+      current_user
       |> Ecto.assoc(:feeds)
       |> Repo.get!(feed_id)
       |> Repo.preload(:entries)
@@ -112,6 +154,36 @@ defmodule ExRssWeb.FeedLive.Index do
 
     case Repo.update(changeset) do
       {:ok, feed} ->
+        feeds_of_current_user = current_user |> Ecto.assoc(:feeds)
+
+        feeds_with_counts =
+          from(
+            f in feeds_of_current_user,
+            join: e in Entry,
+            on: f.id == e.feed_id,
+            group_by: f.id,
+            order_by: [
+              desc_nulls_last: f.position,
+              desc_nulls_last: selected_as(:newest_unread_entry_posted_at)
+            ],
+            select: %{
+              f
+              | unread_entries_count: filter(count(e.id), e.read == false),
+                read_entries_count: filter(count(e.id), e.read == true),
+                newest_unread_entry_posted_at:
+                  filter(max(e.posted_at), e.read == false)
+                  |> selected_as(:newest_unread_entry_posted_at),
+                has_error: f.retries > 0
+            }
+          )
+
+        feeds =
+          feeds_with_counts
+          |> Repo.all()
+          |> Repo.preload(
+            entries: from(e in Entry, where: e.read == false, order_by: [desc: e.posted_at])
+          )
+
         feed_with_counts_query =
           from(
             f in Feed,
@@ -148,7 +220,7 @@ defmodule ExRssWeb.FeedLive.Index do
         socket =
           socket
           |> assign(:oldest_unread_entry, oldest_unread_entry)
-          |> stream_insert(:feeds, updated_feed)
+          |> stream(:feeds, feeds, reset: true)
 
         {:noreply, socket}
 
@@ -181,11 +253,17 @@ defmodule ExRssWeb.FeedLive.Index do
             join: e in Entry,
             on: f.id == e.feed_id,
             group_by: f.id,
-            order_by: [desc_nulls_last: f.position],
+            order_by: [
+              desc_nulls_last: f.position,
+              desc_nulls_last: selected_as(:newest_unread_entry_posted_at)
+            ],
             select: %{
               f
               | unread_entries_count: filter(count(e.id), e.read == false),
                 read_entries_count: filter(count(e.id), e.read == true),
+                newest_unread_entry_posted_at:
+                  filter(max(e.posted_at), e.read == false)
+                  |> selected_as(:newest_unread_entry_posted_at),
                 has_error: f.retries > 0
             }
           )
@@ -231,11 +309,17 @@ defmodule ExRssWeb.FeedLive.Index do
             join: e in Entry,
             on: f.id == e.feed_id,
             group_by: f.id,
-            order_by: [desc_nulls_last: f.position],
+            order_by: [
+              desc_nulls_last: f.position,
+              desc_nulls_last: selected_as(:newest_unread_entry_posted_at)
+            ],
             select: %{
               f
               | unread_entries_count: filter(count(e.id), e.read == false),
                 read_entries_count: filter(count(e.id), e.read == true),
+                newest_unread_entry_posted_at:
+                  filter(max(e.posted_at), e.read == false)
+                  |> selected_as(:newest_unread_entry_posted_at),
                 has_error: f.retries > 0
             }
           )
