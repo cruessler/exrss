@@ -1,4 +1,6 @@
 defmodule ExRssWeb.FeedLive.Index do
+  import Ecto.Query
+
   use ExRssWeb, :live_view
 
   alias ExRss.{Entry, Feed, Repo, User}
@@ -10,11 +12,22 @@ defmodule ExRssWeb.FeedLive.Index do
       ) do
     oldest_unread_entry = User.oldest_unread_entry(current_user.id)
 
+    current_user = Repo.get!(User, current_user.id)
+
+    feeds =
+      current_user
+      |> Ecto.assoc(:feeds)
+      |> Repo.all()
+      |> Repo.preload(
+        entries: from(e in Entry, where: e.read == false, order_by: [desc: e.posted_at])
+      )
+
     socket =
       socket
       |> assign(:current_user, current_user)
       |> assign(:api_token, api_token)
       |> assign(:oldest_unread_entry, oldest_unread_entry)
+      |> stream(:feeds, feeds)
 
     {:ok, socket}
   end
@@ -28,7 +41,11 @@ defmodule ExRssWeb.FeedLive.Index do
 
     case Repo.update(changeset) do
       {:ok, entry} ->
-        updated_feed = Repo.get!(Feed, entry.feed_id)
+        updated_feed =
+          Repo.get!(Feed, entry.feed_id)
+          |> Repo.preload(
+            entries: from(e in Entry, where: e.read == false, order_by: [desc: e.posted_at])
+          )
 
         update_broadcaster =
           Application.get_env(:ex_rss, :update_broadcaster, ExRss.Crawler.UpdateBroadcaster)
@@ -43,7 +60,12 @@ defmodule ExRssWeb.FeedLive.Index do
         oldest_unread_entry =
           User.oldest_unread_entry(socket.assigns.current_user.id)
 
-        {:noreply, assign(socket, :oldest_unread_entry, oldest_unread_entry)}
+        socket =
+          socket
+          |> assign(:oldest_unread_entry, oldest_unread_entry)
+          |> stream_insert(:feeds, updated_feed)
+
+        {:noreply, socket}
 
       _ ->
         {:noreply, socket}
@@ -64,5 +86,67 @@ defmodule ExRssWeb.FeedLive.Index do
     ]
 
     content_tag(tag, "", Keyword.merge(attrs, data_attributes))
+  end
+
+  attr :entry, Entry, required: true
+
+  def entry(assigns) do
+    ~H"""
+    <ul class="flex flex-col">
+      <li class="flex flex-col md:flex-row">
+        <div class="flex flex-col">
+          <a href={@entry.url} target="_blank"><%= @entry.title %></a>
+          <span><%= @entry.posted_at %></span>
+        </div>
+
+        <div class="md:shrink-0 flex self-start mt-1 ml-auto space-x-4">
+          <a
+            href={@entry.url}
+            target="_blank"
+            aria-label={"View entry #{@entry.title}"}
+            phx-click="mark_as_read"
+            phx-value-entry-id={@entry.id}
+          >
+            <.icon name="hero-arrow-top-right-on-square-solid" />
+          </a>
+          <button aria-label="Mark as read" phx-click="mark_as_read" phx-value-entry-id={@entry.id}>
+            <.icon name="hero-check-circle-solid" />
+          </button>
+        </div>
+      </li>
+    </ul>
+    """
+  end
+
+  attr :entries, :list, required: true
+
+  def entries(assigns) do
+    if length(assigns.entries) > 5 do
+      assigns =
+        assigns
+        |> assign(:head_entries, Enum.take(assigns.entries, 2))
+        |> assign(:number_of_entries_not_shown, length(assigns.entries) - 4)
+        |> assign(:tail_entries, Enum.take(assigns.entries, -2))
+
+      ~H"""
+      <ul class="mb-6 flex flex-col space-y-4">
+        <li :for={entry <- @head_entries}>
+          <.entry entry={entry} />
+        </li>
+        <div><%= @number_of_entries_not_shown %> entries not shown</div>
+        <li :for={entry <- @tail_entries}>
+          <.entry entry={entry} />
+        </li>
+      </ul>
+      """
+    else
+      ~H"""
+      <ul class="mb-6 flex flex-col space-y-4">
+        <li :for={entry <- @entries}>
+          <.entry entry={entry} />
+        </li>
+      </ul>
+      """
+    end
   end
 end
