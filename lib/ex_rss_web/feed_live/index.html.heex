@@ -26,6 +26,40 @@
       </div>
 
       <div class="md:shrink-0 flex self-start justify-end mt-1 ml-auto space-x-4">
+        <div id={"remove-feed-#{feed.id}"} class="group">
+          <button
+            aria-label="Remove feed"
+            class="group-data-[confirm-removal=true]:hidden"
+            phx-click={
+              JS.toggle_attribute({"data-confirm-removal", "true", "false"},
+                to: "#remove-feed-#{feed.id}"
+              )
+            }
+          >
+            <.icon name="hero-trash-solid" />
+          </button>
+
+          <button
+            aria-label="Confirm removal of feed"
+            class="hidden group-data-[confirm-removal=true]:inline-block"
+            phx-click="remove_feed"
+            phx-value-feed-id={feed.id}
+          >
+            <.icon name="hero-check-circle-solid" />
+          </button>
+          <button
+            aria-label="Cancel removal of feed"
+            class="hidden group-data-[confirm-removal=true]:inline-block"
+            phx-click={
+              JS.toggle_attribute({"data-confirm-removal", "true", "false"},
+                to: "#remove-feed-#{feed.id}"
+              )
+            }
+          >
+            <.icon name="hero-x-circle-solid" />
+          </button>
+        </div>
+
         <%= if is_nil(feed.position) do %>
           <button aria-label="Pin feed" phx-click="pin_feed" phx-value-feed-id={feed.id}>
             <.icon name="hero-bookmark-solid" />

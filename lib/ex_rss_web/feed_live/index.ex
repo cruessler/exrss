@@ -3,7 +3,7 @@ defmodule ExRssWeb.FeedLive.Index do
 
   use ExRssWeb, :live_view
 
-  alias ExRss.{Entry, Feed, Repo, User}
+  alias ExRss.{Entry, Feed, Repo, User, FeedRemover}
 
   def mount(
         _params,
@@ -163,6 +163,53 @@ defmodule ExRssWeb.FeedLive.Index do
 
   def handle_event("unpin_feed", %{"feed-id" => feed_id}, socket) do
     update_feed_position(feed_id, nil, socket)
+  end
+
+  def handle_event("remove_feed", %{"feed-id" => feed_id}, socket) do
+    current_user = Repo.get!(User, socket.assigns.current_user.id)
+
+    multi =
+      FeedRemover.remove_feed(current_user, %{"id" => feed_id})
+
+    case Repo.transaction(multi) do
+      {:ok, %{feed: _}} ->
+        feeds_of_current_user = current_user |> Ecto.assoc(:feeds)
+
+        feeds_with_counts =
+          from(
+            f in feeds_of_current_user,
+            join: e in Entry,
+            on: f.id == e.feed_id,
+            group_by: f.id,
+            order_by: [desc_nulls_last: f.position],
+            select: %{
+              f
+              | unread_entries_count: filter(count(e.id), e.read == false),
+                read_entries_count: filter(count(e.id), e.read == true),
+                has_error: f.retries > 0
+            }
+          )
+
+        feeds =
+          feeds_with_counts
+          |> Repo.all()
+          |> Repo.preload(
+            entries: from(e in Entry, where: e.read == false, order_by: [desc: e.posted_at])
+          )
+
+        oldest_unread_entry =
+          User.oldest_unread_entry(socket.assigns.current_user.id)
+
+        socket =
+          socket
+          |> assign(:oldest_unread_entry, oldest_unread_entry)
+          |> stream(:feeds, feeds, reset: true)
+
+        {:noreply, socket}
+
+      _ ->
+        {:noreply, socket}
+    end
   end
 
   def update_feed_position(feed_id, position, socket) do
