@@ -14,9 +14,24 @@ defmodule ExRssWeb.FeedLive.Index do
 
     current_user = Repo.get!(User, current_user.id)
 
+    feeds_of_current_user = current_user |> Ecto.assoc(:feeds)
+
+    feeds_with_counts =
+      from(
+        f in feeds_of_current_user,
+        join: e in Entry,
+        on: f.id == e.feed_id,
+        group_by: f.id,
+        select: %{
+          f
+          | unread_entries_count: filter(count(e.id), e.read == false),
+            read_entries_count: filter(count(e.id), e.read == true),
+            has_error: f.retries > 0
+        }
+      )
+
     feeds =
-      current_user
-      |> Ecto.assoc(:feeds)
+      feeds_with_counts
       |> Repo.all()
       |> Repo.preload(
         entries: from(e in Entry, where: e.read == false, order_by: [desc: e.posted_at])
@@ -41,8 +56,22 @@ defmodule ExRssWeb.FeedLive.Index do
 
     case Repo.update(changeset) do
       {:ok, entry} ->
+        feed_with_counts_query =
+          from(
+            f in Feed,
+            join: e in Entry,
+            on: f.id == e.feed_id,
+            group_by: f.id,
+            select: %{
+              f
+              | unread_entries_count: filter(count(e.id), e.read == false),
+                read_entries_count: filter(count(e.id), e.read == true),
+                has_error: f.retries > 0
+            }
+          )
+
         updated_feed =
-          Repo.get!(Feed, entry.feed_id)
+          Repo.get!(feed_with_counts_query, entry.feed_id)
           |> Repo.preload(
             entries: from(e in Entry, where: e.read == false, order_by: [desc: e.posted_at])
           )

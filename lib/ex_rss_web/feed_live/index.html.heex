@@ -12,6 +12,16 @@
   <li :for={{dom_id, feed} <- @streams.feeds} id={dom_id}>
     <h1 class="mb-2 font-bold"><%= feed.title %></h1>
 
+    <ul class="mb-4">
+      <li class="inline-block mr-2">
+        <%= feed.read_entries_count + feed.unread_entries_count %> entries
+      </li>
+      <li class="inline-block mr-2"><%= feed.unread_entries_count %> unread</li>
+      <li class="inline-block mr-2">
+        last successful update at <%= feed.last_successful_update_at %>
+      </li>
+    </ul>
+
     <.entries entries={feed.entries} />
   </li>
 </ul>
