@@ -44,11 +44,23 @@ defmodule ExRssWeb.FeedLive.Index do
         entries: from(e in Entry, where: e.read == false, order_by: [desc: e.posted_at])
       )
 
+    number_of_unread_entries =
+      feeds |> List.foldl(0, fn feed, acc -> feed.unread_entries_count + acc end)
+
+    number_of_read_entries =
+      feeds |> List.foldl(0, fn feed, acc -> feed.read_entries_count + acc end)
+
+    number_of_feeds_with_error =
+      feeds |> Enum.count(& &1.has_error)
+
     socket =
       socket
       |> assign(:current_user, current_user)
       |> assign(:api_token, api_token)
       |> assign(:oldest_unread_entry, oldest_unread_entry)
+      |> assign(:number_of_unread_entries, number_of_unread_entries)
+      |> assign(:number_of_read_entries, number_of_read_entries)
+      |> assign(:number_of_feeds_with_error, number_of_feeds_with_error)
       |> stream(:feeds, feeds)
 
     {:ok, socket}
@@ -96,6 +108,15 @@ defmodule ExRssWeb.FeedLive.Index do
             entries: from(e in Entry, where: e.read == false, order_by: [desc: e.posted_at])
           )
 
+        number_of_unread_entries =
+          feeds |> List.foldl(0, fn feed, acc -> feed.unread_entries_count + acc end)
+
+        number_of_read_entries =
+          feeds |> List.foldl(0, fn feed, acc -> feed.read_entries_count + acc end)
+
+        number_of_feeds_with_error =
+          feeds |> Enum.count(& &1.has_error)
+
         feed_with_counts_query =
           from(
             f in Feed,
@@ -132,6 +153,9 @@ defmodule ExRssWeb.FeedLive.Index do
         socket =
           socket
           |> assign(:oldest_unread_entry, oldest_unread_entry)
+          |> assign(:number_of_unread_entries, number_of_unread_entries)
+          |> assign(:number_of_read_entries, number_of_read_entries)
+          |> assign(:number_of_feeds_with_error, number_of_feeds_with_error)
           |> stream(:feeds, feeds, reset: true)
 
         {:noreply, socket}
@@ -184,6 +208,15 @@ defmodule ExRssWeb.FeedLive.Index do
             entries: from(e in Entry, where: e.read == false, order_by: [desc: e.posted_at])
           )
 
+        number_of_unread_entries =
+          feeds |> List.foldl(0, fn feed, acc -> feed.unread_entries_count + acc end)
+
+        number_of_read_entries =
+          feeds |> List.foldl(0, fn feed, acc -> feed.read_entries_count + acc end)
+
+        number_of_feeds_with_error =
+          feeds |> Enum.count(& &1.has_error)
+
         feed_with_counts_query =
           from(
             f in Feed,
@@ -220,6 +253,9 @@ defmodule ExRssWeb.FeedLive.Index do
         socket =
           socket
           |> assign(:oldest_unread_entry, oldest_unread_entry)
+          |> assign(:number_of_unread_entries, number_of_unread_entries)
+          |> assign(:number_of_read_entries, number_of_read_entries)
+          |> assign(:number_of_feeds_with_error, number_of_feeds_with_error)
           |> stream(:feeds, feeds, reset: true)
 
         {:noreply, socket}
@@ -275,12 +311,24 @@ defmodule ExRssWeb.FeedLive.Index do
             entries: from(e in Entry, where: e.read == false, order_by: [desc: e.posted_at])
           )
 
+        number_of_unread_entries =
+          feeds |> List.foldl(0, fn feed, acc -> feed.unread_entries_count + acc end)
+
+        number_of_read_entries =
+          feeds |> List.foldl(0, fn feed, acc -> feed.read_entries_count + acc end)
+
+        number_of_feeds_with_error =
+          feeds |> Enum.count(& &1.has_error)
+
         oldest_unread_entry =
           User.oldest_unread_entry(socket.assigns.current_user.id)
 
         socket =
           socket
           |> assign(:oldest_unread_entry, oldest_unread_entry)
+          |> assign(:number_of_unread_entries, number_of_unread_entries)
+          |> assign(:number_of_read_entries, number_of_read_entries)
+          |> assign(:number_of_feeds_with_error, number_of_feeds_with_error)
           |> stream(:feeds, feeds, reset: true)
 
         {:noreply, socket}
@@ -331,6 +379,15 @@ defmodule ExRssWeb.FeedLive.Index do
             entries: from(e in Entry, where: e.read == false, order_by: [desc: e.posted_at])
           )
 
+        number_of_unread_entries =
+          feeds |> List.foldl(0, fn feed, acc -> feed.unread_entries_count + acc end)
+
+        number_of_read_entries =
+          feeds |> List.foldl(0, fn feed, acc -> feed.read_entries_count + acc end)
+
+        number_of_feeds_with_error =
+          feeds |> Enum.count(& &1.has_error)
+
         feed_with_counts_query =
           from(
             f in Feed,
@@ -367,6 +424,9 @@ defmodule ExRssWeb.FeedLive.Index do
         socket =
           socket
           |> assign(:oldest_unread_entry, oldest_unread_entry)
+          |> assign(:number_of_unread_entries, number_of_unread_entries)
+          |> assign(:number_of_read_entries, number_of_read_entries)
+          |> assign(:number_of_feeds_with_error, number_of_feeds_with_error)
           |> stream(:feeds, feeds, reset: true)
 
         {:noreply, socket}
