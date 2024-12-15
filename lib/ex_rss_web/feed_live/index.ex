@@ -400,7 +400,7 @@ defmodule ExRssWeb.FeedLive.Index do
       <li class="flex flex-col md:flex-row">
         <div class="flex flex-col">
           <a href={@entry.url} target="_blank"><%= @entry.title %></a>
-          <span><%= @entry.posted_at %></span>
+          <span><%= format_updated_at(@entry.posted_at) %></span>
         </div>
 
         <div class="md:shrink-0 flex self-start mt-1 ml-auto space-x-4">
@@ -451,6 +451,42 @@ defmodule ExRssWeb.FeedLive.Index do
         </li>
       </ul>
       """
+    end
+  end
+
+  def format_updated_at(updated_at, attrs \\ []) do
+    duration =
+      Timex.Interval.new(from: updated_at, until: Timex.now())
+      |> Timex.Interval.duration(:duration)
+
+    duration_in_days = Timex.Duration.to_days(duration)
+
+    if duration_in_days > 5 do
+      case Timex.format(
+             updated_at,
+             "%B %d, %Y, %k:%M",
+             :strftime
+           ) do
+        {:ok, formatted_updated_at} ->
+          formatted_updated_at
+
+        _ ->
+          {default, _attrs} = Keyword.pop(attrs, :default, "n/a")
+
+          default
+      end
+    else
+      # There is also a relative formatter provided by Timex in case the code
+      # below needs to be changed or improved.
+      #
+      # https://hexdocs.pm/timex/Timex.Format.DateTime.Formatters.Relative.html#summary
+      formatted_duration =
+        duration
+        |> Timex.Duration.to_minutes(truncate: true)
+        |> Timex.Duration.from_minutes()
+        |> Timex.format_duration(:humanized)
+
+      "#{formatted_duration} ago"
     end
   end
 end
