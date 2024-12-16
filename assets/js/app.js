@@ -7,13 +7,7 @@ import { LiveSocket } from '../../deps/phoenix_live_view';
 const hooks = {
   ElmModules: {
     mounted() {
-      const elmModules = mountElmModules();
-
-      const feedsModule = elmModules['App.Feeds'];
-
-      if (feedsModule !== undefined) {
-        joinChannels(feedsModule);
-      }
+      mountElmModules();
     },
   },
 };
@@ -59,29 +53,6 @@ const mountElmModules = () => {
 
     return acc;
   }, {});
-};
-
-const joinChannels = (feedsModule) => {
-  const token = window.userToken;
-
-  if (token === undefined || token.length === 0) {
-    return;
-  }
-
-  const socket = new Socket('/socket', { params: { token } });
-
-  socket.connect();
-
-  const channel = socket.channel('user:self', {});
-  channel.join();
-
-  channel.on('unread_entries', (payload) => {
-    const feed = payload.feed;
-
-    if (feed !== undefined) {
-      feedsModule.ports.unreadEntriesReceiver.send(feed);
-    }
-  });
 };
 
 window.addEventListener('phx:live_reload:attached', ({ detail: reloader }) => {

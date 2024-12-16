@@ -5,7 +5,6 @@ import Feeds.Model as Model exposing (..)
 import Feeds.Msg exposing (..)
 import Feeds.Options.Addition as Addition
 import Feeds.Options.Discovery as Discovery
-import Feeds.Options.Removal as Removal
 import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
@@ -32,9 +31,6 @@ requests =
                     Addition.requestFieldset
                         { onAdd = AddFeed, onRemove = RemoveResponse }
                         addition
-
-                Model.Removal removal ->
-                    Removal.requestFieldset removal
         )
         >> Dict.values
         >> H.div []
