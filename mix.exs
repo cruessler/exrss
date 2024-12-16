@@ -74,8 +74,6 @@ defmodule ExRss.Mixfile do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate", "test"],
-      "test.elm": ["cmd cd assets && npm test"],
-      "test.elm.watch": ["cmd cd assets && npm test -- --watch"],
       "assets.deploy": ["cmd --cd assets npm run deploy", "phx.digest"]
     ]
   end

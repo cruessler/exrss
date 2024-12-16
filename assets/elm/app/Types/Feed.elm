@@ -3,46 +3,19 @@ module Types.Feed exposing
     , Entry
     , Feed
     , Frequency
-    , Status(..)
-    , compareByNewestEntry
-    , compareByNewestUnreadEntry
-    , compareByPinned
-    , compareByPostedAt
-    , compareByStatus
-    , createWithCounts
-    , createWithEntries
     , decodeCandidate
     , decodeCandidates
-    , decodeEntry
     , decodeFeed
-    , decodeFeedOnlyUnreadEntries
-    , decodeFeeds
-    , decodeFeedsOnlyUnreadEntries
     , encodeCandidate
-    , encodeEntry
-    , entries
-    , entry
-    , hasError
     , id
-    , lastSuccessfulUpdateAt
-    , markAsRead
-    , open
-    , pin
-    , position
-    , readEntriesCount
     , title
-    , toggle
-    , unpin
-    , unreadEntriesCount
-    , updateEntries
-    , updateEntry
     , url
     )
 
 import Dict exposing (Dict)
 import Iso8601
 import Json.Decode as D exposing (bool, field, int, list, map, nullable, string)
-import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as E
 import Time
 
@@ -62,18 +35,12 @@ type Feed
         }
 
 
-type Status
-    = NoChange
-    | UpdatePending
-
-
 type alias Entry =
     { id : Int
     , url : String
     , title : Maybe String
     , read : Bool
     , postedAt : Maybe Time.Posix
-    , status : Status
     }
 
 
@@ -107,38 +74,6 @@ createWithEntries id_ url_ title_ hasError_ lastSuccessfulUpdateAt_ entries_ =
         }
 
 
-createWithCounts : Int -> String -> String -> Dict Int Entry -> Int -> Int -> Feed
-createWithCounts id_ url_ title_ entries_ unreadEntriesCount_ readEntriesCount_ =
-    Feed
-        { id = id_
-        , url = url_
-        , title = title_
-        , entries = entries_
-        , open = False
-        , unreadEntriesCount = unreadEntriesCount_
-        , readEntriesCount = readEntriesCount_
-        , hasError = False
-        , position = Nothing
-        , lastSuccessfulUpdateAt = Nothing
-        }
-
-
-create : Int -> String -> String -> Dict Int Entry -> Bool -> Int -> Int -> Bool -> Maybe Int -> Maybe Time.Posix -> Feed
-create id_ url_ title_ entries_ open_ unreadEntriesCount_ readEntriesCount_ hasError_ position_ lastSuccessfulUpdateAt_ =
-    Feed
-        { id = id_
-        , url = url_
-        , title = title_
-        , entries = entries_
-        , open = open_
-        , unreadEntriesCount = unreadEntriesCount_
-        , readEntriesCount = readEntriesCount_
-        , hasError = hasError_
-        , position = position_
-        , lastSuccessfulUpdateAt = lastSuccessfulUpdateAt_
-        }
-
-
 id : Feed -> Int
 id (Feed feed) =
     feed.id
@@ -152,220 +87,6 @@ url (Feed feed) =
 title : Feed -> String
 title (Feed feed) =
     feed.title
-
-
-open : Feed -> Bool
-open (Feed feed) =
-    feed.open
-
-
-toggle : Feed -> Feed
-toggle (Feed feed) =
-    Feed { feed | open = not feed.open }
-
-
-entries : Feed -> Dict Int Entry
-entries (Feed feed) =
-    feed.entries
-
-
-entry : Int -> Dict Int Feed -> Maybe Entry
-entry entryId =
-    Dict.foldl
-        (\_ (Feed f) acc ->
-            case acc of
-                Nothing ->
-                    Dict.get entryId f.entries
-
-                e ->
-                    e
-        )
-        Nothing
-
-
-unreadEntriesCount : Feed -> Int
-unreadEntriesCount (Feed feed) =
-    feed.unreadEntriesCount
-
-
-readEntriesCount : Feed -> Int
-readEntriesCount (Feed feed) =
-    feed.readEntriesCount
-
-
-lastSuccessfulUpdateAt : Feed -> Maybe Time.Posix
-lastSuccessfulUpdateAt (Feed feed) =
-    feed.lastSuccessfulUpdateAt
-
-
-position : Feed -> Maybe Int
-position (Feed feed) =
-    feed.position
-
-
-markAsRead : Entry -> Dict Int Feed -> Dict Int Feed
-markAsRead e =
-    let
-        updateFeed _ (Feed feed) =
-            let
-                oldEntryWasUnread =
-                    Dict.get e.id feed.entries
-                        |> Maybe.map (.read >> not)
-                        |> Maybe.withDefault False
-
-                newEntries =
-                    Dict.update
-                        e.id
-                        (Maybe.map
-                            (\e_ -> { e_ | read = True, status = UpdatePending })
-                        )
-                        feed.entries
-            in
-            if oldEntryWasUnread then
-                Feed
-                    { feed
-                        | entries = newEntries
-                        , unreadEntriesCount = feed.unreadEntriesCount - 1
-                        , readEntriesCount = feed.readEntriesCount + 1
-                    }
-
-            else
-                Feed
-                    { feed | entries = newEntries }
-    in
-    Dict.map updateFeed
-
-
-pin : Feed -> Feed
-pin (Feed feed) =
-    Feed { feed | position = Just 0 }
-
-
-unpin : Feed -> Feed
-unpin (Feed feed) =
-    Feed { feed | position = Nothing }
-
-
-hasError : Feed -> Bool
-hasError (Feed feed) =
-    feed.hasError
-
-
-updateEntry : Int -> (Entry -> Entry) -> Dict Int Feed -> Dict Int Feed
-updateEntry id_ f =
-    let
-        updateEntry_ _ (Feed feed) =
-            { feed
-                | entries =
-                    Dict.update
-                        id_
-                        (Maybe.map f)
-                        feed.entries
-            }
-                |> Feed
-    in
-    Dict.map updateEntry_
-
-
-updateEntries : Feed -> Dict Int Entry -> Feed
-updateEntries (Feed feed) newEntries =
-    Feed { feed | entries = newEntries }
-
-
-compareBy : (Entry -> Bool) -> Feed -> Feed -> Order
-compareBy filter a b =
-    let
-        significantEntry : Feed -> Maybe Entry
-        significantEntry (Feed feed) =
-            feed.entries
-                |> Dict.values
-                |> List.filter filter
-                |> List.sortWith compareByPostedAt
-                |> List.reverse
-                |> List.head
-    in
-    case ( significantEntry a, significantEntry b ) of
-        ( Just x, Just y ) ->
-            compareByPostedAt x y
-
-        ( Just _, Nothing ) ->
-            GT
-
-        ( Nothing, Just _ ) ->
-            LT
-
-        _ ->
-            EQ
-
-
-compareByNewestUnreadEntry : Feed -> Feed -> Order
-compareByNewestUnreadEntry =
-    compareBy (\a -> not a.read)
-
-
-compareByNewestEntry : Feed -> Feed -> Order
-compareByNewestEntry =
-    compareBy (always True)
-
-
-compareByStatus : Feed -> Feed -> Order
-compareByStatus (Feed a) (Feed b) =
-    let
-        anyUnread : Dict Int Entry -> Bool
-        anyUnread =
-            Dict.foldl (\_ v acc -> acc || not v.read) False
-    in
-    case ( anyUnread a.entries, anyUnread b.entries ) of
-        ( True, False ) ->
-            LT
-
-        ( False, True ) ->
-            GT
-
-        _ ->
-            EQ
-
-
-compareByPinned : Feed -> Feed -> Order
-compareByPinned (Feed a) (Feed b) =
-    case ( a.position, b.position ) of
-        ( Just aPosition, Just bPosition ) ->
-            compare aPosition bPosition
-
-        ( Just _, Nothing ) ->
-            LT
-
-        ( Nothing, Just _ ) ->
-            GT
-
-        ( Nothing, Nothing ) ->
-            EQ
-
-
-compareByPostedAt : Entry -> Entry -> Order
-compareByPostedAt a b =
-    case ( a.postedAt, b.postedAt ) of
-        ( Just x, Just y ) ->
-            compare (Time.posixToMillis x) (Time.posixToMillis y)
-
-        ( Just _, Nothing ) ->
-            GT
-
-        ( Nothing, Just _ ) ->
-            LT
-
-        _ ->
-            EQ
-
-
-decodeFeeds : D.Decoder (List Feed)
-decodeFeeds =
-    list decodeFeed
-
-
-decodeFeedsOnlyUnreadEntries : D.Decoder (List Feed)
-decodeFeedsOnlyUnreadEntries =
-    list decodeFeedOnlyUnreadEntries
 
 
 countEntries : Dict Int Entry -> D.Decoder Feed
@@ -416,21 +137,6 @@ decodeFeed =
         |> D.andThen countEntries
 
 
-decodeFeedOnlyUnreadEntries : D.Decoder Feed
-decodeFeedOnlyUnreadEntries =
-    D.succeed create
-        |> required "id" int
-        |> required "url" string
-        |> optional "title" string ""
-        |> required "entries" decodeEntries
-        |> hardcoded False
-        |> required "unread_entries_count" int
-        |> required "read_entries_count" int
-        |> required "has_error" bool
-        |> optional "position" (D.nullable int) Nothing
-        |> required "last_successful_update_at" timestampOrNull
-
-
 decodeEntries : D.Decoder (Dict Int Entry)
 decodeEntries =
     let
@@ -475,15 +181,6 @@ encodeCandidate candidate =
         ]
 
 
-encodeEntry : Entry -> E.Value
-encodeEntry e =
-    E.object
-        [ ( "entry"
-          , E.object [ ( "read", E.bool e.read ) ]
-          )
-        ]
-
-
 timestampOrNull : D.Decoder (Maybe Time.Posix)
 timestampOrNull =
     let
@@ -502,4 +199,3 @@ decodeEntry =
         |> required "title" (nullable string)
         |> required "read" bool
         |> required "posted_at" timestampOrNull
-        |> hardcoded NoChange
