@@ -1,5 +1,6 @@
 defmodule ExRssWeb.AppView do
-  use Phoenix.HTML
+  import Phoenix.HTML
+  use PhoenixHTMLHelpers
 
   def form_group(form, field, attrs, fun) when is_function(fun, 1) do
     {class, _attrs} = Keyword.pop(attrs, :class, "")

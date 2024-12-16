@@ -41,6 +41,7 @@ defmodule ExRss.Mixfile do
       {:ecto_sql, "~> 3.0"},
       {:postgrex, "~> 0.19.1"},
       {:phoenix_html, "~> 4.1"},
+      {:phoenix_html_helpers, "~> 1.0"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:phoenix_live_view, "~> 0.20"},
       {:gettext, "~> 0.11"},

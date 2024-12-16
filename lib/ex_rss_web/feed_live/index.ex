@@ -438,7 +438,7 @@ defmodule ExRssWeb.FeedLive.Index do
 
   # 2024-12-03
   # This `use` is needed for `content_tag` to be available in `elm_module`.
-  use Phoenix.HTML
+  use PhoenixHTMLHelpers
 
   def elm_module(module, params \\ %{}, attrs \\ []) do
     {tag, attrs} = Keyword.pop(attrs, :tag, :div)
