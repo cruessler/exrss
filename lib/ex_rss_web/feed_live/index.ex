@@ -515,38 +515,43 @@ defmodule ExRssWeb.FeedLive.Index do
   end
 
   def format_updated_at(updated_at, attrs \\ []) do
-    duration =
-      Timex.Interval.new(from: updated_at, until: Timex.now())
-      |> Timex.Interval.duration(:duration)
+    {default, _attrs} = Keyword.pop(attrs, :default, "n/a")
 
-    duration_in_days = Timex.Duration.to_days(duration)
+    with interval = %Timex.Interval{} <- Timex.Interval.new(from: updated_at, until: Timex.now()) do
+      duration =
+        Timex.Interval.duration(interval, :duration)
 
-    if duration_in_days > 5 do
-      case Timex.format(
-             updated_at,
-             "%B %d, %Y, %k:%M",
-             :strftime
-           ) do
-        {:ok, formatted_updated_at} ->
-          formatted_updated_at
+      duration_in_days =
+        Timex.Duration.to_days(duration)
 
-        _ ->
-          {default, _attrs} = Keyword.pop(attrs, :default, "n/a")
+      if duration_in_days > 5 do
+        case Timex.format(
+               updated_at,
+               "%B %d, %Y, %k:%M",
+               :strftime
+             ) do
+          {:ok, formatted_updated_at} ->
+            formatted_updated_at
 
-          default
+          _ ->
+            default
+        end
+      else
+        # There is also a relative formatter provided by Timex in case the code
+        # below needs to be changed or improved.
+        #
+        # https://hexdocs.pm/timex/Timex.Format.DateTime.Formatters.Relative.html#summary
+        formatted_duration =
+          duration
+          |> Timex.Duration.to_minutes(truncate: true)
+          |> Timex.Duration.from_minutes()
+          |> Timex.format_duration(:humanized)
+
+        "#{formatted_duration} ago"
       end
     else
-      # There is also a relative formatter provided by Timex in case the code
-      # below needs to be changed or improved.
-      #
-      # https://hexdocs.pm/timex/Timex.Format.DateTime.Formatters.Relative.html#summary
-      formatted_duration =
-        duration
-        |> Timex.Duration.to_minutes(truncate: true)
-        |> Timex.Duration.from_minutes()
-        |> Timex.format_duration(:humanized)
-
-      "#{formatted_duration} ago"
+      _ ->
+        default
     end
   end
 end
