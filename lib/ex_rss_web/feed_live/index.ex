@@ -459,8 +459,8 @@ defmodule ExRssWeb.FeedLive.Index do
     <ul class="flex flex-col">
       <li class="flex flex-col md:flex-row">
         <div class="flex flex-col">
-          <a href={@entry.url} target="_blank"><%= @entry.title %></a>
-          <span><%= format_updated_at(@entry.posted_at) %></span>
+          <a href={@entry.url} target="_blank">{@entry.title}</a>
+          <span>{format_updated_at(@entry.posted_at)}</span>
         </div>
 
         <div class="md:shrink-0 flex self-start mt-1 ml-auto space-x-4">
@@ -497,7 +497,7 @@ defmodule ExRssWeb.FeedLive.Index do
         <li :for={entry <- @head_entries}>
           <.entry entry={entry} />
         </li>
-        <div><%= @number_of_entries_not_shown %> entries not shown</div>
+        <div>{@number_of_entries_not_shown} entries not shown</div>
         <li :for={entry <- @tail_entries}>
           <.entry entry={entry} />
         </li>

@@ -1,18 +1,18 @@
 <div id="elm-app-feeds" phx-update="ignore">
-  <%= elm_module("App.Feeds", %{apiToken: @api_token}, id: "elm-module-app-feeds") %>
+  {elm_module("App.Feeds", %{apiToken: @api_token}, id: "elm-module-app-feeds")}
 </div>
 
 <ul class="flex space-x-2 my-2">
   <li>
-    <%= @number_of_unread_entries + @number_of_read_entries %> entries
+    {@number_of_unread_entries + @number_of_read_entries} entries
   </li>
-  <li><%= @number_of_unread_entries %> unread</li>
+  <li>{@number_of_unread_entries} unread</li>
   <li>
     <%= if @number_of_feeds_with_error == 1 do %>
       1 feed had errors when it was last updated
     <% end %>
     <%= if @number_of_feeds_with_error > 1 do %>
-      <%= @number_of_feeds_with_error %> feeds had errors when they were last updated
+      {@number_of_feeds_with_error} feeds had errors when they were last updated
     <% end %>
   </li>
 </ul>
@@ -31,15 +31,15 @@
   <li :for={{dom_id, feed} <- @streams.feeds} id={dom_id}>
     <div class="flex">
       <div>
-        <h1 class="mb-2 font-bold"><%= feed.title %></h1>
+        <h1 class="mb-2 font-bold">{feed.title}</h1>
 
         <ul class="mb-4">
           <li class="inline-block mr-2">
-            <%= feed.read_entries_count + feed.unread_entries_count %> entries
+            {feed.read_entries_count + feed.unread_entries_count} entries
           </li>
-          <li class="inline-block mr-2"><%= feed.unread_entries_count %> unread</li>
+          <li class="inline-block mr-2">{feed.unread_entries_count} unread</li>
           <li class="inline-block mr-2">
-            last update <%= format_updated_at(feed.last_successful_update_at) %>
+            last update {format_updated_at(feed.last_successful_update_at)}
           </li>
         </ul>
       </div>
