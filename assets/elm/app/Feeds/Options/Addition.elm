@@ -2,7 +2,6 @@ module Feeds.Options.Addition exposing (requestFieldset)
 
 import Dict exposing (Dict)
 import Feeds.Addition as Addition exposing (Addition)
-import Feeds.Model exposing (..)
 import Feeds.Msg exposing (..)
 import Html as H exposing (Html)
 import Html.Attributes as A

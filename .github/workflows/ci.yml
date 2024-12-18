@@ -79,13 +79,17 @@ jobs:
 
       - name: Precompile Elm entry points
         run: |
-          # By compiling both `Feeds.elm` and `NewFeed.elm`, we make sure all
-          # intermediate files are present before `npm run deploy` runs.
+          # By compiling `NewFeed.elm`, we make sure all intermediate files are
+          # present before `npm run deploy` runs.
           #
           # Otherwise, webpack would compile files in parallel which can lead
           # to data races and let one of the compiler processes fail with an
           # error about corrupt files.
-          npx elm make app/App/Feeds.elm --output /dev/null
+          #
+          # 2024-12-18
+          # This is probably not necessary anymore, but since the Elm parts
+          # will soon be completely removed, this doesn’t really matter and we
+          # can leave this step in place, just in case it is still necessary.
           npx elm make app/App/NewFeed.elm --output /dev/null
         working-directory: assets/elm
 

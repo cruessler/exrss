@@ -1,4 +1,3 @@
-import Feeds from '../elm/app/App/Feeds.elm';
 import NewFeed from '../elm/app/App/NewFeed.elm';
 
 import { Socket } from '../../deps/phoenix';
@@ -30,7 +29,7 @@ liveSocket.connect();
 window.liveSocket = liveSocket;
 
 const Elm = {
-  App: { Feeds: Feeds.Elm.App.Feeds, NewFeed: NewFeed.Elm.App.NewFeed },
+  App: { NewFeed: NewFeed.Elm.App.NewFeed },
 };
 
 const mountElmModules = () => {

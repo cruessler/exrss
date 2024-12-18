@@ -1,19 +1,13 @@
 module Feeds.Options.Discovery exposing
     ( addableFeed
-    , discoverFeedFieldset
-    , discoverFeedsFieldset
     , requestFieldset
     )
 
-import Dict exposing (Dict)
 import Feeds.Discovery as Discovery exposing (Discovery)
-import Feeds.Model exposing (..)
-import Feeds.Msg exposing (..)
+import Feeds.Msg exposing (Msg(..))
 import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
-import Http
-import Json.Decode as Decode
 import Request exposing (..)
 import Types.Feed exposing (..)
 
@@ -26,81 +20,6 @@ close url =
         , E.onClick <| RemoveResponse url
         ]
         [ H.text "×" ]
-
-
-onEnter : Msg -> H.Attribute Msg
-onEnter msg =
-    let
-        isEnter key =
-            if key == 13 then
-                Decode.succeed msg
-
-            else
-                Decode.fail "keyCode != 13"
-    in
-    E.on "keydown" <| Decode.andThen isEnter E.keyCode
-
-
-discoverFeedsFieldset : String -> Html Msg
-discoverFeedsFieldset discoveryUrl =
-    H.fieldset [ A.class "border-2 p-2" ]
-        [ H.legend [] [ H.text "Discover feeds on a site" ]
-        , H.label
-            [ A.for "feed-url" ]
-            [ H.text "Address to discover feeds on" ]
-        , H.input
-            [ A.id "feed-url"
-            , A.type_ "url"
-            , A.value discoveryUrl
-            , E.onInput SetDiscoveryUrl
-            , onEnter <| DiscoverFeeds discoveryUrl
-            ]
-            []
-        , H.button
-            [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
-            , E.onClick <| DiscoverFeeds discoveryUrl
-            ]
-            [ H.text "Discover" ]
-        , H.p
-            []
-            [ H.text "Enter the address of a site that contains one or more feeds. "
-            , H.text "Make sure it starts with "
-            , H.code [] [ H.text "http://" ]
-            , H.text " or "
-            , H.code [] [ H.text "https://" ]
-            , H.text "."
-            ]
-        ]
-
-
-discoverFeedFieldset : Html Msg
-discoverFeedFieldset =
-    H.fieldset [ A.class "border-2 p-2" ]
-        [ H.legend [] [ H.text "Add feed by address" ]
-        , H.form [ A.method "GET", A.action "/feeds/new/" ]
-            [ H.label [ A.for "add-feed-url" ] [ H.text "Address of the feed" ]
-            , H.input
-                [ A.id "add-feed-url"
-                , A.type_ "url"
-                , A.name "url"
-                ]
-                []
-            , H.input
-                [ A.class "px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
-                , A.type_ "submit"
-                , A.value "Discover"
-                ]
-                []
-            ]
-        , H.p []
-            [ H.text "Enter the address of an RSS or Atom feed. "
-            , H.text "Make sure it starts with "
-            , H.code [] [ H.text "http://" ]
-            , H.text " or "
-            , H.code [] [ H.text "https://" ]
-            , H.text "."
-            ]
-        ]
 
 
 inProgressFieldset : String -> Html Msg

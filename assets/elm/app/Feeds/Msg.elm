@@ -2,7 +2,6 @@ module Feeds.Msg exposing (Msg(..))
 
 import Feeds.Addition as Addition
 import Feeds.Discovery as Discovery
-import Feeds.Model exposing (..)
 import Types.Feed exposing (..)
 
 
