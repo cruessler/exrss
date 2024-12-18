@@ -10,9 +10,21 @@ defmodule ExRssWeb.FeedLive.Index do
         %{"api_token" => api_token, "current_user" => current_user} = _session,
         socket
       ) do
-    oldest_unread_entry = User.oldest_unread_entry(current_user.id)
+    socket =
+      socket
+      |> assign(:current_user, current_user)
+      |> assign(:api_token, api_token)
+      |> assign_feeds()
 
-    current_user = Repo.get!(User, current_user.id)
+    {:ok, socket}
+  end
+
+  def assign_feeds(socket, opts \\ []) do
+    user_id = socket.assigns.current_user.id
+
+    oldest_unread_entry = User.oldest_unread_entry(user_id)
+
+    current_user = Repo.get!(User, socket.assigns.current_user.id)
 
     feeds_of_current_user = current_user |> Ecto.assoc(:feeds)
 
@@ -53,17 +65,12 @@ defmodule ExRssWeb.FeedLive.Index do
     number_of_feeds_with_error =
       feeds |> Enum.count(& &1.has_error)
 
-    socket =
-      socket
-      |> assign(:current_user, current_user)
-      |> assign(:api_token, api_token)
-      |> assign(:oldest_unread_entry, oldest_unread_entry)
-      |> assign(:number_of_unread_entries, number_of_unread_entries)
-      |> assign(:number_of_read_entries, number_of_read_entries)
-      |> assign(:number_of_feeds_with_error, number_of_feeds_with_error)
-      |> stream(:feeds, feeds)
-
-    {:ok, socket}
+    socket
+    |> assign(:oldest_unread_entry, oldest_unread_entry)
+    |> assign(:number_of_unread_entries, number_of_unread_entries)
+    |> assign(:number_of_read_entries, number_of_read_entries)
+    |> assign(:number_of_feeds_with_error, number_of_feeds_with_error)
+    |> stream(:feeds, feeds, opts)
   end
 
   def handle_event("mark_as_read", %{"entry-id" => entry_id}, socket) do
@@ -78,45 +85,6 @@ defmodule ExRssWeb.FeedLive.Index do
 
     case Repo.update(changeset) do
       {:ok, entry} ->
-        feeds_of_current_user = current_user |> Ecto.assoc(:feeds)
-
-        feeds_with_counts =
-          from(
-            f in feeds_of_current_user,
-            join: e in Entry,
-            on: f.id == e.feed_id,
-            group_by: f.id,
-            order_by: [
-              desc_nulls_last: f.position,
-              desc_nulls_last: selected_as(:newest_unread_entry_posted_at)
-            ],
-            select: %{
-              f
-              | unread_entries_count: filter(count(e.id), e.read == false),
-                read_entries_count: filter(count(e.id), e.read == true),
-                newest_unread_entry_posted_at:
-                  filter(max(e.posted_at), e.read == false)
-                  |> selected_as(:newest_unread_entry_posted_at),
-                has_error: f.retries > 0
-            }
-          )
-
-        feeds =
-          feeds_with_counts
-          |> Repo.all()
-          |> Repo.preload(
-            entries: from(e in Entry, where: e.read == false, order_by: [desc: e.posted_at])
-          )
-
-        number_of_unread_entries =
-          feeds |> List.foldl(0, fn feed, acc -> feed.unread_entries_count + acc end)
-
-        number_of_read_entries =
-          feeds |> List.foldl(0, fn feed, acc -> feed.read_entries_count + acc end)
-
-        number_of_feeds_with_error =
-          feeds |> Enum.count(& &1.has_error)
-
         feed_with_counts_query =
           from(
             f in Feed,
@@ -147,16 +115,9 @@ defmodule ExRssWeb.FeedLive.Index do
           [updated_feed]
         )
 
-        oldest_unread_entry =
-          User.oldest_unread_entry(socket.assigns.current_user.id)
-
         socket =
           socket
-          |> assign(:oldest_unread_entry, oldest_unread_entry)
-          |> assign(:number_of_unread_entries, number_of_unread_entries)
-          |> assign(:number_of_read_entries, number_of_read_entries)
-          |> assign(:number_of_feeds_with_error, number_of_feeds_with_error)
-          |> stream(:feeds, feeds, reset: true)
+          |> assign_feeds(reset: true)
 
         {:noreply, socket}
 
@@ -178,45 +139,6 @@ defmodule ExRssWeb.FeedLive.Index do
 
     case Repo.update(changeset) do
       {:ok, feed} ->
-        feeds_of_current_user = current_user |> Ecto.assoc(:feeds)
-
-        feeds_with_counts =
-          from(
-            f in feeds_of_current_user,
-            join: e in Entry,
-            on: f.id == e.feed_id,
-            group_by: f.id,
-            order_by: [
-              desc_nulls_last: f.position,
-              desc_nulls_last: selected_as(:newest_unread_entry_posted_at)
-            ],
-            select: %{
-              f
-              | unread_entries_count: filter(count(e.id), e.read == false),
-                read_entries_count: filter(count(e.id), e.read == true),
-                newest_unread_entry_posted_at:
-                  filter(max(e.posted_at), e.read == false)
-                  |> selected_as(:newest_unread_entry_posted_at),
-                has_error: f.retries > 0
-            }
-          )
-
-        feeds =
-          feeds_with_counts
-          |> Repo.all()
-          |> Repo.preload(
-            entries: from(e in Entry, where: e.read == false, order_by: [desc: e.posted_at])
-          )
-
-        number_of_unread_entries =
-          feeds |> List.foldl(0, fn feed, acc -> feed.unread_entries_count + acc end)
-
-        number_of_read_entries =
-          feeds |> List.foldl(0, fn feed, acc -> feed.read_entries_count + acc end)
-
-        number_of_feeds_with_error =
-          feeds |> Enum.count(& &1.has_error)
-
         feed_with_counts_query =
           from(
             f in Feed,
@@ -247,16 +169,9 @@ defmodule ExRssWeb.FeedLive.Index do
           [updated_feed]
         )
 
-        oldest_unread_entry =
-          User.oldest_unread_entry(socket.assigns.current_user.id)
-
         socket =
           socket
-          |> assign(:oldest_unread_entry, oldest_unread_entry)
-          |> assign(:number_of_unread_entries, number_of_unread_entries)
-          |> assign(:number_of_read_entries, number_of_read_entries)
-          |> assign(:number_of_feeds_with_error, number_of_feeds_with_error)
-          |> stream(:feeds, feeds, reset: true)
+          |> assign_feeds(reset: true)
 
         {:noreply, socket}
 
@@ -281,55 +196,9 @@ defmodule ExRssWeb.FeedLive.Index do
 
     case Repo.transaction(multi) do
       {:ok, %{feed: _}} ->
-        feeds_of_current_user = current_user |> Ecto.assoc(:feeds)
-
-        feeds_with_counts =
-          from(
-            f in feeds_of_current_user,
-            join: e in Entry,
-            on: f.id == e.feed_id,
-            group_by: f.id,
-            order_by: [
-              desc_nulls_last: f.position,
-              desc_nulls_last: selected_as(:newest_unread_entry_posted_at)
-            ],
-            select: %{
-              f
-              | unread_entries_count: filter(count(e.id), e.read == false),
-                read_entries_count: filter(count(e.id), e.read == true),
-                newest_unread_entry_posted_at:
-                  filter(max(e.posted_at), e.read == false)
-                  |> selected_as(:newest_unread_entry_posted_at),
-                has_error: f.retries > 0
-            }
-          )
-
-        feeds =
-          feeds_with_counts
-          |> Repo.all()
-          |> Repo.preload(
-            entries: from(e in Entry, where: e.read == false, order_by: [desc: e.posted_at])
-          )
-
-        number_of_unread_entries =
-          feeds |> List.foldl(0, fn feed, acc -> feed.unread_entries_count + acc end)
-
-        number_of_read_entries =
-          feeds |> List.foldl(0, fn feed, acc -> feed.read_entries_count + acc end)
-
-        number_of_feeds_with_error =
-          feeds |> Enum.count(& &1.has_error)
-
-        oldest_unread_entry =
-          User.oldest_unread_entry(socket.assigns.current_user.id)
-
         socket =
           socket
-          |> assign(:oldest_unread_entry, oldest_unread_entry)
-          |> assign(:number_of_unread_entries, number_of_unread_entries)
-          |> assign(:number_of_read_entries, number_of_read_entries)
-          |> assign(:number_of_feeds_with_error, number_of_feeds_with_error)
-          |> stream(:feeds, feeds, reset: true)
+          |> assign_feeds(reset: true)
 
         {:noreply, socket}
 
@@ -347,47 +216,6 @@ defmodule ExRssWeb.FeedLive.Index do
 
     case Repo.update(changeset) do
       {:ok, feed} ->
-        current_user = Repo.get!(User, socket.assigns.current_user.id)
-
-        feeds_of_current_user = current_user |> Ecto.assoc(:feeds)
-
-        feeds_with_counts =
-          from(
-            f in feeds_of_current_user,
-            join: e in Entry,
-            on: f.id == e.feed_id,
-            group_by: f.id,
-            order_by: [
-              desc_nulls_last: f.position,
-              desc_nulls_last: selected_as(:newest_unread_entry_posted_at)
-            ],
-            select: %{
-              f
-              | unread_entries_count: filter(count(e.id), e.read == false),
-                read_entries_count: filter(count(e.id), e.read == true),
-                newest_unread_entry_posted_at:
-                  filter(max(e.posted_at), e.read == false)
-                  |> selected_as(:newest_unread_entry_posted_at),
-                has_error: f.retries > 0
-            }
-          )
-
-        feeds =
-          feeds_with_counts
-          |> Repo.all()
-          |> Repo.preload(
-            entries: from(e in Entry, where: e.read == false, order_by: [desc: e.posted_at])
-          )
-
-        number_of_unread_entries =
-          feeds |> List.foldl(0, fn feed, acc -> feed.unread_entries_count + acc end)
-
-        number_of_read_entries =
-          feeds |> List.foldl(0, fn feed, acc -> feed.read_entries_count + acc end)
-
-        number_of_feeds_with_error =
-          feeds |> Enum.count(& &1.has_error)
-
         feed_with_counts_query =
           from(
             f in Feed,
@@ -418,16 +246,9 @@ defmodule ExRssWeb.FeedLive.Index do
           [updated_feed]
         )
 
-        oldest_unread_entry =
-          User.oldest_unread_entry(socket.assigns.current_user.id)
-
         socket =
           socket
-          |> assign(:oldest_unread_entry, oldest_unread_entry)
-          |> assign(:number_of_unread_entries, number_of_unread_entries)
-          |> assign(:number_of_read_entries, number_of_read_entries)
-          |> assign(:number_of_feeds_with_error, number_of_feeds_with_error)
-          |> stream(:feeds, feeds, reset: true)
+          |> assign_feeds(reset: true)
 
         {:noreply, socket}
 
