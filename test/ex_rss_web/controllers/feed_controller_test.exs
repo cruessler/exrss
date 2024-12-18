@@ -29,6 +29,5 @@ defmodule ExRssWeb.FeedControllerTest do
     response = html_response(conn, 200)
 
     assert response =~ "Hello ExRss!"
-    assert response =~ "data-elm-module=\"App.Feeds\""
   end
 end
