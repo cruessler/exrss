@@ -11,6 +11,8 @@ defmodule ExRssWeb.FeedLive.Index do
         %{"api_token" => api_token, "current_user" => current_user} = _session,
         socket
       ) do
+    ExRssWeb.Endpoint.subscribe("user:#{current_user.id}")
+
     socket =
       socket
       |> assign(:current_user, current_user)
@@ -164,6 +166,10 @@ defmodule ExRssWeb.FeedLive.Index do
       {:error, _error} ->
         {:noreply, socket}
     end
+  end
+
+  def handle_info(%{event: "unread_entries"}, socket) do
+    {:noreply, assign_feeds(socket, reset: true)}
   end
 
   def update_feed_position(feed_id, position, socket) do
