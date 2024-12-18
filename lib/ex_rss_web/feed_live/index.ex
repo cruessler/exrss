@@ -87,42 +87,8 @@ defmodule ExRssWeb.FeedLive.Index do
       |> Entry.changeset(%{"read" => true})
 
     case Repo.update(changeset) do
-      {:ok, entry} ->
-        feed_with_counts_query =
-          from(
-            f in Feed,
-            join: e in Entry,
-            on: f.id == e.feed_id,
-            group_by: f.id,
-            select: %{
-              f
-              | unread_entries_count: filter(count(e.id), e.read == false),
-                read_entries_count: filter(count(e.id), e.read == true),
-                has_error: f.retries > 0
-            }
-          )
-
-        updated_feed =
-          Repo.get!(feed_with_counts_query, entry.feed_id)
-          |> Repo.preload(
-            entries: from(e in Entry, where: e.read == false, order_by: [desc: e.posted_at])
-          )
-
-        update_broadcaster =
-          Application.get_env(:ex_rss, :update_broadcaster, ExRss.Crawler.UpdateBroadcaster)
-
-        Task.Supervisor.start_child(
-          ExRss.TaskSupervisor,
-          update_broadcaster,
-          :broadcast_update,
-          [updated_feed]
-        )
-
-        socket =
-          socket
-          |> assign_feeds(reset: true)
-
-        {:noreply, socket}
+      {:ok, _entry} ->
+        {:noreply, assign_feeds(socket, reset: true)}
 
       _ ->
         {:noreply, socket}
@@ -141,42 +107,8 @@ defmodule ExRssWeb.FeedLive.Index do
       |> Feed.mark_as_read()
 
     case Repo.update(changeset) do
-      {:ok, feed} ->
-        feed_with_counts_query =
-          from(
-            f in Feed,
-            join: e in Entry,
-            on: f.id == e.feed_id,
-            group_by: f.id,
-            select: %{
-              f
-              | unread_entries_count: filter(count(e.id), e.read == false),
-                read_entries_count: filter(count(e.id), e.read == true),
-                has_error: f.retries > 0
-            }
-          )
-
-        updated_feed =
-          Repo.get!(feed_with_counts_query, feed.id)
-          |> Repo.preload(
-            entries: from(e in Entry, where: e.read == false, order_by: [desc: e.posted_at])
-          )
-
-        update_broadcaster =
-          Application.get_env(:ex_rss, :update_broadcaster, ExRss.Crawler.UpdateBroadcaster)
-
-        Task.Supervisor.start_child(
-          ExRss.TaskSupervisor,
-          update_broadcaster,
-          :broadcast_update,
-          [updated_feed]
-        )
-
-        socket =
-          socket
-          |> assign_feeds(reset: true)
-
-        {:noreply, socket}
+      {:ok, _feed} ->
+        {:noreply, assign_feeds(socket, reset: true)}
 
       _ ->
         {:noreply, socket}
@@ -242,42 +174,8 @@ defmodule ExRssWeb.FeedLive.Index do
       |> Feed.changeset(%{"position" => position})
 
     case Repo.update(changeset) do
-      {:ok, feed} ->
-        feed_with_counts_query =
-          from(
-            f in Feed,
-            join: e in Entry,
-            on: f.id == e.feed_id,
-            group_by: f.id,
-            select: %{
-              f
-              | unread_entries_count: filter(count(e.id), e.read == false),
-                read_entries_count: filter(count(e.id), e.read == true),
-                has_error: f.retries > 0
-            }
-          )
-
-        updated_feed =
-          Repo.get!(feed_with_counts_query, feed.id)
-          |> Repo.preload(
-            entries: from(e in Entry, where: e.read == false, order_by: [desc: e.posted_at])
-          )
-
-        update_broadcaster =
-          Application.get_env(:ex_rss, :update_broadcaster, ExRss.Crawler.UpdateBroadcaster)
-
-        Task.Supervisor.start_child(
-          ExRss.TaskSupervisor,
-          update_broadcaster,
-          :broadcast_update,
-          [updated_feed]
-        )
-
-        socket =
-          socket
-          |> assign_feeds(reset: true)
-
-        {:noreply, socket}
+      {:ok, _feed} ->
+        {:noreply, assign_feeds(socket, reset: true)}
 
       _ ->
         {:noreply, socket}
