@@ -3,7 +3,8 @@ defmodule ExRssWeb.FeedLive.Index do
 
   use ExRssWeb, :live_view
 
-  alias ExRss.{Entry, Feed, Repo, User, FeedRemover}
+  alias ExRss.{Entry, Feed, Repo, User}
+  alias ExRss.{FeedAdder, FeedRemover}
 
   def mount(
         _params,
@@ -14,6 +15,8 @@ defmodule ExRssWeb.FeedLive.Index do
       socket
       |> assign(:current_user, current_user)
       |> assign(:api_token, api_token)
+      |> assign(:form, to_form(%{}))
+      |> assign(:discovered_feeds, [])
       |> assign_feeds()
 
     {:ok, socket}
@@ -207,6 +210,30 @@ defmodule ExRssWeb.FeedLive.Index do
     end
   end
 
+  def handle_event("discover_feeds", %{"feed_url" => feed_url}, socket) do
+    case FeedAdder.discover_feeds(feed_url) do
+      {:ok, feeds} ->
+        {:noreply, assign(socket, :discovered_feeds, feeds)}
+
+      {:error, _error} ->
+        {:noreply, socket}
+    end
+  end
+
+  def handle_event("add_feed", feed_params, socket) do
+    multi =
+      Repo.get!(User, socket.assigns.current_user.id)
+      |> FeedAdder.add_feed(feed_params)
+
+    case Repo.transaction(multi) do
+      {:ok, %{feed: _new_feed}} ->
+        {:noreply, assign(socket, :discovered_feeds, [])}
+
+      {:error, _error} ->
+        {:noreply, socket}
+    end
+  end
+
   def update_feed_position(feed_id, position, socket) do
     changeset =
       Repo.get!(User, socket.assigns.current_user.id)
@@ -374,5 +401,16 @@ defmodule ExRssWeb.FeedLive.Index do
       _ ->
         default
     end
+  end
+
+  def format_frequency(%{seconds: seconds, posts: posts}) do
+    duration =
+      if seconds < 2 * 86400 do
+        "#{(seconds / 3600) |> round} hours"
+      else
+        "#{(seconds / 86400) |> round} days"
+      end
+
+    "#{posts} posts in #{duration}"
   end
 end
