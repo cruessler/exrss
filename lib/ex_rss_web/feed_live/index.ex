@@ -196,7 +196,7 @@ defmodule ExRssWeb.FeedLive.Index do
       <li class="flex flex-col md:flex-row">
         <div class="flex flex-col">
           <a href={@entry.url} target="_blank">{@entry.title}</a>
-          <span>{format_updated_at(@entry.posted_at)}</span>
+          <span>{format_timestamp_relative_to_now(@entry.posted_at)}</span>
         </div>
 
         <div class="md:shrink-0 flex self-start mt-1 ml-auto space-x-4">
@@ -250,7 +250,7 @@ defmodule ExRssWeb.FeedLive.Index do
     end
   end
 
-  def format_updated_at(updated_at, attrs \\ []) do
+  def format_timestamp_relative_to_now(updated_at, attrs \\ []) do
     {default, _attrs} = Keyword.pop(attrs, :default, "n/a")
 
     with interval = %Timex.Interval{} <- Timex.Interval.new(from: updated_at, until: Timex.now()) do
@@ -261,17 +261,7 @@ defmodule ExRssWeb.FeedLive.Index do
         Timex.Duration.to_days(duration)
 
       if duration_in_days > 5 do
-        case Timex.format(
-               updated_at,
-               "%B %d, %Y, %k:%M",
-               :strftime
-             ) do
-          {:ok, formatted_updated_at} ->
-            formatted_updated_at
-
-          _ ->
-            default
-        end
+        format_datetime(updated_at, default)
       else
         # There is also a relative formatter provided by Timex in case the code
         # below needs to be changed or improved.
@@ -286,6 +276,23 @@ defmodule ExRssWeb.FeedLive.Index do
         "#{formatted_duration} ago"
       end
     else
+      {:error, :invalid_until} ->
+        format_datetime(updated_at, default)
+
+      _ ->
+        default
+    end
+  end
+
+  defp format_datetime(datetime, default) do
+    case Timex.format(
+           datetime,
+           "%B %d, %Y, %k:%M",
+           :strftime
+         ) do
+      {:ok, formatted_datetime} ->
+        formatted_datetime
+
       _ ->
         default
     end
