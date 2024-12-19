@@ -46,8 +46,7 @@ defmodule ExRssWeb.Router do
 
       scope "/feeds" do
         live "/", FeedLive.Index, :index
-
-        get "/new", FeedController, :new
+        live "/new", FeedLive.New, :new
       end
     end
   end

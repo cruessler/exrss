@@ -1,0 +1,24 @@
+<%= if @candidate do %>
+  <h1 class="text-m">This feed can be added</h1>
+
+  {@candidate.title}
+
+  <small class="inline-block ml-6">{format_frequency(@candidate.frequency)}</small>
+  <p><code>{@candidate.url}</code></p>
+
+  <button
+    class="px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
+    type="button"
+    phx-click="add_feed"
+    phx-value-title={@candidate.title}
+    phx-value-url={@candidate.url}
+  >
+    Add
+  </button>
+<% end %>
+
+<%= if @added_feed do %>
+  <h1 class="text-m">This feed has been added</h1>
+
+  <p><code>{@added_feed.url}</code></p>
+<% end %>
