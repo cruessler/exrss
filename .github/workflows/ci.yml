@@ -66,32 +66,7 @@ jobs:
       - run: mix format --check-formatted
       - run: |
           npx prettier --check "js/**/*.js" "*.mjs"
-          npx elm-format --elm-version=0.19 --validate elm
         working-directory: assets
-
-      - name: Install Elm
-        run: |
-          curl -L -o elm.gz https://github.com/elm/compiler/releases/download/0.19.1/binary-for-linux-64-bit.gz
-          rm elm
-          gunzip elm.gz
-          chmod +x elm
-        working-directory: assets/node_modules/elm/bin
-
-      - name: Precompile Elm entry points
-        run: |
-          # By compiling `NewFeed.elm`, we make sure all intermediate files are
-          # present before `npm run deploy` runs.
-          #
-          # Otherwise, webpack would compile files in parallel which can lead
-          # to data races and let one of the compiler processes fail with an
-          # error about corrupt files.
-          #
-          # 2024-12-18
-          # This is probably not necessary anymore, but since the Elm parts
-          # will soon be completely removed, this doesn’t really matter and we
-          # can leave this step in place, just in case it is still necessary.
-          npx elm make app/App/NewFeed.elm --output /dev/null
-        working-directory: assets/elm
 
       - name: Build [Node.js ${{ matrix.node }}]
         run: |
