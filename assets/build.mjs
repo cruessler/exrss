@@ -1,18 +1,8 @@
 import esbuild from 'esbuild';
-import ElmPlugin from 'esbuild-plugin-elm';
 
 const args = process.argv.slice(2);
 const watch = args.includes('--watch');
 const deploy = args.includes('--deploy');
-
-const plugins = [
-  ElmPlugin({
-    cwd: './elm/',
-    debug: !deploy,
-    optimize: deploy,
-    clearOnWatch: watch,
-  }),
-];
 
 let opts = {
   entryPoints: ['js/app.js'],
@@ -20,7 +10,6 @@ let opts = {
   target: 'es2017',
   outdir: '../priv/static/assets',
   logLevel: 'info',
-  plugins,
 };
 
 if (deploy) {
