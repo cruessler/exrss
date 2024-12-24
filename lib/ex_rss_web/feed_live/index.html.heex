@@ -40,7 +40,7 @@
 
   <ul class="mb-2">
     <li :for={discovered_feed <- @discovered_feeds}>
-      {discovered_feed.title}
+      {discovered_feed.title || "<this feed comes without a title>"}
       <small class="inline-block ml-6">{format_frequency(discovered_feed.frequency)}</small>
       <p><code>{discovered_feed.url}</code></p>
 
@@ -86,7 +86,7 @@
   <li :for={{dom_id, feed} <- @streams.feeds} id={dom_id}>
     <div class="flex">
       <div>
-        <h1 class="mb-2 font-bold">{feed.title}</h1>
+        <h1 class="mb-2 font-bold">{feed.title || "URL: #{feed.url}"}</h1>
 
         <ul class="mb-4">
           <li class="inline-block mr-2">

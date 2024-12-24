@@ -50,7 +50,7 @@ defmodule ExRss.Feed do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:title, :url, :position])
-    |> validate_required([:user_id, :title, :url])
+    |> validate_required([:user_id, :url])
     |> assoc_constraint(:user)
     |> unique_constraint(:url)
   end
@@ -58,7 +58,7 @@ defmodule ExRss.Feed do
   def api_changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:position])
-    |> validate_required([:user_id, :title, :url])
+    |> validate_required([:user_id, :url])
     |> assoc_constraint(:user)
     |> unique_constraint(:url)
   end

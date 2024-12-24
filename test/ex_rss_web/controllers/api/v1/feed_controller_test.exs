@@ -107,7 +107,7 @@ defmodule ExRssWeb.Api.V1.FeedControllerTest do
       |> post("/api/v1/feeds", feed: [title: "", url: ""])
 
     response = json_response(conn, 400)
-    assert %{"errors" => %{"title" => _, "url" => _}} = response
+    assert %{"errors" => %{"url" => _}} = response
   end
 
   test "PATCH /feeds/1 marks entries as read", %{
