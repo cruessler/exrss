@@ -4,8 +4,7 @@
   "scripts": {
     "deploy": "npm run deploy:esbuild && npm run deploy:tailwind",
     "deploy:esbuild": "node build.mjs --deploy",
-    "deploy:tailwind": "npx tailwindcss -i ./css/app.css -o ../priv/static/assets/app.css --minify",
-    "test": "cd elm && npx elm-test"
+    "deploy:tailwind": "npx tailwindcss -i ./css/app.css -o ../priv/static/assets/app.css --minify"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.9",
