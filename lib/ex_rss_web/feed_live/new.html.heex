@@ -1,7 +1,7 @@
 <%= if @candidate do %>
   <h1 class="text-m">This feed can be added</h1>
 
-  {@candidate.title}
+  {@candidate.title || "<this feed comes without a title>"}
 
   <small class="inline-block ml-6">{format_frequency(@candidate.frequency)}</small>
   <p><code>{@candidate.url}</code></p>
