@@ -1,3 +1,0 @@
-<%=
-  elm_module("App.NewFeed", %{url: @url, candidate: @candidate, apiToken: @api_token}, id: "elm-module-app-new-feed")
-%>
