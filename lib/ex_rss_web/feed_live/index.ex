@@ -8,7 +8,7 @@ defmodule ExRssWeb.FeedLive.Index do
 
   def mount(
         _params,
-        %{"api_token" => api_token, "current_user" => current_user} = _session,
+        %{"current_user" => current_user} = _session,
         socket
       ) do
     ExRssWeb.Endpoint.subscribe("user:#{current_user.id}")
@@ -16,7 +16,6 @@ defmodule ExRssWeb.FeedLive.Index do
     socket =
       socket
       |> assign(:current_user, current_user)
-      |> assign(:api_token, api_token)
       |> assign(:form, to_form(%{}))
       |> assign(:discovered_feeds, [])
       |> assign_feeds()

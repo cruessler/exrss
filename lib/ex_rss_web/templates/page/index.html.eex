@@ -3,7 +3,7 @@
 <p role="alert"><%= Phoenix.Flash.get(@flash, :info) %></p>
 <p role="alert"><%= Phoenix.Flash.get(@flash, :error) %></p>
 
-<%= if @current_user do %>
+<%= if assigns[:current_user] do %>
   <p>
     Hello <%= @current_user.email %>!
   </p>
