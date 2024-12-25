@@ -4,11 +4,9 @@ defmodule ExRssWeb.FeedLive.New do
   alias ExRss.{Repo, User}
   alias ExRss.FeedAdder
 
-  def mount(
-        %{"url" => url},
-        %{"current_user" => current_user},
-        socket
-      ) do
+  def mount(%{"url" => url}, _session, socket) do
+    current_user = socket.assigns.current_user
+
     candidate =
       case FeedAdder.discover_feed(url) do
         {:ok, candidate} -> candidate

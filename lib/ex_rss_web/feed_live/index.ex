@@ -6,11 +6,9 @@ defmodule ExRssWeb.FeedLive.Index do
   alias ExRss.{Entry, Feed, Repo, User}
   alias ExRss.{FeedAdder, FeedRemover}
 
-  def mount(
-        _params,
-        %{"current_user" => current_user} = _session,
-        socket
-      ) do
+  def mount(_params, _session, socket) do
+    current_user = socket.assigns.current_user
+
     ExRssWeb.Endpoint.subscribe("user:#{current_user.id}")
 
     socket =

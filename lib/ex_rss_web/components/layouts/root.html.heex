@@ -18,12 +18,52 @@
   </head>
 
   <body class="m-6 grid grid-cols-12">
-    <div class="col-span-12 md:col-start-3 md:col-span-8">
-      <p role="alert">{Phoenix.Flash.get(@flash, :info)}</p>
-      <p role="alert">{Phoenix.Flash.get(@flash, :error)}</p>
+    <header class="col-span-12 md:col-start-3 md:col-span-8">
+      <ul class="relative z-10 flex items-center gap-4 justify-end">
+        <%= if @current_user do %>
+          <li class="text-[0.8125rem] leading-6 text-zinc-900">
+            {@current_user.email}
+          </li>
+          <li>
+            <.link
+              href={~p"/users/settings"}
+              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+            >
+              Settings
+            </.link>
+          </li>
+          <li>
+            <.link
+              href={~p"/users/log_out"}
+              method="delete"
+              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+            >
+              Log out
+            </.link>
+          </li>
+        <% else %>
+          <li>
+            <.link
+              href={~p"/users/register"}
+              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+            >
+              Register
+            </.link>
+          </li>
+          <li>
+            <.link
+              href={~p"/users/log_in"}
+              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+            >
+              Log in
+            </.link>
+          </li>
+        <% end %>
+      </ul>
+    </header>
 
+    <main class="col-span-12 md:col-start-3 md:col-span-8">
       {@inner_content}
-    </div>
-    <!-- /container -->
+    </main>
   </body>
 </html>
