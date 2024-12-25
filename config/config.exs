@@ -20,6 +20,15 @@ config :ex_rss, ExRssWeb.Endpoint,
   render_errors: [view: ExRssWeb.ErrorView, accepts: ~w(html json)],
   pubsub_server: ExRss.PubSub
 
+# Configures the mailer
+#
+# By default it uses the "Local" adapter which stores the emails locally. You
+# can see the emails in your browser, at "/dev/mailbox".
+#
+# For production it's recommended to configure a different adapter at the
+# `config/runtime.exs`.
+config :ex_rss, ExRss.Mailer, adapter: Swoosh.Adapters.Local
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
