@@ -44,6 +44,8 @@ defmodule ExRss.Mixfile do
       {:phoenix_html_helpers, "~> 1.0"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:phoenix_live_view, "~> 1.0"},
+      {:swoosh, "~> 1.4"},
+      {:finch, "~> 0.19"},
       {:gettext, "~> 0.11"},
       {:floki, "~> 0.24"},
       {:feeder_ex, "~> 1.1"},

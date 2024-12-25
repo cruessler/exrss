@@ -8,6 +8,8 @@ defmodule ExRss.Application do
         {Task.Supervisor, name: ExRss.TaskSupervisor},
         ExRss.Repo,
         {Phoenix.PubSub, name: ExRss.PubSub},
+        # Start the Finch HTTP client for sending emails
+        {Finch, name: ExRss.Finch},
         ExRssWeb.Endpoint
       ] ++ workers(Application.get_env(:ex_rss, :start_crawler))
 
