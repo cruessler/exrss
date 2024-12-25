@@ -11,7 +11,7 @@ config :ex_rss, ExRssWeb.Endpoint,
   secret_key_base: String.duplicate("a", 64)
 
 # In test we don't send emails.
-config :lightweight_todo, ExRss.Mailer, adapter: Swoosh.Adapters.Test
+config :ex_rss, ExRss.Mailer, adapter: Swoosh.Adapters.Test
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false

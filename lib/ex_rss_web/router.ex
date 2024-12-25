@@ -8,11 +8,15 @@ defmodule ExRssWeb.Router do
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
+    # TODO 2024-12-25
+    # `fetch_flash` can probably be removed as it seems to have been superseded
+    # by `fetch_live_flash`.
     plug :fetch_flash
     plug :fetch_live_flash
     plug :put_root_layout, {ExRssWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_user
   end
 
   pipeline :api do
@@ -30,32 +34,44 @@ defmodule ExRssWeb.Router do
   end
 
   scope "/", ExRssWeb do
-    # Use the default browser stack
-    pipe_through :browser
+    pipe_through [:browser, :redirect_if_user_is_authenticated]
 
-    get "/", PageController, :index
+    live_session :redirect_if_user_is_authenticated,
+      on_mount: [{ExRssWeb.UserAuth, :redirect_if_user_is_authenticated}] do
+      live "/users/register", UserRegistrationLive, :new
+      live "/users/log_in", UserLoginLive, :new
+      live "/users/reset_password", UserForgotPasswordLive, :new
+      live "/users/reset_password/:token", UserResetPasswordLive, :edit
+    end
 
-    resources "/session",
-              SessionController,
-              only: [:create, :new, :delete],
-              singleton: true
-
-    resources "/users", UserController, only: [:create, :new]
+    post "/users/log_in", UserSessionController, :create
   end
 
   scope "/", ExRssWeb do
-    # 2024-12-24
-    # `:fetch_current_user`, at some point, can probably be moved to the
-    # pipeline `:browser` (that’s where the generator puts it). It is here
-    # because this is the least impactful place when I started the migration to
-    # the generated auth code.
-    pipe_through [:browser, :fetch_current_user, :require_authenticated_user]
+    pipe_through [:browser, :require_authenticated_user]
 
     live_session :require_authenticated_user,
       on_mount: [{ExRssWeb.UserAuth, :ensure_authenticated}] do
+      live "/users/settings", UserSettingsLive, :edit
+      live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+
       live "/feeds", FeedLive.Index, :index
       live "/feeds/new", FeedLive.New, :new
     end
+  end
+
+  scope "/", ExRssWeb do
+    pipe_through [:browser]
+
+    delete "/users/log_out", UserSessionController, :delete
+
+    live_session :current_user,
+      on_mount: [{ExRssWeb.UserAuth, :mount_current_user}] do
+      live "/users/confirm/:token", UserConfirmationLive, :edit
+      live "/users/confirm", UserConfirmationInstructionsLive, :new
+    end
+
+    get "/", PageController, :index
   end
 
   scope "/api", ExRssWeb.Api do

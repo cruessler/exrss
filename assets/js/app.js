@@ -1,3 +1,6 @@
+// Include phoenix_html to handle method=PUT/DELETE in forms and buttons.
+import '../../deps/phoenix_html';
+
 import { Socket } from '../../deps/phoenix';
 import { LiveSocket } from '../../deps/phoenix_live_view';
 
