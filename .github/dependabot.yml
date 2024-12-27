@@ -1,11 +1,5 @@
 version: 2
 updates:
-  - package-ecosystem: elm
-    directory: '/assets/elm'
-    schedule:
-      interval: weekly
-      day: saturday
-
   - package-ecosystem: mix
     directory: '/'
     schedule:
