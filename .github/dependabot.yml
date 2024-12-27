@@ -11,12 +11,20 @@ updates:
     schedule:
       interval: weekly
       day: saturday
+    ignore:
+      # `dependency-name` is required.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
 
   - package-ecosystem: npm
     directory: '/assets'
     schedule:
       interval: weekly
       day: saturday
+    ignore:
+      # `dependency-name` is required.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
 
   - package-ecosystem: github-actions
     directory: '/'
