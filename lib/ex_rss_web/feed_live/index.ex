@@ -186,10 +186,11 @@ defmodule ExRssWeb.FeedLive.Index do
   end
 
   attr :entry, Entry, required: true
+  attr :dom_id, :string, required: true
 
   def entry(assigns) do
     ~H"""
-    <ul class="flex flex-col">
+    <ul id={@dom_id} class="flex flex-col phx-click-loading:opacity-50">
       <li class="flex flex-col md:flex-row">
         <div class="flex flex-col">
           <a href={@entry.url} target="_blank">{@entry.title}</a>
@@ -201,12 +202,16 @@ defmodule ExRssWeb.FeedLive.Index do
             href={@entry.url}
             target="_blank"
             aria-label={"View entry #{@entry.title}"}
-            phx-click="mark_as_read"
+            phx-click={JS.push("mark_as_read", loading: "##{@dom_id}")}
             phx-value-entry-id={@entry.id}
           >
             <.icon name="hero-arrow-top-right-on-square-solid" />
           </a>
-          <button aria-label="Mark as read" phx-click="mark_as_read" phx-value-entry-id={@entry.id}>
+          <button
+            aria-label="Mark as read"
+            phx-click={JS.push("mark_as_read", loading: "##{@dom_id}")}
+            phx-value-entry-id={@entry.id}
+          >
             <.icon name="hero-check-circle-solid" />
           </button>
         </div>
@@ -228,11 +233,11 @@ defmodule ExRssWeb.FeedLive.Index do
       ~H"""
       <ul class="mb-6 flex flex-col space-y-4">
         <li :for={entry <- @head_entries}>
-          <.entry entry={entry} />
+          <.entry entry={entry} dom_id={"entry-#{entry.id}"} />
         </li>
         <div>{@number_of_entries_not_shown} entries not shown</div>
         <li :for={entry <- @tail_entries}>
-          <.entry entry={entry} />
+          <.entry entry={entry} dom_id={"entry-#{entry.id}"} />
         </li>
       </ul>
       """
@@ -240,7 +245,7 @@ defmodule ExRssWeb.FeedLive.Index do
       ~H"""
       <ul class="mb-6 flex flex-col space-y-4">
         <li :for={entry <- @entries}>
-          <.entry entry={entry} />
+          <.entry entry={entry} dom_id={"entry-#{entry.id}"} />
         </li>
       </ul>
       """
