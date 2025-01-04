@@ -76,7 +76,7 @@
 
 <div class="mb-6">
   <%= if @oldest_unread_entry do %>
-    <.entry entry={@oldest_unread_entry} />
+    <.entry entry={@oldest_unread_entry} dom_id="entry-oldest-unread" />
   <% else %>
     <div>No entry found</div>
   <% end %>
