@@ -47,6 +47,9 @@ config :ex_rss, ExRssWeb.Endpoint,
     ]
   ]
 
+# Enable dev routes for dashboard and mailbox
+config :ex_rss, dev_routes: true
+
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
 config :phoenix, :stacktrace_depth, 20
