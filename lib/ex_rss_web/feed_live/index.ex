@@ -68,6 +68,7 @@ defmodule ExRssWeb.FeedLive.Index do
       feeds |> Enum.count(& &1.has_error)
 
     socket
+    |> assign(:page_title, "#{number_of_unread_entries} unread")
     |> assign(:oldest_unread_entry, oldest_unread_entry)
     |> assign(:number_of_unread_entries, number_of_unread_entries)
     |> assign(:number_of_read_entries, number_of_read_entries)
