@@ -86,13 +86,18 @@ defmodule ExRssWeb.FeedLive.Index do
       |> Repo.get!(entry_id)
       |> Entry.changeset(%{"read" => true})
 
-    case Repo.update(changeset) do
-      {:ok, _entry} ->
-        {:noreply, assign_feeds(socket, reset: true)}
+    socket =
+      case Repo.update(changeset) do
+        {:ok, entry} ->
+          socket
+          |> assign_feeds(reset: true)
+          |> put_flash(:info, "Entry “#{entry.title}” marked as read")
 
-      _ ->
-        {:noreply, socket}
-    end
+        _ ->
+          socket
+      end
+
+    {:noreply, socket}
   end
 
   def handle_event("mark_as_read", %{"feed-id" => feed_id}, socket) do
@@ -106,13 +111,20 @@ defmodule ExRssWeb.FeedLive.Index do
       |> Repo.preload(:entries)
       |> Feed.mark_as_read()
 
-    case Repo.update(changeset) do
-      {:ok, _feed} ->
-        {:noreply, assign_feeds(socket, reset: true)}
+    socket =
+      case Repo.update(changeset) do
+        {:ok, feed} ->
+          socket
+          |> assign_feeds(reset: true)
+          # TODO
+          # Handle case where feed does not have a title.
+          |> put_flash(:info, "Feed “#{feed.title}” marked as read")
 
-      _ ->
-        {:noreply, socket}
-    end
+        _ ->
+          socket
+      end
+
+    {:noreply, socket}
   end
 
   def handle_event("pin_feed", %{"feed-id" => feed_id}, socket) do

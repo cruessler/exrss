@@ -1,8 +1,5 @@
 <h1>Welcome to ExRss!</h1>
 
-<p role="alert"><%= Phoenix.Flash.get(@flash, :info) %></p>
-<p role="alert"><%= Phoenix.Flash.get(@flash, :error) %></p>
-
 <%= if assigns[:current_user] do %>
   <p>
     Hello <%= @current_user.email %>!
