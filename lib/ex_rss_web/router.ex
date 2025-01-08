@@ -8,10 +8,6 @@ defmodule ExRssWeb.Router do
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
-    # TODO 2024-12-25
-    # `fetch_flash` can probably be removed as it seems to have been superseded
-    # by `fetch_live_flash`.
-    plug :fetch_flash
     plug :fetch_live_flash
     plug :put_root_layout, {ExRssWeb.Layouts, :root}
     plug :protect_from_forgery
