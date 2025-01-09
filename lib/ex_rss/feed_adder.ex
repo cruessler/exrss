@@ -35,6 +35,13 @@ defmodule ExRss.FeedAdder do
          {:ok, raw_feed} <- Feed.parse(response.body) do
       candidate = extract_candidate(raw_feed)
 
+      candidate =
+        if is_nil(candidate.url) do
+          Map.put(candidate, :url, url)
+        else
+          candidate
+        end
+
       {:ok, candidate}
     else
       i when is_integer(i) ->
