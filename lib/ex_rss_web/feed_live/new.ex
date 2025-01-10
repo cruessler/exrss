@@ -40,18 +40,21 @@ defmodule ExRssWeb.FeedLive.New do
       Repo.get!(User, socket.assigns.current_user.id)
       |> FeedAdder.add_feed(feed_params)
 
-    case Repo.transaction(multi) do
-      {:ok, %{feed: added_feed}} ->
-        socket =
+    socket =
+      case Repo.transaction(multi) do
+        {:ok, %{feed: added_feed}} ->
           socket
           |> assign(:candidate, nil)
           |> assign(:added_feed, added_feed)
+          # TODO
+          # Handle case where feed does not have a title.
+          |> put_flash(:info, "Feed “#{added_feed.title}” was added")
 
-        {:noreply, socket}
+        {:error, _error} ->
+          socket
+      end
 
-      {:error, _error} ->
-        {:noreply, socket}
-    end
+    {:noreply, socket}
   end
 
   def format_frequency(%{seconds: seconds, posts: posts}) do
