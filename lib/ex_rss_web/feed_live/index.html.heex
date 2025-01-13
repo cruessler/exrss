@@ -1,61 +1,68 @@
-<h1 class="text-m">Discover feeds on a site</h1>
-
-<.form for={@form} class="flex flex-row space-x-6" phx-submit="discover_feeds">
-  <div class="grow">
-    <.input type="url" field={@form[:feed_url]} label="Address to discover feeds on" />
+<div id="add-feeds-forms" class="border rounded-md p-4">
+  <div class="flex">
+    <h1 class="text-m">Discover feeds on a site</h1>
+    <a class="ml-auto" phx-click={JS.show(to: "#add-feeds-forms")}>Open</a>
   </div>
 
-  <button class="self-end px-4 py-2 text-sm font-extrabold bg-blue-700 text-white">
-    Discover
-  </button>
-</.form>
+  <div id="add-feeds-forms" class="hidden">
+    <.form for={@form} class="flex flex-row space-x-6" phx-submit="discover_feeds">
+      <div class="grow">
+        <.input type="url" field={@form[:feed_url]} label="Address to discover feeds on" />
+      </div>
 
-<p>
-  Enter the address of a site that contains one or more feeds. Make sure it starts with
-  <code>http://</code>
-  or <code>https://</code>.
-</p>
-
-<h1 class="text-m">Add feed by address</h1>
-
-<form method="GET" action="/feeds/new/" class="flex flex-row space-x-6">
-  <div class="grow">
-    <.input type="url" name="url" value="" label="Address of the feed" />
-  </div>
-
-  <input
-    class="self-end px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
-    type="submit"
-    value="Discover"
-  />
-</form>
-
-<p>
-  Enter the address of an RSS or Atom feed. Make sure it starts with <code>http://</code>
-  or <code>https://</code>.
-</p>
-
-<%= if length(@discovered_feeds) > 0 do %>
-  <h1 class="text-m">These feeds can be added</h1>
-
-  <ul class="mb-2">
-    <li :for={discovered_feed <- @discovered_feeds}>
-      {discovered_feed.title || "<this feed comes without a title>"}
-      <small class="inline-block ml-6">{format_frequency(discovered_feed.frequency)}</small>
-      <p><code>{discovered_feed.url}</code></p>
-
-      <button
-        class="px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
-        type="button"
-        phx-click="add_feed"
-        phx-value-title={discovered_feed.title}
-        phx-value-url={discovered_feed.url}
-      >
-        Add
+      <button class="self-end px-4 py-2 text-sm font-extrabold bg-blue-700 text-white">
+        Discover
       </button>
-    </li>
-  </ul>
-<% end %>
+    </.form>
+
+    <p>
+      Enter the address of a site that contains one or more feeds. Make sure it starts with
+      <code>http://</code>
+      or <code>https://</code>.
+    </p>
+
+    <h1 class="text-m">Add feed by address</h1>
+
+    <form method="GET" action="/feeds/new/" class="flex flex-row space-x-6">
+      <div class="grow">
+        <.input type="url" name="url" value="" label="Address of the feed" />
+      </div>
+
+      <input
+        class="self-end px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
+        type="submit"
+        value="Discover"
+      />
+    </form>
+
+    <p>
+      Enter the address of an RSS or Atom feed. Make sure it starts with <code>http://</code>
+      or <code>https://</code>.
+    </p>
+
+    <%= if length(@discovered_feeds) > 0 do %>
+      <h1 class="text-m">These feeds can be added</h1>
+
+      <ul class="mb-2">
+        <li :for={discovered_feed <- @discovered_feeds}>
+          {discovered_feed.title || "<this feed comes without a title>"}
+          <small class="inline-block ml-6">{format_frequency(discovered_feed.frequency)}</small>
+          <p><code>{discovered_feed.url}</code></p>
+
+          <button
+            class="px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
+            type="button"
+            phx-click="add_feed"
+            phx-value-title={discovered_feed.title}
+            phx-value-url={discovered_feed.url}
+          >
+            Add
+          </button>
+        </li>
+      </ul>
+    <% end %>
+  </div>
+</div>
 
 <ul class="flex space-x-2 my-2">
   <li>
