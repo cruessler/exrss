@@ -6,6 +6,7 @@ defmodule ExRssWeb.FeedLive.Index do
   alias ExRss.{Entry, Feed, Repo, User}
   alias ExRss.{FeedAdder, FeedRemover}
 
+  @impl true
   def mount(_params, _session, socket) do
     current_user = socket.assigns.current_user
 
@@ -76,6 +77,7 @@ defmodule ExRssWeb.FeedLive.Index do
     |> stream(:feeds, feeds, opts)
   end
 
+  @impl true
   def handle_event("mark_as_read", %{"entry-id" => entry_id}, socket) do
     current_user =
       Repo.get!(User, socket.assigns.current_user.id)
@@ -178,6 +180,7 @@ defmodule ExRssWeb.FeedLive.Index do
     end
   end
 
+  @impl true
   def handle_info(%{event: "unread_entries"}, socket) do
     {:noreply, assign_feeds(socket, reset: true)}
   end
