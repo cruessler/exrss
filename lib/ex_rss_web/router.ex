@@ -67,6 +67,7 @@ defmodule ExRssWeb.Router do
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
 
       live "/feeds", FeedLive.Index, :index
+      live "/feeds/discover", FeedLive.Index, :discover
       live "/feeds/new", FeedLive.New, :new
     end
   end

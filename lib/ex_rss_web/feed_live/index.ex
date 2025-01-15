@@ -22,6 +22,11 @@ defmodule ExRssWeb.FeedLive.Index do
     {:ok, socket}
   end
 
+  @impl true
+  def handle_params(_params, _url, socket) do
+    {:noreply, socket}
+  end
+
   def assign_feeds(socket, opts \\ []) do
     user_id = socket.assigns.current_user.id
 
