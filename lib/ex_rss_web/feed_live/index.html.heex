@@ -1,68 +1,67 @@
-<div id="add-feeds-forms" class="border rounded-md p-4">
-  <div class="flex">
-    <h1 class="text-m">Discover feeds on a site</h1>
-    <a class="ml-auto" phx-click={JS.show(to: "#add-feeds-forms")}>Open</a>
-  </div>
+<.link patch={~p"/feeds/discover"}>
+  <.button>Discover feeds</.button>
+</.link>
 
-  <div id="add-feeds-forms" class="hidden">
-    <.form for={@form} class="flex flex-row space-x-6" phx-submit="discover_feeds">
-      <div class="grow">
-        <.input type="url" field={@form[:feed_url]} label="Address to discover feeds on" />
-      </div>
+<.modal :if={@live_action == :discover} id="add-feeds-modal" show on_cancel={JS.patch(~p"/feeds")}>
+  <h1 class="text-m">Discover feeds on a site</h1>
 
-      <button class="self-end px-4 py-2 text-sm font-extrabold bg-blue-700 text-white">
-        Discover
-      </button>
-    </.form>
+  <.form for={@form} class="flex flex-row space-x-6" phx-submit="discover_feeds">
+    <div class="grow">
+      <.input type="url" field={@form[:feed_url]} label="Address to discover feeds on" />
+    </div>
 
-    <p>
-      Enter the address of a site that contains one or more feeds. Make sure it starts with
-      <code>http://</code>
-      or <code>https://</code>.
-    </p>
+    <button class="self-end px-4 py-2 text-sm font-extrabold bg-blue-700 text-white">
+      Discover
+    </button>
+  </.form>
 
-    <h1 class="text-m">Add feed by address</h1>
+  <p>
+    Enter the address of a site that contains one or more feeds. Make sure it starts with
+    <code>http://</code>
+    or <code>https://</code>.
+  </p>
 
-    <form method="GET" action="/feeds/new/" class="flex flex-row space-x-6">
-      <div class="grow">
-        <.input type="url" name="url" value="" label="Address of the feed" />
-      </div>
+  <h1 class="text-m">Add feed by address</h1>
 
-      <input
-        class="self-end px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
-        type="submit"
-        value="Discover"
-      />
-    </form>
+  <form method="GET" action="/feeds/new/" class="flex flex-row space-x-6">
+    <div class="grow">
+      <.input type="url" name="url" value="" label="Address of the feed" />
+    </div>
 
-    <p>
-      Enter the address of an RSS or Atom feed. Make sure it starts with <code>http://</code>
-      or <code>https://</code>.
-    </p>
+    <input
+      class="self-end px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
+      type="submit"
+      value="Discover"
+    />
+  </form>
 
-    <%= if length(@discovered_feeds) > 0 do %>
-      <h1 class="text-m">These feeds can be added</h1>
+  <p>
+    Enter the address of an RSS or Atom feed. Make sure it starts with <code>http://</code>
+    or <code>https://</code>.
+  </p>
 
-      <ul class="mb-2">
-        <li :for={discovered_feed <- @discovered_feeds}>
-          {discovered_feed.title || "<this feed comes without a title>"}
-          <small class="inline-block ml-6">{format_frequency(discovered_feed.frequency)}</small>
-          <p><code>{discovered_feed.url}</code></p>
+  <%= if length(@discovered_feeds) > 0 do %>
+    <h1 class="text-m">These feeds can be added</h1>
 
-          <button
-            class="px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
-            type="button"
-            phx-click="add_feed"
-            phx-value-title={discovered_feed.title}
-            phx-value-url={discovered_feed.url}
-          >
-            Add
-          </button>
-        </li>
-      </ul>
-    <% end %>
-  </div>
-</div>
+    <ul class="mb-2">
+      <li :for={discovered_feed <- @discovered_feeds}>
+        {discovered_feed.title || "<this feed comes without a title>"}
+        <small class="inline-block ml-6">{format_frequency(discovered_feed.frequency)}</small>
+        <p><code>{discovered_feed.url}</code></p>
+
+        <button
+          class="px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
+          type="button"
+          phx-click="add_feed"
+          phx-value-title={discovered_feed.title}
+          phx-value-url={discovered_feed.url}
+        >
+          Add
+        </button>
+      </li>
+    </ul>
+  <% end %>
+</.modal>
 
 <ul class="flex space-x-2 my-2">
   <li>
