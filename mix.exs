@@ -76,10 +76,11 @@ defmodule ExRss.Mixfile do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "ecto.setup", "cmd --cd assets npm install"],
+      setup: ["deps.get", "ecto.setup", "assets.setup"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate", "test"],
+      "assets.setup": ["cmd --cd assets npm install"],
       "assets.deploy": ["cmd --cd assets npm run deploy", "phx.digest"]
     ]
   end
