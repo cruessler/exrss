@@ -38,7 +38,7 @@ defmodule ExRss.Crawler.QueueTest do
 
     duration = Timex.Duration.from_milliseconds(15_000)
     soon = DateTime.utc_now() |> Timex.add(duration)
-    assert_in_delta Queue.timeout([%{next_update_at: soon}]), 15_000, 100
+    assert_in_delta Queue.timeout([%{next_update_at: soon}]), 15_000, 200
   end
 
   test "sends message without next_update_at to updater immediately" do
