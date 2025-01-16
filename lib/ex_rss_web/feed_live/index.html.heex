@@ -96,18 +96,6 @@
         <h2 class="hidden md:block md:mb-2 text-gray-400">
           {feed.url}
         </h2>
-
-        <ul class="mb-4">
-          <li class="inline-block mr-2 px-3 py-1 border rounded-full border-blue-500 bg-blue-200">
-            {feed.read_entries_count + feed.unread_entries_count} entries
-          </li>
-          <li class="inline-block mr-2 px-3 py-1 border rounded-full border-lime-400 bg-lime-100">
-            {feed.unread_entries_count} unread
-          </li>
-          <li class="inline-block mr-2 px-3 py-1 border rounded-full border-stone-500 bg-stone-200">
-            last update {format_timestamp_relative_to_now(feed.last_successful_update_at)}
-          </li>
-        </ul>
       </div>
 
       <div class="md:shrink-0 flex self-start justify-end mt-1 ml-auto space-x-4">
@@ -160,6 +148,18 @@
         </button>
       </div>
     </div>
+
+    <ul class="mb-4 flex flex-wrap gap-y-2">
+      <li class="inline-block mr-2 px-3 py-1 border rounded-full border-blue-500 bg-blue-200">
+        {feed.read_entries_count + feed.unread_entries_count} entries
+      </li>
+      <li class="inline-block mr-2 px-3 py-1 border rounded-full border-lime-400 bg-lime-100">
+        {feed.unread_entries_count} unread
+      </li>
+      <li class="inline-block mr-2 px-3 py-1 border rounded-full border-stone-500 bg-stone-200">
+        last update {format_timestamp_relative_to_now(feed.last_successful_update_at)}
+      </li>
+    </ul>
 
     <.entries entries={feed.entries} />
   </li>

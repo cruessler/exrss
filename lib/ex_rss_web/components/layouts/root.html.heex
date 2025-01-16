@@ -12,9 +12,9 @@
     </script>
   </head>
 
-  <body class="m-6 grid grid-cols-12">
-    <header class="col-span-12 md:col-start-3 md:col-span-8">
-      <ul class="relative z-10 flex items-center gap-4 justify-end">
+  <body class="mx-6 grid grid-cols-12">
+    <header class="col-span-12 md:col-start-2 md:col-span-10 lg:col-start-3 lg:col-span-8 xl:col-start-4 xl:col-span-6">
+      <ul class="relative z-10 flex flex-wrap items-center gap-x-4 justify-end">
         <%= if @current_user do %>
           <li class="text-[0.8125rem] leading-6 text-zinc-900">
             {@current_user.email}
@@ -57,7 +57,7 @@
       </ul>
     </header>
 
-    <main class="col-span-12 md:col-start-3 md:col-span-8">
+    <main class="col-span-12 md:col-start-2 md:col-span-10 lg:col-start-3 lg:col-span-8 xl:col-start-4 xl:col-span-6">
       {@inner_content}
     </main>
   </body>
