@@ -64,10 +64,12 @@
 </.modal>
 
 <ul class="flex space-x-2 my-2">
-  <li>
+  <li class="inline-block mr-2 px-3 py-1 border rounded-full border-blue-500 bg-blue-200">
     {@number_of_unread_entries + @number_of_read_entries} entries
   </li>
-  <li>{@number_of_unread_entries} unread</li>
+  <li class="inline-block mr-2 px-3 py-1 border rounded-full border-lime-400 bg-lime-100">
+    {@number_of_unread_entries} unread
+  </li>
   <li>
     <%= if @number_of_feeds_with_error == 1 do %>
       1 feed had errors when it was last updated
