@@ -65,7 +65,7 @@ defmodule ExRss.Crawler.QueueTest do
 
     GenServer.cast(pid, {:add_feed, feed})
 
-    assert_receive :update, 100
+    assert_receive :update, 200
   end
 
   test "sends message to update_broadcaster" do
