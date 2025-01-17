@@ -142,6 +142,8 @@ defmodule ExRss.FeedAdderTest do
   test "doesn’t extract frequency info when no publication dates are given" do
     {:ok, raw_feed, _} = FeederEx.parse(@rss_whithout_pubdate)
 
-    assert is_nil(FeedAdder.extract_frequency_info(raw_feed))
+    frequency_info = FeedAdder.extract_frequency_info(raw_feed)
+
+    assert %{posts: 1, seconds: :not_available} = frequency_info
   end
 end
