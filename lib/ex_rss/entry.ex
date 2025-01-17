@@ -71,10 +71,15 @@ defmodule ExRss.Entry do
     "%Y-%m-%dT%H:%M:%S.%L%:z",
     # 2019-01-17T00:00:00Z
     "%Y-%m-%dT%H:%M:%SZ",
+    # Beware the difference between trailing `%z` and `%:z`.
+    # 2022-07-09T15:00:00+0000
+    "%Y-%m-%dT%H:%M:%S%z",
+
     # Internet date/time format as specified by RFC 3339
     # See https://tools.ietf.org/html/rfc3339
     # 2018-01-13T19:05:08+00:00
     "%Y-%m-%dT%H:%M:%S%:z",
+
     # 2021-11-06
     # Make sure this comes after other formats that this format is a substring
     # of.
