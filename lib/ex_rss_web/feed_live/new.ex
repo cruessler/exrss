@@ -57,6 +57,9 @@ defmodule ExRssWeb.FeedLive.New do
     {:noreply, socket}
   end
 
+  def format_frequency(%{seconds: :not_available, posts: posts}),
+    do: "#{posts} posts, no frequency info available"
+
   def format_frequency(%{seconds: seconds, posts: posts}) do
     duration =
       if seconds < 2 * 86400 do

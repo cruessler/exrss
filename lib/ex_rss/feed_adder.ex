@@ -150,6 +150,8 @@ defmodule ExRss.FeedAdder do
     %{posts: 3, seconds: 97362}
   """
   def extract_frequency_info(raw_feed) do
+    posts = Enum.count(raw_feed.entries)
+
     entries =
       raw_feed.entries
       |> Enum.flat_map(fn e ->
@@ -162,9 +164,9 @@ defmodule ExRss.FeedAdder do
     try do
       {min_date, max_date} = Enum.min_max_by(entries, &Timex.to_gregorian_microseconds/1)
 
-      %{posts: Enum.count(entries), seconds: Timex.diff(max_date, min_date, :seconds)}
+      %{posts: posts, seconds: Timex.diff(max_date, min_date, :seconds)}
     rescue
-      Enum.EmptyError -> nil
+      Enum.EmptyError -> %{posts: posts, seconds: :not_available}
     end
   end
 end
