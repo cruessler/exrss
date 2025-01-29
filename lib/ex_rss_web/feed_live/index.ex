@@ -30,6 +30,7 @@ defmodule ExRssWeb.FeedLive.Index do
   def assign_feeds(socket, opts \\ []) do
     user_id = socket.assigns.current_user.id
 
+    newest_unread_entry = User.newest_unread_entry(user_id)
     oldest_unread_entry = User.oldest_unread_entry(user_id)
 
     current_user = Repo.get!(User, socket.assigns.current_user.id)
@@ -75,6 +76,7 @@ defmodule ExRssWeb.FeedLive.Index do
 
     socket
     |> assign(:page_title, "#{number_of_unread_entries} unread")
+    |> assign(:newest_unread_entry, newest_unread_entry)
     |> assign(:oldest_unread_entry, oldest_unread_entry)
     |> assign(:number_of_unread_entries, number_of_unread_entries)
     |> assign(:number_of_read_entries, number_of_read_entries)
