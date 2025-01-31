@@ -18,7 +18,7 @@ config :ex_rss, ExRssWeb.Endpoint,
   watchers: [
     node: ["build.mjs", "--watch", cd: Path.expand("../assets", __DIR__)],
     npx: [
-      "tailwindcss",
+      "@tailwindcss/cli",
       "-i",
       "./css/app.css",
       "-o",
