@@ -19,6 +19,20 @@ updates:
       # `dependency-name` is required.
       - dependency-name: "*"
         update-types: ["version-update:semver-patch"]
+    groups:
+      tailwind:
+        patterns:
+          - '@tailwindcss/*'
+          - 'tailwindcss'
+        update-types:
+          - 'minor'
+          - 'patch'
+      misc:
+        patterns:
+          - '*'
+        update-types:
+          - 'minor'
+          - 'patch'
 
   - package-ecosystem: github-actions
     directory: '/'
