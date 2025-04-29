@@ -17,13 +17,21 @@ defmodule ExRssWeb.FeedLive.Index do
       |> assign(:current_user, current_user)
       |> assign(:form, to_form(%{}))
       |> assign(:discovered_feeds, [])
+      |> assign(:filter, :all)
       |> assign_feeds()
 
     {:ok, socket}
   end
 
   @impl true
-  def handle_params(_params, _url, socket) do
+  def handle_params(params, _url, socket) do
+    socket =
+      case params["filter"] do
+        "unread" -> assign(socket, :filter, :unread)
+        _ -> assign(socket, :filter, :all)
+      end
+      |> assign_feeds(reset: true)
+
     {:noreply, socket}
   end
 
@@ -73,6 +81,12 @@ defmodule ExRssWeb.FeedLive.Index do
 
     number_of_feeds_with_error =
       feeds |> Enum.count(& &1.has_error)
+
+    feeds =
+      case socket.assigns.filter do
+        :unread -> feeds |> Enum.filter(&(&1.unread_entries_count > 0))
+        :all -> feeds
+      end
 
     socket
     |> assign(:page_title, "#{number_of_unread_entries} unread")
