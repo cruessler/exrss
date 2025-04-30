@@ -7,7 +7,7 @@ defmodule ExRssWeb.FeedLive.Index do
   alias ExRss.{FeedAdder, FeedRemover}
 
   @impl true
-  def mount(_params, _session, socket) do
+  def mount(params, _session, socket) do
     current_user = socket.assigns.current_user
 
     ExRssWeb.Endpoint.subscribe("user:#{current_user.id}")
@@ -18,6 +18,7 @@ defmodule ExRssWeb.FeedLive.Index do
       |> assign(:form, to_form(%{}))
       |> assign(:discovered_feeds, [])
       |> assign(:filter, :all)
+      |> assign_filter(params["filter"])
       |> assign_feeds()
 
     {:ok, socket}
@@ -26,16 +27,21 @@ defmodule ExRssWeb.FeedLive.Index do
   @impl true
   def handle_params(params, _url, socket) do
     socket =
-      case params["filter"] do
-        "unread" -> assign(socket, :filter, :unread)
-        _ -> assign(socket, :filter, :all)
-      end
+      socket
+      |> assign_filter(params["filter"])
       |> assign_feeds(reset: true)
 
     {:noreply, socket}
   end
 
-  def assign_feeds(socket, opts \\ []) do
+  defp assign_filter(socket, filter) do
+    case filter do
+      "unread" -> assign(socket, :filter, :unread)
+      _ -> assign(socket, :filter, :all)
+    end
+  end
+
+  defp assign_feeds(socket, opts \\ []) do
     user_id = socket.assigns.current_user.id
 
     newest_unread_entry = User.newest_unread_entry(user_id)
