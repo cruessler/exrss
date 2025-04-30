@@ -17,9 +17,8 @@ defmodule ExRssWeb.FeedLive.Index do
       |> assign(:current_user, current_user)
       |> assign(:form, to_form(%{}))
       |> assign(:discovered_feeds, [])
-      |> assign(:filter, :all)
       |> assign_filter(params["filter"])
-      |> assign_feeds(reset: true)
+      |> stream(:feeds, [], reset: true)
 
     {:ok, socket}
   end
@@ -29,7 +28,7 @@ defmodule ExRssWeb.FeedLive.Index do
     socket =
       socket
       |> assign_filter(params["filter"])
-      |> assign_feeds(reset: true)
+      |> assign_feeds()
 
     {:noreply, socket}
   end
@@ -41,7 +40,7 @@ defmodule ExRssWeb.FeedLive.Index do
     end
   end
 
-  defp assign_feeds(socket, opts \\ []) do
+  defp assign_feeds(socket) do
     user_id = socket.assigns.current_user.id
 
     newest_unread_entry = User.newest_unread_entry(user_id)
@@ -101,7 +100,7 @@ defmodule ExRssWeb.FeedLive.Index do
     |> assign(:number_of_unread_entries, number_of_unread_entries)
     |> assign(:number_of_read_entries, number_of_read_entries)
     |> assign(:number_of_feeds_with_error, number_of_feeds_with_error)
-    |> stream(:feeds, feeds, opts)
+    |> stream(:feeds, feeds, reset: true)
   end
 
   @impl true
@@ -119,7 +118,7 @@ defmodule ExRssWeb.FeedLive.Index do
       case Repo.update(changeset) do
         {:ok, entry} ->
           socket
-          |> assign_feeds(reset: true)
+          |> assign_feeds()
           |> put_flash(:info, "Entry “#{entry.title}” marked as read")
 
         _ ->
@@ -144,7 +143,7 @@ defmodule ExRssWeb.FeedLive.Index do
       case Repo.update(changeset) do
         {:ok, feed} ->
           socket
-          |> assign_feeds(reset: true)
+          |> assign_feeds()
           # TODO
           # Handle case where feed does not have a title.
           |> put_flash(:info, "Feed “#{feed.title}” marked as read")
@@ -174,7 +173,7 @@ defmodule ExRssWeb.FeedLive.Index do
       {:ok, %{feed: _}} ->
         socket =
           socket
-          |> assign_feeds(reset: true)
+          |> assign_feeds()
 
         {:noreply, socket}
 
@@ -209,7 +208,7 @@ defmodule ExRssWeb.FeedLive.Index do
 
   @impl true
   def handle_info(%{event: "unread_entries"}, socket) do
-    {:noreply, assign_feeds(socket, reset: true)}
+    {:noreply, assign_feeds(socket)}
   end
 
   def update_feed_position(feed_id, position, socket) do
@@ -221,7 +220,7 @@ defmodule ExRssWeb.FeedLive.Index do
 
     case Repo.update(changeset) do
       {:ok, _feed} ->
-        {:noreply, assign_feeds(socket, reset: true)}
+        {:noreply, assign_feeds(socket)}
 
       _ ->
         {:noreply, socket}
