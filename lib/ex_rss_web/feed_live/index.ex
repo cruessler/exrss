@@ -19,7 +19,7 @@ defmodule ExRssWeb.FeedLive.Index do
       |> assign(:discovered_feeds, [])
       |> assign(:filter, :all)
       |> assign_filter(params["filter"])
-      |> assign_feeds()
+      |> assign_feeds(reset: true)
 
     {:ok, socket}
   end
