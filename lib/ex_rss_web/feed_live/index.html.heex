@@ -76,12 +76,14 @@
     :if={@number_of_feeds_with_error > 0}
     class="inline-block px-3 py-1 border rounded-full border-red-500 bg-red-200"
   >
-    <%= if @number_of_feeds_with_error == 1 do %>
-      1 feed had errors when it was last updated
-    <% end %>
-    <%= if @number_of_feeds_with_error > 1 do %>
-      {@number_of_feeds_with_error} feeds had errors when they were last updated
-    <% end %>
+    <.link patch={~p"/feeds?filter=with_error"}>
+      <%= if @number_of_feeds_with_error == 1 do %>
+        1 feed had errors when it was last updated
+      <% end %>
+      <%= if @number_of_feeds_with_error > 1 do %>
+        {@number_of_feeds_with_error} feeds had errors when they were last updated
+      <% end %>
+    </.link>
   </li>
 </ul>
 

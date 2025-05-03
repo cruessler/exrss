@@ -36,6 +36,7 @@ defmodule ExRssWeb.FeedLive.Index do
   defp assign_filter(socket, filter) do
     case filter do
       "unread" -> assign(socket, :filter, :unread)
+      "with_error" -> assign(socket, :filter, :with_error)
       _ -> assign(socket, :filter, :all)
     end
   end
@@ -90,6 +91,7 @@ defmodule ExRssWeb.FeedLive.Index do
     feeds =
       case socket.assigns.filter do
         :unread -> feeds |> Enum.filter(&(&1.unread_entries_count > 0))
+        :with_error -> feeds |> Enum.filter(& &1.has_error)
         :all -> feeds
       end
 
