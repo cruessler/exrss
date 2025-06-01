@@ -237,7 +237,7 @@ defmodule ExRssWeb.FeedLive.Index do
     <ul id={@dom_id} class="flex flex-col phx-click-loading:opacity-50">
       <li class="flex flex-col md:flex-row">
         <div class="flex flex-col">
-          <a href={@entry.url} target="_blank">{@entry.title}</a>
+          {@entry.title}
           <span>{format_timestamp_relative_to_now(@entry.posted_at)}</span>
         </div>
 
