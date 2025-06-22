@@ -85,6 +85,9 @@ defmodule ExRssWeb.FeedLive.Index do
     number_of_read_entries =
       feeds |> List.foldl(0, fn feed, acc -> feed.read_entries_count + acc end)
 
+    number_of_feeds =
+      feeds |> Enum.count()
+
     number_of_feeds_with_error =
       feeds |> Enum.count(& &1.has_error)
 
@@ -101,6 +104,7 @@ defmodule ExRssWeb.FeedLive.Index do
     |> assign(:oldest_unread_entry, oldest_unread_entry)
     |> assign(:number_of_unread_entries, number_of_unread_entries)
     |> assign(:number_of_read_entries, number_of_read_entries)
+    |> assign(:number_of_feeds, number_of_feeds)
     |> assign(:number_of_feeds_with_error, number_of_feeds_with_error)
     |> stream(:feeds, feeds, reset: true)
   end
