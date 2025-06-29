@@ -1,9 +1,11 @@
 defmodule ExRssWeb.Api.AuthorizationTest do
   use ExUnit.Case, async: true
-  use Plug.Test
 
   alias ExRss.User.Account
   alias ExRssWeb.Plug.Api.Authorization
+
+  import Plug.Test
+  import Plug.Conn
 
   @salt "user"
   @plug Authorization.init(@salt)

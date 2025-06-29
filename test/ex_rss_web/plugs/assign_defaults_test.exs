@@ -1,8 +1,9 @@
 defmodule ExRssWeb.AssignDefaultsTest do
   use ExUnit.Case, async: true
-  use Plug.Test
 
   alias ExRssWeb.Plug.AssignDefaults
+
+  import Plug.Test
 
   @plug AssignDefaults.init([])
 

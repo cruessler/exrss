@@ -1,10 +1,11 @@
 defmodule ExRssWeb.AuthenticationTest do
   use ExUnit.Case, async: true
-  use Plug.Test
 
   alias ExRssWeb.Plug.Authentication
   alias ExRss.Repo
   alias ExRss.User
+
+  import Plug.Test
 
   @session Plug.Session.init(
              store: :cookie,
