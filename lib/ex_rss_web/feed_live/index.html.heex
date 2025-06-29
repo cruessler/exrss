@@ -127,7 +127,7 @@
         <div id={"remove-feed-#{feed.id}"} class="group">
           <button
             aria-label="Remove feed"
-            class="group-data-[confirm-removal=true]:hidden"
+            class="group-data-[confirm-removal=true]:hidden cursor-pointer"
             phx-click={
               JS.toggle_attribute({"data-confirm-removal", "true", "false"},
                 to: "#remove-feed-#{feed.id}"
@@ -143,11 +143,11 @@
             phx-click="remove_feed"
             phx-value-feed-id={feed.id}
           >
-            <.icon name="hero-check-circle-solid" />
+            <.icon name="hero-check-circle-solid cursor-pointer" />
           </button>
           <button
             aria-label="Cancel removal of feed"
-            class="hidden group-data-[confirm-removal=true]:inline-block"
+            class="hidden group-data-[confirm-removal=true]:inline-block cursor-pointer"
             phx-click={
               JS.toggle_attribute({"data-confirm-removal", "true", "false"},
                 to: "#remove-feed-#{feed.id}"
@@ -159,16 +159,31 @@
         </div>
 
         <%= if is_nil(feed.position) do %>
-          <button aria-label="Pin feed" phx-click="pin_feed" phx-value-feed-id={feed.id}>
+          <button
+            aria-label="Pin feed"
+            class="cursor-pointer"
+            phx-click="pin_feed"
+            phx-value-feed-id={feed.id}
+          >
             <.icon name="hero-bookmark-solid" />
           </button>
         <% else %>
-          <button aria-label="Unpin feed" phx-click="unpin_feed" phx-value-feed-id={feed.id}>
+          <button
+            aria-label="Unpin feed"
+            class="cursor-pointer"
+            phx-click="unpin_feed"
+            phx-value-feed-id={feed.id}
+          >
             <.icon name="hero-bookmark-slash-solid" />
           </button>
         <% end %>
 
-        <button aria-label="Mark as read" phx-click="mark_as_read" phx-value-feed-id={feed.id}>
+        <button
+          aria-label="Mark as read"
+          class="cursor-pointer"
+          phx-click="mark_as_read"
+          phx-value-feed-id={feed.id}
+        >
           <.icon name="hero-check-circle-solid" />
         </button>
       </div>
