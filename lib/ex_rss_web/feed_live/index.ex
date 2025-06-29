@@ -257,6 +257,7 @@ defmodule ExRssWeb.FeedLive.Index do
           </a>
           <button
             aria-label="Mark as read"
+            class="cursor-pointer"
             phx-click={JS.push("mark_as_read", loading: "##{@dom_id}")}
             phx-value-entry-id={@entry.id}
           >
