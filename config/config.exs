@@ -17,7 +17,10 @@ config :ex_rss, ExRssWeb.Endpoint,
   # version.
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
   live_view: [signing_salt: "abcdefgh"],
-  render_errors: [view: ExRssWeb.ErrorView, accepts: ~w(html json)],
+  render_errors: [
+    formats: [html: ExRssWeb.ErrorHTML],
+    layout: false
+  ],
   pubsub_server: ExRss.PubSub
 
 # Configures the mailer
