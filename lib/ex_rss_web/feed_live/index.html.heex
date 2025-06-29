@@ -10,7 +10,10 @@
       <.input type="url" field={@form[:feed_url]} label="Address to discover feeds on" />
     </div>
 
-    <button class="self-end px-4 py-2 text-sm font-extrabold bg-blue-700 text-white">
+    <button
+      class="self-end px-4 py-2 text-sm font-extrabold bg-blue-700 text-white rounded-md"
+      phx-disable-with="Loading …"
+    >
       Discover
     </button>
   </.form>
@@ -29,7 +32,7 @@
     </div>
 
     <input
-      class="self-end px-4 py-2 text-sm font-extrabold bg-blue-700 text-white"
+      class="self-end px-4 py-2 text-sm font-extrabold bg-blue-700 text-white rounded-md"
       type="submit"
       value="Discover"
     />
