@@ -1,12 +1,14 @@
 defmodule ExRssWeb.RememberUser do
   use ExUnit.Case, async: true
-  use Plug.Test
 
   alias Ecto.Changeset
 
   alias ExRss.Repo
   alias ExRss.{Session, User}
   alias ExRssWeb.Plug.RememberUser
+
+  import Plug.Test
+  import Plug.Conn
 
   @user %User{id: 1}
 

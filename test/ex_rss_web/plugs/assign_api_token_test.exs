@@ -1,10 +1,12 @@
 defmodule ExRssWeb.AssignApiToken do
   use ExUnit.Case, async: true
-  use Plug.Test
 
   alias ExRss.User
   alias ExRss.User.Account
   alias ExRssWeb.Plug.AssignApiToken
+
+  import Plug.Test
+  import Plug.Conn
 
   @salt "user"
   @user %User{id: 1}
