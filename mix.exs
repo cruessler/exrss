@@ -10,7 +10,8 @@ defmodule ExRss.Mixfile do
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      compilers: [:phoenix_live_view] ++ Mix.compilers()
     ]
   end
 
@@ -44,6 +45,7 @@ defmodule ExRss.Mixfile do
       {:phoenix_html_helpers, "~> 1.0"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:phoenix_live_view, "~> 1.0"},
+      {:lazy_html, ">= 0.0.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8"},
       {:swoosh, "~> 1.4"},
       {:finch, "~> 0.19"},

@@ -9,6 +9,11 @@ import topbar from '../vendor/topbar';
 const csrfToken = document
   .querySelector("meta[name='csrf-token']")
   .getAttribute('content');
+
+// See the following guide for how to configure colocated hooks. As of
+// 2025-08-05 I did not make the required changes as there are no colocated
+// hooks yet in this application.
+// https://github.com/phoenixframework/phoenix_live_view/blob/v1.1.1/CHANGELOG.md
 const liveSocket = new LiveSocket('/live', Socket, {
   longPollFallbackMs: 2500,
   params: { _csrf_token: csrfToken },
