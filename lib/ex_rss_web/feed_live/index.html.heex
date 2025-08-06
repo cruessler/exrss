@@ -113,8 +113,8 @@
   <% end %>
 </div>
 
-<ul id="live-feeds" phx-update="stream">
-  <li :for={{dom_id, feed} <- @streams.feeds} id={dom_id}>
+<ul id="live-feeds">
+  <li :for={feed <- @feeds} :key={feed.id} id={"feed-#{feed.id}"}>
     <div class="flex">
       <div>
         <h1 class="mb-2 md:mb-0 font-bold">{feed.title || "URL: #{feed.url}"}</h1>

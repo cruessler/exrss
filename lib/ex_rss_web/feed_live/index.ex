@@ -18,7 +18,7 @@ defmodule ExRssWeb.FeedLive.Index do
       |> assign(:form, to_form(%{}))
       |> assign(:discovered_feeds, [])
       |> assign_filter(params["filter"])
-      |> stream(:feeds, [], reset: true)
+      |> assign(:feeds, [])
 
     {:ok, socket}
   end
@@ -106,7 +106,7 @@ defmodule ExRssWeb.FeedLive.Index do
     |> assign(:number_of_read_entries, number_of_read_entries)
     |> assign(:number_of_feeds, number_of_feeds)
     |> assign(:number_of_feeds_with_error, number_of_feeds_with_error)
-    |> stream(:feeds, feeds, reset: true)
+    |> assign(:feeds, feeds)
   end
 
   @impl true
