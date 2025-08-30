@@ -16,7 +16,7 @@ config :ex_rss, ExRssWeb.Endpoint,
   code_reloader: true,
   check_origin: false,
   watchers: [
-    node: ["build.mjs", "--watch", cd: Path.expand("../assets", __DIR__)],
+    esbuild: {Esbuild, :install_and_run, [:ex_rss, ~w(--sourcemap=inline --watch)]},
     npx: [
       "@tailwindcss/cli",
       "-i",
