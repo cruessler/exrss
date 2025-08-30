@@ -47,6 +47,7 @@ defmodule ExRss.Mixfile do
       {:phoenix_live_view, "~> 1.0"},
       {:lazy_html, ">= 0.0.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8"},
+      {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
       {:swoosh, "~> 1.4"},
       {:finch, "~> 0.19"},
       {:telemetry_metrics, "~> 1.0"},
@@ -78,12 +79,13 @@ defmodule ExRss.Mixfile do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "ecto.setup", "assets.setup"],
+      setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate", "test"],
-      "assets.setup": ["cmd --cd assets npm install"],
-      "assets.deploy": ["cmd --cd assets npm run deploy", "phx.digest"]
+      "assets.setup": ["cmd --cd assets npm install", "esbuild.install --if-missing"],
+      "assets.build": ["esbuild ex_rss"],
+      "assets.deploy": ["cmd --cd assets npm run deploy", "esbuild ex_rss --minify", "phx.digest"]
     ]
   end
 end

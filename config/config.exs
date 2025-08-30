@@ -32,6 +32,16 @@ config :ex_rss, ExRssWeb.Endpoint,
 # `config/runtime.exs`.
 config :ex_rss, ExRss.Mailer, adapter: Swoosh.Adapters.Local
 
+# Configure esbuild (the version is required)
+config :esbuild,
+  version: "0.25.4",
+  ex_rss: [
+    args:
+      ~w(js/app.js --bundle --target=es2022 --outdir=../priv/static/assets/js --external:/fonts/* --external:/images/* --alias:@=.),
+    cd: Path.expand("../assets", __DIR__),
+    env: %{"NODE_PATH" => [Path.expand("../deps", __DIR__), Mix.Project.build_path()]}
+  ]
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

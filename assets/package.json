@@ -2,14 +2,12 @@
   "repository": {},
   "license": "MIT",
   "scripts": {
-    "deploy": "npm run deploy:esbuild && npm run deploy:tailwind",
-    "deploy:esbuild": "node build.mjs --deploy",
+    "deploy": "npm run deploy:tailwind",
     "deploy:tailwind": "npx @tailwindcss/cli -i ./css/app.css -o ../priv/static/assets/app.css --minify"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.3",
     "@tailwindcss/forms": "^0.5.9",
-    "esbuild": "^0.25.0",
     "prettier": "^3.6.2",
     "tailwindcss": "^4.0.0"
   }
