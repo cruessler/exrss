@@ -48,6 +48,7 @@ defmodule ExRss.Mixfile do
       {:lazy_html, ">= 0.0.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8"},
       {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
+      {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
       {:swoosh, "~> 1.4"},
       {:finch, "~> 0.19"},
       {:telemetry_metrics, "~> 1.0"},
@@ -83,9 +84,17 @@ defmodule ExRss.Mixfile do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate", "test"],
-      "assets.setup": ["cmd --cd assets npm install", "esbuild.install --if-missing"],
-      "assets.build": ["esbuild ex_rss"],
-      "assets.deploy": ["cmd --cd assets npm run deploy", "esbuild ex_rss --minify", "phx.digest"]
+      "assets.setup": [
+        "cmd --cd assets npm install",
+        "tailwind.install --if-missing",
+        "esbuild.install --if-missing"
+      ],
+      "assets.build": ["tailwind ex_rss", "esbuild ex_rss"],
+      "assets.deploy": [
+        "tailwind ex_rss --minify",
+        "esbuild ex_rss --minify",
+        "phx.digest"
+      ]
     ]
   end
 end

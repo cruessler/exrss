@@ -17,15 +17,7 @@ config :ex_rss, ExRssWeb.Endpoint,
   check_origin: false,
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:ex_rss, ~w(--sourcemap=inline --watch)]},
-    npx: [
-      "@tailwindcss/cli",
-      "-i",
-      "./css/app.css",
-      "-o",
-      "../priv/static/assets/app.css",
-      "--watch",
-      cd: Path.expand("../assets", __DIR__)
-    ]
+    tailwind: {Tailwind, :install_and_run, [:ex_rss, ~w(--watch)]}
   ]
 
 # Watch static and templates for browser reloading.
