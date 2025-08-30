@@ -15,7 +15,7 @@ const csrfToken = document
 // hooks yet in this application.
 // https://github.com/phoenixframework/phoenix_live_view/blob/v1.1.1/CHANGELOG.md
 const liveSocket = new LiveSocket('/live', Socket, {
-  longPollFallbackMs: 2500,
+  longPollFallbackMs: 5000,
   params: { _csrf_token: csrfToken },
 });
 
