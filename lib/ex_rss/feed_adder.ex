@@ -61,7 +61,7 @@ defmodule ExRss.FeedAdder do
       feeds =
         for f <- extract_feeds(html) do
           Map.put(f, :url, URI.merge(uri, f.href) |> to_string)
-          |> add_frequency_info(fetch)
+          |> add_discovery_info(fetch)
         end
 
       {:ok, feeds}
@@ -129,10 +129,12 @@ defmodule ExRss.FeedAdder do
     Floki.find(html, "link[rel=alternate][type='application/atom+xml']")
   end
 
-  def add_frequency_info(feed, fetch \\ &fetch_url/1) do
+  def add_discovery_info(feed, fetch \\ &fetch_url/1) do
     with {:ok, body, _} <- fetch.(feed.url),
          {:ok, raw_feed} <- Feed.parse(body) do
-      Map.put(feed, :frequency, extract_frequency_info(raw_feed))
+      feed
+      |> Map.put(:frequency, extract_frequency_info(raw_feed))
+      |> Map.put(:newest_entries, extract_newest_entries(raw_feed))
     else
       {:error, error} ->
         Logger.error("Could not add frequency info", url: feed.url, error: error)
@@ -168,5 +170,10 @@ defmodule ExRss.FeedAdder do
     rescue
       Enum.EmptyError -> %{posts: posts, seconds: :not_available}
     end
+  end
+
+  def extract_newest_entries(raw_feed) do
+    raw_feed.entries
+    |> Enum.take(3)
   end
 end

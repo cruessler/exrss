@@ -301,7 +301,19 @@ defmodule ExRssWeb.FeedLive.Index do
     end
   end
 
-  def format_timestamp_relative_to_now(updated_at, attrs \\ []) do
+  def format_timestamp_relative_to_now(updated_at, attrs \\ [])
+
+  def format_timestamp_relative_to_now(updated_at, attrs)
+      when is_binary(updated_at) do
+    {default, _attrs} = Keyword.pop(attrs, :default, "n/a")
+
+    case Entry.parse_time(updated_at) do
+      {:ok, updated_at} -> format_timestamp_relative_to_now(updated_at, attrs)
+      _ -> default
+    end
+  end
+
+  def format_timestamp_relative_to_now(updated_at, attrs) do
     {default, _attrs} = Keyword.pop(attrs, :default, "n/a")
 
     with interval = %Timex.Interval{} <- Timex.Interval.new(from: updated_at, until: Timex.now()) do
