@@ -111,7 +111,7 @@ defmodule ExRss.FeedAdderTest do
   end
 
   test "extracts feeds" do
-    {:ok, html} = Floki.parse_document(@html)
+    html = LazyHTML.from_document(@html)
 
     feeds = FeedAdder.extract_feeds(html)
 
