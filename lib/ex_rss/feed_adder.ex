@@ -56,8 +56,9 @@ defmodule ExRss.FeedAdder do
   end
 
   def discover_feeds(url, fetch \\ &fetch_url/1) do
-    with {:ok, body, uri} <- fetch.(url),
-         {:ok, html} <- Floki.parse_document(body) do
+    with {:ok, body, uri} <- fetch.(url) do
+      html = LazyHTML.from_document(body)
+
       feeds =
         for f <- extract_feeds(html) do
           Map.put(f, :url, URI.merge(uri, f.href) |> to_string)
@@ -87,9 +88,7 @@ defmodule ExRss.FeedAdder do
   end
 
   def extract_feeds(html) do
-    (rss_feeds(html) ++ atom_feeds(html))
-    |> Enum.map(&extract_feed/1)
-    |> Enum.reject(&is_nil/1)
+    rss_feeds(html) ++ atom_feeds(html)
   end
 
   def extract_candidate(feed) do
@@ -100,7 +99,7 @@ defmodule ExRss.FeedAdder do
   end
 
   def extract_feed(feed) do
-    case Floki.attribute(feed, "href") do
+    case LazyHTML.attribute(feed, "href") do
       [href] ->
         title = extract_title(feed)
 
@@ -112,7 +111,7 @@ defmodule ExRss.FeedAdder do
   end
 
   def extract_title(feed) do
-    case Floki.attribute(feed, "title") do
+    case LazyHTML.attribute(feed, "title") do
       [title] ->
         title
 
@@ -122,11 +121,15 @@ defmodule ExRss.FeedAdder do
   end
 
   def rss_feeds(html) do
-    Floki.find(html, "link[rel=alternate][type='application/rss+xml']")
+    LazyHTML.query(html, "link[rel=alternate][type='application/rss+xml']")
+    |> Enum.map(&extract_feed/1)
+    |> Enum.reject(&is_nil/1)
   end
 
   def atom_feeds(html) do
-    Floki.find(html, "link[rel=alternate][type='application/atom+xml']")
+    LazyHTML.query(html, "link[rel=alternate][type='application/atom+xml']")
+    |> Enum.map(&extract_feed/1)
+    |> Enum.reject(&is_nil/1)
   end
 
   def add_discovery_info(feed, fetch \\ &fetch_url/1) do
