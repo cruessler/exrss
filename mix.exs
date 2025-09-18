@@ -46,6 +46,7 @@ defmodule ExRss.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:phoenix_live_view, "~> 1.0"},
       {:lazy_html, ">= 0.0.0"},
+      {:saxy, ">= 1.6.0"},
       {:phoenix_live_dashboard, "~> 0.8"},
       {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
