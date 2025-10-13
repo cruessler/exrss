@@ -36,8 +36,9 @@ defmodule ExRssWeb do
       import Ecto
       import Ecto.Query
 
+      use Gettext, backend: ExRssWeb.Gettext
+
       import Plug.Conn
-      import ExRssWeb.Gettext
 
       unquote(verified_routes())
     end
@@ -111,6 +112,8 @@ defmodule ExRssWeb do
 
   defp html_helpers do
     quote do
+      use Gettext, backend: ExRssWeb.Gettext
+
       # HTML escaping functionality
       import Phoenix.HTML
 
