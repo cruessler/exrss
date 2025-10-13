@@ -4,14 +4,14 @@ defmodule ExRss.Mixfile do
   def project do
     [
       app: :ex_rss,
-      version: "0.0.1",
-      elixir: "~> 1.2",
+      version: "0.1.0",
+      elixir: "~> 1.16",
       elixirc_paths: elixirc_paths(Mix.env()),
-      build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-      compilers: [:phoenix_live_view] ++ Mix.compilers()
+      compilers: [:phoenix_live_view] ++ Mix.compilers(),
+      listeners: [Phoenix.CodeReloader]
     ]
   end
 
