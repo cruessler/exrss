@@ -30,7 +30,7 @@ defmodule ExRssWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller
+      use Phoenix.Controller, formats: [:html, :json]
 
       alias ExRss.Repo
       import Ecto
