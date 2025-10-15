@@ -1,0 +1,16 @@
+<h1>Welcome to ExRss!</h1>
+
+<%= if assigns[:current_user] do %>
+  <p>
+    Hello {@current_user.email}!
+  </p>
+  <p>
+    Your feeds can be found at <a href={~p"/feeds"}>
+      <%= ~p"/feeds" %></a>.
+  </p>
+<% else %>
+  <p>
+    Right now, there is not much you can do. Maybe you want to <a href={~p"/users/register"}>register</a>?
+    If you are already registered you can of course <a href={~p"/users/log_in"}>log in</a>.
+  </p>
+<% end %>
