@@ -3,6 +3,6 @@
   "license": "MIT",
   "scripts": {},
   "devDependencies": {
-    "prettier": "^3.7.2"
+    "prettier": "^3.8.0"
   }
 }
