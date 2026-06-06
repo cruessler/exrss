@@ -2,9 +2,14 @@ version: 2
 updates:
   - package-ecosystem: mix
     directory: '/'
+
     schedule:
       interval: weekly
       day: saturday
+
+    assignees:
+      - "cruessler"
+
     ignore:
       # `dependency-name` is required.
       - dependency-name: "*"
@@ -12,13 +17,19 @@ updates:
 
   - package-ecosystem: npm
     directory: '/assets'
+
     schedule:
       interval: weekly
       day: saturday
+
+    assignees:
+      - "cruessler"
+
     ignore:
       # `dependency-name` is required.
       - dependency-name: "*"
         update-types: ["version-update:semver-patch"]
+
     groups:
       tailwind:
         patterns:
@@ -36,6 +47,10 @@ updates:
 
   - package-ecosystem: github-actions
     directory: '/'
+
     schedule:
       interval: weekly
       day: saturday
+
+    assignees:
+      - "cruessler"
