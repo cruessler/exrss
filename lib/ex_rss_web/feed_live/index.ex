@@ -236,6 +236,9 @@ defmodule ExRssWeb.FeedLive.Index do
   attr :entry, Entry, required: true
   attr :dom_id, :string, required: true
 
+  # TODO:
+  # Can we extract just the buttons? They are used by `by_date.html.heex` as
+  # well.
   def entry(assigns) do
     ~H"""
     <ul id={@dom_id} class="flex flex-col phx-click-loading:opacity-50">
