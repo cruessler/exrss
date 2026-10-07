@@ -69,6 +69,8 @@ defmodule ExRssWeb.Router do
       live "/feeds", FeedLive.Index, :index
       live "/feeds/discover", FeedLive.Index, :discover
       live "/feeds/new", FeedLive.New, :new
+
+      live "/entries", EntryLive.Index, :index
     end
   end
 

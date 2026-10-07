@@ -2,6 +2,10 @@
   <.button>Discover feeds</.button>
 </.link>
 
+<.link patch={~p"/entries"}>
+  <.button>Entries</.button>
+</.link>
+
 <.modal :if={@live_action == :discover} id="add-feeds-modal" show on_cancel={JS.patch(~p"/feeds")}>
   <h1>Discover feeds on a site</h1>
 
