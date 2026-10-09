@@ -1,3 +1,11 @@
+<.link patch={~p"/entries"}>
+  <.button>Newest first</.button>
+</.link>
+
+<.link patch={~p"/entries?order=asc"}>
+  <.button>Oldest first</.button>
+</.link>
+
 <ul class="mb-6 flex flex-col space-y-4">
   <li
     :for={entry <- @entries}
