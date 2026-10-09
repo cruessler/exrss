@@ -5,3 +5,6 @@ node = "26"
 
 [settings]
 lockfile = true
+
+[settings.erlang]
+compile = true
