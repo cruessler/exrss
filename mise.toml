@@ -1,6 +1,7 @@
 [tools]
 elixir = "1.17"
 erlang = "27"
+node = "26"
 
 [settings]
 lockfile = true
