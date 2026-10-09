@@ -6,7 +6,7 @@ defmodule ExRssWeb.EntryLive.Index do
   alias ExRss.{Entry, Feed, Repo, User}
 
   @impl true
-  def mount(_params, _session, socket) do
+  def mount(params, _session, socket) do
     current_user = socket.assigns.current_user
 
     ExRssWeb.Endpoint.subscribe("user:#{current_user.id}")
@@ -14,6 +14,7 @@ defmodule ExRssWeb.EntryLive.Index do
     socket =
       socket
       |> assign(:current_user, current_user)
+      |> assign_order(params["order"])
       |> assign(:entries, [])
 
     {:ok, socket}
@@ -24,15 +25,24 @@ defmodule ExRssWeb.EntryLive.Index do
 
     entries_of_current_user = current_user |> Ecto.assoc(:entries)
 
+    order_by =
+      if socket.assigns.order == :asc do
+        [
+          asc_nulls_last: :posted_at
+        ]
+      else
+        [
+          desc_nulls_last: :posted_at
+        ]
+      end
+
     entries =
       from(
         e in entries_of_current_user,
         join: f in Feed,
         on: f.id == e.feed_id,
         where: e.read == false,
-        order_by: [
-          desc_nulls_last: e.posted_at
-        ],
+        order_by: ^order_by,
         select: e,
         preload: :feed
       )
@@ -76,12 +86,20 @@ defmodule ExRssWeb.EntryLive.Index do
   end
 
   @impl true
-  def handle_params(_params, _url, socket) do
+  def handle_params(params, _url, socket) do
     socket =
       socket
+      |> assign_order(params["order"])
       |> assign_entries()
 
     {:noreply, socket}
+  end
+
+  defp assign_order(socket, order) do
+    case order do
+      "asc" -> assign(socket, :order, :asc)
+      _ -> assign(socket, :order, :desc)
+    end
   end
 
   @impl true
