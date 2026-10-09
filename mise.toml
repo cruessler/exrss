@@ -1,0 +1,10 @@
+[tools]
+elixir = "1.18"
+erlang = "28"
+node = "26"
+
+[settings]
+lockfile = true
+
+[settings.erlang]
+compile = true
