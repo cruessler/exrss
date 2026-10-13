@@ -18,11 +18,11 @@ defmodule ExRss.FeedFixtures do
     entries =
       0..5
       |> Enum.map(fn _ ->
-        unique_integer = System.unique_integer()
+        id = System.unique_integer([:positive])
 
         %{
-          link: "http://example.com/#{unique_integer}",
-          title: "Title #{unique_integer}",
+          link: "http://example.com/#{id}",
+          title: "Title #{id}",
           # TODO
           # Use random date instead.
           updated: "Sun, 21 Dec 2015 16:08:00 +0100",
