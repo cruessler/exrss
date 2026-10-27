@@ -2,7 +2,7 @@ defmodule ExRss.FeedTest do
   use ExRss.DataCase
 
   alias Ecto.Changeset
-  alias ExRss.{Entry, Feed, User}
+  alias ExRss.{Entry, Feed, FeedsFixtures, User}
   alias Timex.Duration
 
   @valid_attrs %{title: "some content", url: "some content"}
@@ -146,5 +146,32 @@ defmodule ExRss.FeedTest do
   test "parses feed" do
     assert {:ok, %{entries: [_]}} = Feed.parse(@xml)
     assert {:error, _} = Feed.parse("")
+  end
+
+  describe "FeederEx and SweetXml yield the same result" do
+    # TODO:
+    # Do we want to move this elsewhere?
+    defp parse_entries(raw_feed, feed) do
+      for entry <- raw_feed.entries do
+        entry
+        |> Entry.parse()
+        |> Entry.make_url_absolute(feed.url)
+        |> Map.put(:feed_id, feed.id)
+      end
+    end
+
+    test "fixtures" do
+      xml = FeedsFixtures.rss_fixture("1.atom")
+
+      feed = %{id: "", url: "https://example.com/blog/"}
+
+      {:ok, feeder_ex_feed} = xml |> Feed.parse()
+      feeder_ex_entries = parse_entries(feeder_ex_feed, feed)
+
+      sweet_xml_entries =
+        xml |> Feed.parse_using_sweet_xml() |> parse_entries(feed)
+
+      assert feeder_ex_entries == sweet_xml_entries
+    end
   end
 end

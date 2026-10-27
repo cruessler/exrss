@@ -81,6 +81,69 @@ defmodule ExRss.Feed do
     end
   end
 
+  def parse_using_sweet_xml(xml) do
+    import SweetXml
+
+    document = SweetXml.parse(xml, namespace_conformant: true)
+
+    query =
+      ~x"""
+      boolean(
+        /rdf:RDF[
+          rss:channel
+          and rss:item/rss:link[normalize-space(.) != '']
+        ]
+      )
+      """
+      |> add_namespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+      |> add_namespace("rss", "http://purl.org/rss/1.0/")
+
+    is_rss_1_0 = xpath(document, query)
+
+    is_rss_2_0 =
+      xpath(xml, ~x"""
+      boolean(
+        /rss[@version='2.0']/channel[
+          item/link[normalize-space(.) != '']
+        ]
+      )
+      """)
+
+    query =
+      ~x"boolean(/atom:feed)"
+      |> add_namespace("atom", "http://www.w3.org/2005/Atom")
+
+    is_atom = xpath(document, query)
+
+    if is_rss_1_0 do
+      # TODO:
+      # Implement and verify extraction for RSS 1.0.
+    else
+      if is_rss_2_0 do
+        # TODO:
+        # Verify extraction for RSS 2.0. In particular, add at least one test case.
+        xml
+        |> xpath(~x"//rss/channel"l,
+          title: ~x"./title/text()",
+          updated: ~x"./pubDate/text()",
+          entries: [~x"./item"l, title: ~x"./title/text()", updated: ~x"./pubDate/text()"]
+        )
+      else
+        if is_atom do
+          entries =
+            xml
+            |> xpath(~x"/feed/entry"l,
+              title: ~x"./title/text()"s,
+              link: ~x"./link[not(@rel) or @rel='alternate'][1]/@href"s,
+              updated: ~x"./updated/text()"s
+            )
+
+          %{entries: entries}
+        end
+      end
+    end
+  end
+
   def mark_as_read(feed) do
     entries = for e <- feed.entries, do: Changeset.change(e, read: true)
 
