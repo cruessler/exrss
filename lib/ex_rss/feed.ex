@@ -118,6 +118,7 @@ defmodule ExRss.Feed do
     if is_rss_1_0 do
       # TODO:
       # Implement and verify extraction for RSS 1.0.
+      {:error, :not_implemented}
     else
       if is_rss_2_0 do
         # TODO:
@@ -138,7 +139,7 @@ defmodule ExRss.Feed do
               updated: ~x"./updated/text()"s
             )
 
-          %{entries: entries}
+          {:ok, %{entries: entries}}
         end
       end
     end

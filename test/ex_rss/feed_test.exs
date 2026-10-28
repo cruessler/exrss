@@ -168,8 +168,8 @@ defmodule ExRss.FeedTest do
       {:ok, feeder_ex_feed} = xml |> Feed.parse()
       feeder_ex_entries = parse_entries(feeder_ex_feed, feed)
 
-      sweet_xml_entries =
-        xml |> Feed.parse_using_sweet_xml() |> parse_entries(feed)
+      {:ok, sweet_xml_feed} = xml |> Feed.parse_using_sweet_xml()
+      sweet_xml_entries = parse_entries(sweet_xml_feed, feed)
 
       assert feeder_ex_entries == sweet_xml_entries
     end
