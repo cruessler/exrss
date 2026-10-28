@@ -121,14 +121,20 @@ defmodule ExRss.Feed do
       {:error, :not_implemented}
     else
       if is_rss_2_0 do
-        # TODO:
-        # Verify extraction for RSS 2.0. In particular, add at least one test case.
-        xml
-        |> xpath(~x"//rss/channel"l,
-          title: ~x"./title/text()",
-          updated: ~x"./pubDate/text()",
-          entries: [~x"./item"l, title: ~x"./title/text()", updated: ~x"./pubDate/text()"]
-        )
+        feed =
+          xml
+          |> xpath(~x"//rss/channel",
+            title: ~x"./title/text()"s,
+            updated: ~x"./pubDate/text()"s,
+            entries: [
+              ~x"./item"l,
+              title: ~x"./title/text()"s,
+              link: ~x"./link/text()"s,
+              updated: ~x"./pubDate/text()"s
+            ]
+          )
+
+        {:ok, feed}
       else
         if is_atom do
           entries =
