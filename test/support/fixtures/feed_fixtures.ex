@@ -1,14 +1,12 @@
 defmodule ExRss.FeedFixtures do
-  alias Ecto.Changeset
   alias ExRss.{Entry, Feed, Repo}
 
   @valid_feed_attrs %{title: "some content", url: "https://example.com/some-content"}
 
-  def feed_fixture(%{user_id: user_id, title: title}) do
+  def feed_fixture(%{user_id: user_id, url: url, title: title}) do
     %{id: feed_id} =
       feed =
-      Feed.changeset(%Feed{user_id: user_id}, @valid_feed_attrs)
-      |> Changeset.put_change(:title, title)
+      Feed.changeset(%Feed{user_id: user_id}, %{url: url, title: title})
       |> Repo.insert!()
 
     {6, nil} = entry_fixtures(%{feed_id: feed_id})
@@ -17,7 +15,7 @@ defmodule ExRss.FeedFixtures do
   end
 
   def feed_fixture(%{user_id: user_id}) do
-    feed_fixture(%{user_id: user_id, title: @valid_feed_attrs.title})
+    feed_fixture(Map.merge(%{user_id: user_id}, @valid_feed_attrs))
   end
 
   defp entry_fixtures(%{feed_id: feed_id}) do

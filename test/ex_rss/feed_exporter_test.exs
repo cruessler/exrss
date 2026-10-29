@@ -30,4 +30,41 @@ defmodule ExRss.FeedExporterTest do
              </opml>
              """)
   end
+
+  test "exports multiple feeds" do
+    %{id: user_id} = user_fixture()
+
+    feeds = [
+      feed_fixture(%{
+        user_id: user_id,
+        url: "https://example.com/blog/first.rss",
+        title: "First feed"
+      }),
+      feed_fixture(%{
+        user_id: user_id,
+        url: "https://example.com/blog/second.rss",
+        title: "Second feed"
+      }),
+      feed_fixture(%{
+        user_id: user_id,
+        url: "https://example.com/blog/third.rss",
+        title: "Third feed"
+      })
+    ]
+
+    assert {:ok, opml} = FeedExporter.export_feeds(feeds)
+
+    assert opml ==
+             String.trim("""
+             <?xml version="1.0" encoding="utf-8"?>\
+             <opml version="1.0">\
+             <head/>\
+             <body>\
+             <outline type="rss" text="First feed" xmlUrl="https://example.com/blog/first.rss"/>\
+             <outline type="rss" text="Second feed" xmlUrl="https://example.com/blog/second.rss"/>\
+             <outline type="rss" text="Third feed" xmlUrl="https://example.com/blog/third.rss"/>\
+             </body>\
+             </opml>
+             """)
+  end
 end

@@ -24,7 +24,14 @@ defmodule Mix.Tasks.ExRss.ExportFeedsTest do
     first_user = user_fixture()
     second_user = user_fixture()
     first_feed = feed_fixture(%{user_id: first_user.id})
-    second_feed = feed_fixture(%{user_id: second_user.id, title: "second feed"})
+
+    second_feed =
+      feed_fixture(%{
+        user_id: second_user.id,
+        url: "https://example.com/blog/feed.rss",
+        title: "second feed"
+      })
+
     filename = Path.join(tmp_dir, "feeds.opml")
 
     ExportFeeds.run([to_string(first_user.id), filename])
