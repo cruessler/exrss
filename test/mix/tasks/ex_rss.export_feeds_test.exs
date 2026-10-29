@@ -25,6 +25,12 @@ defmodule Mix.Tasks.ExRss.ExportFeedsTest do
     end
   end
 
+  test "raises when user can't be found" do
+    assert_raise Mix.Error, "Could not load user ##{12}", fn ->
+      ExportFeeds.run(["12", "feeds.opml"])
+    end
+  end
+
   test "shows usage when arguments are missing" do
     assert_raise Mix.Error, "Usage: mix ex_rss.export_feeds <USER_ID> <FILENAME>", fn ->
       ExportFeeds.run([])

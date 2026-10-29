@@ -16,7 +16,11 @@ defmodule Mix.Tasks.ExRss.ExportFeeds do
 
         Mix.Task.run("app.start")
 
-        user = Repo.get!(User, user_id) |> Repo.preload(:feeds)
+        user =
+          case Repo.get(User, user_id) |> Repo.preload(:feeds) do
+            nil -> Mix.raise("Could not load user ##{user_id}")
+            user -> user
+          end
 
         Mix.shell().info("Exporting user ##{user_id}'s feeds to #{filename} …")
 
