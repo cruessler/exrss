@@ -1,17 +1,23 @@
 defmodule ExRss.FeedFixtures do
+  alias Ecto.Changeset
   alias ExRss.{Entry, Feed, Repo}
 
   @valid_feed_attrs %{title: "some content", url: "https://example.com/some-content"}
 
-  def feed_fixture(%{user_id: user_id}) do
+  def feed_fixture(%{user_id: user_id, title: title}) do
     %{id: feed_id} =
       feed =
       Feed.changeset(%Feed{user_id: user_id}, @valid_feed_attrs)
+      |> Changeset.put_change(:title, title)
       |> Repo.insert!()
 
     {6, nil} = entry_fixtures(%{feed_id: feed_id})
 
     Repo.preload(feed, :entries)
+  end
+
+  def feed_fixture(%{user_id: user_id}) do
+    feed_fixture(%{user_id: user_id, title: @valid_feed_attrs.title})
   end
 
   defp entry_fixtures(%{feed_id: feed_id}) do

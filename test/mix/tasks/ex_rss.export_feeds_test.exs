@@ -6,7 +6,7 @@ defmodule Mix.Tasks.ExRss.ExportFeedsTest do
   alias Mix.Tasks.ExRss.ExportFeeds
 
   @tag :tmp_dir
-  test "the task works", %{tmp_dir: tmp_dir} do
+  test "a user's feeds are exported", %{tmp_dir: tmp_dir} do
     user = user_fixture()
     feed = feed_fixture(%{user_id: user.id})
     filename = Path.join(tmp_dir, "feeds.opml")
@@ -15,6 +15,23 @@ defmodule Mix.Tasks.ExRss.ExportFeedsTest do
 
     opml = File.read!(filename)
     assert opml =~ ~s(xmlUrl="#{feed.url}")
+
+    assert_received {:mix_shell, :info, ["Exported 1 feeds"]}
+  end
+
+  @tag :tmp_dir
+  test "only requested user's feeds are exported", %{tmp_dir: tmp_dir} do
+    first_user = user_fixture()
+    second_user = user_fixture()
+    first_feed = feed_fixture(%{user_id: first_user.id})
+    second_feed = feed_fixture(%{user_id: second_user.id, title: "second feed"})
+    filename = Path.join(tmp_dir, "feeds.opml")
+
+    ExportFeeds.run([to_string(first_user.id), filename])
+
+    opml = File.read!(filename)
+    assert opml =~ ~s(text="#{first_feed.title}")
+    refute opml =~ ~s(text="#{second_feed.title}")
 
     assert_received {:mix_shell, :info, ["Exported 1 feeds"]}
   end
@@ -40,7 +57,7 @@ defmodule Mix.Tasks.ExRss.ExportFeedsTest do
       ExportFeeds.run([to_string(user.id), filename])
     end
 
-    assert !File.exists?(filename)
+    refute File.exists?(filename)
   end
 
   test "shows usage when arguments are missing" do
