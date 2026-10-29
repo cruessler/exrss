@@ -31,6 +31,18 @@ defmodule Mix.Tasks.ExRss.ExportFeedsTest do
     end
   end
 
+  @tag :tmp_dir
+  test "raises when user doesn't have feeds", %{tmp_dir: tmp_dir} do
+    user = user_fixture()
+    filename = Path.join(tmp_dir, "feeds.opml")
+
+    assert_raise Mix.Error, "User ##{user.id} has no feeds to export", fn ->
+      ExportFeeds.run([to_string(user.id), filename])
+    end
+
+    assert !File.exists?(filename)
+  end
+
   test "shows usage when arguments are missing" do
     assert_raise Mix.Error, "Usage: mix ex_rss.export_feeds <USER_ID> <FILENAME>", fn ->
       ExportFeeds.run([])
