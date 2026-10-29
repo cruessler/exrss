@@ -1,6 +1,10 @@
 defmodule ExRss.FeedExporter do
   @prolog [version: "1.0", encoding: "utf-8"]
 
+  def export_feeds([]) do
+    {:error, :no_feeds_to_export}
+  end
+
   def export_feeds(feeds) do
     import Saxy.XML
 

@@ -6,6 +6,10 @@ defmodule ExRss.FeedExporterTest do
 
   alias ExRss.FeedExporter
 
+  test "errors when given no feeds" do
+    assert {:error, :no_feeds_to_export} == FeedExporter.export_feeds([])
+  end
+
   test "exports feed" do
     %{id: user_id} = user_fixture()
     feed = feed_fixture(%{user_id: user_id})
