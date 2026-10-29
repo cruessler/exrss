@@ -23,6 +23,6 @@ defmodule ExRss.FeedExporter do
     body = element("body", [], feeds)
     opml = element("opml", [version: "1.0"], [head, body])
 
-    Saxy.encode!(opml, @prolog)
+    {:ok, Saxy.encode!(opml, @prolog)}
   end
 end
