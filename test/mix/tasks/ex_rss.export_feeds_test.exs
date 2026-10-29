@@ -5,10 +5,6 @@ defmodule Mix.Tasks.ExRss.ExportFeedsTest do
 
   alias Mix.Tasks.ExRss.ExportFeeds
 
-  setup do
-    Mix.shell(Mix.Shell.Process)
-  end
-
   @tag :tmp_dir
   test "the task works", %{tmp_dir: tmp_dir} do
     user = user_fixture()
