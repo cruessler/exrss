@@ -17,7 +17,7 @@ defmodule ExRss.FeedExporterTest do
     assert %{} = feed
     assert length(feed.entries) == 6
 
-    opml = FeedExporter.export_feeds([feed])
+    assert {:ok, opml} = FeedExporter.export_feeds([feed])
 
     assert opml ==
              String.trim("""
