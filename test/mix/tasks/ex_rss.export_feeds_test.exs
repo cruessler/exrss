@@ -50,8 +50,11 @@ defmodule Mix.Tasks.ExRss.ExportFeedsTest do
   end
 
   test "raises when user can't be found" do
-    assert_raise Mix.Error, "Could not load user ##{12}", fn ->
-      ExportFeeds.run(["12", "feeds.opml"])
+    user = user_fixture()
+    Repo.delete(user)
+
+    assert_raise Mix.Error, "Could not load user ##{user.id}", fn ->
+      ExportFeeds.run([to_string(user.id), "feeds.opml"])
     end
   end
 
