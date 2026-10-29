@@ -20,8 +20,8 @@ defmodule Mix.Tasks.ExRss.ExportFeeds do
 
             Mix.shell().info("Exported #{length(user.feeds)} feeds")
 
-          {:error, message} ->
-            Mix.shell().error(message)
+          {:error, :no_feeds_to_export} ->
+            Mix.raise("User ##{user_id} has no feeds to export")
         end
     end
   end
