@@ -8,13 +8,13 @@ defmodule Mix.Tasks.ExRss.ExportFeeds do
   def run(args) do
     case args do
       [user_id, filename] ->
-        Mix.Task.run("app.start")
-
         user_id =
           case Integer.parse(user_id) do
             {user_id, ""} -> user_id
             _ -> Mix.raise("#{user_id} could not be parsed as a user id")
           end
+
+        Mix.Task.run("app.start")
 
         user = Repo.get!(User, user_id) |> Repo.preload(:feeds)
 
