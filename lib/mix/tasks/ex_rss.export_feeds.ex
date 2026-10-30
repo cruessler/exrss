@@ -1,0 +1,49 @@
+defmodule Mix.Tasks.ExRss.ExportFeeds do
+  use Mix.Task
+
+  alias ExRss.{FeedExporter, Repo, User}
+
+  @shortdoc "Exports a user's feeds to an OPML file"
+
+  @moduledoc """
+  Exports the specified user's feeds to an OPML file.
+
+      mix ex_rss.export_feeds 1 feeds.opml
+
+  An existing file will be overwritten.
+  """
+
+  def run(args) do
+    case args do
+      [user_id, filename] ->
+        user_id =
+          case Integer.parse(user_id) do
+            {user_id, ""} -> user_id
+            _ -> Mix.raise("#{user_id} could not be parsed as a user id")
+          end
+
+        Mix.Task.run("app.start")
+
+        user =
+          case Repo.get(User, user_id) |> Repo.preload(:feeds) do
+            nil -> Mix.raise("Could not load user ##{user_id}")
+            user -> user
+          end
+
+        Mix.shell().info("Exporting user ##{user_id}'s feeds to #{filename} …")
+
+        case FeedExporter.export_feeds(user.feeds) do
+          {:ok, xml} ->
+            File.write!(filename, xml)
+
+            Mix.shell().info("Exported #{length(user.feeds)} feeds")
+
+          {:error, :no_feeds_to_export} ->
+            Mix.raise("User ##{user_id} has no feeds to export")
+        end
+
+      _ ->
+        Mix.raise("Usage: mix ex_rss.export_feeds <USER_ID> <FILENAME>")
+    end
+  end
+end
