@@ -5,6 +5,14 @@ defmodule Mix.Tasks.ExRss.ExportFeeds do
 
   @shortdoc "Exports a user's feeds to an OPML file"
 
+  @moduledoc """
+  Exports the specified user's feeds to an OPML file.
+
+      mix ex_rss.export_feeds 1 feeds.opml
+
+  An existing file will be overwritten.
+  """
+
   def run(args) do
     case args do
       [user_id, filename] ->
