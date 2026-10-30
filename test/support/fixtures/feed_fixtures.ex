@@ -3,19 +3,17 @@ defmodule ExRss.FeedFixtures do
 
   @valid_feed_attrs %{title: "some content", url: "https://example.com/some-content"}
 
-  def feed_fixture(%{user_id: user_id, url: url, title: title}) do
+  def feed_fixture(%{user_id: user_id} = attrs) do
+    attrs = Map.merge(@valid_feed_attrs, attrs)
+
     %{id: feed_id} =
       feed =
-      Feed.changeset(%Feed{user_id: user_id}, %{url: url, title: title})
+      Feed.changeset(%Feed{user_id: user_id}, attrs)
       |> Repo.insert!()
 
     {6, nil} = entry_fixtures(%{feed_id: feed_id})
 
     Repo.preload(feed, :entries)
-  end
-
-  def feed_fixture(%{user_id: user_id}) do
-    feed_fixture(Map.merge(%{user_id: user_id}, @valid_feed_attrs))
   end
 
   defp entry_fixtures(%{feed_id: feed_id}) do
