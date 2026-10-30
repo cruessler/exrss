@@ -4,7 +4,7 @@ defmodule ExRss.FeedExporterTest do
   import ExRss.AccountsFixtures
   import ExRss.FeedFixtures
 
-  alias ExRss.FeedExporter
+  alias ExRss.{FeedExporter, FeedImporter}
 
   test "errors when given no feeds" do
     assert {:error, :no_feeds_to_export} == FeedExporter.export_feeds([])
@@ -66,5 +66,38 @@ defmodule ExRss.FeedExporterTest do
              </body>\
              </opml>
              """)
+  end
+
+  test "exports feed with characters that need escaping" do
+    %{id: user_id} = user_fixture()
+
+    feed =
+      feed_fixture(%{
+        user_id: user_id,
+        url: "https://example.com/blog?page=1&category=news",
+        title: ~s(Assortment of XML special characters "'&<>)
+      })
+
+    assert %{} = feed
+
+    assert {:ok, opml} = FeedExporter.export_feeds([feed])
+
+    assert opml ==
+             String.trim("""
+             <?xml version="1.0" encoding="utf-8"?>\
+             <opml version="1.0">\
+             <head/>\
+             <body>\
+             <outline type="rss" text="Assortment of XML special characters &quot;&apos;&amp;&lt;&gt;" xmlUrl="https://example.com/blog?page=1&amp;category=news"/>\
+             </body>\
+             </opml>
+             """)
+
+    [feed] = FeedImporter.extract_feeds(opml)
+
+    assert %{
+             url: "https://example.com/blog?page=1&category=news",
+             title: ~s(Assortment of XML special characters "'&<>)
+           } = feed
   end
 end
