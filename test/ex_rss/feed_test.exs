@@ -179,6 +179,7 @@ defmodule ExRss.FeedTest do
         parse_entries(sweet_xml_feed, feed)
         |> Enum.map(&Map.drop(&1, [:inserted_at, :updated_at]))
 
+      assert length(feeder_ex_entries) > 0
       assert feeder_ex_entries == sweet_xml_entries
     end
 
