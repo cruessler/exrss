@@ -82,8 +82,7 @@ defmodule ExRss.Feed do
   end
 
   # TODO:
-  # Find a better name for `raw_feed` (applies to
-  # `FeedUpdater.parse_entries()`, too).
+  # Find a better name for `raw_feed` (applies to `FeedUpdater.update()`, too).
   def parse_entries(feed, raw_feed) do
     entries =
       raw_feed.entries
