@@ -146,6 +146,8 @@ defmodule ExRss.Feed do
             )
 
           {:ok, %{entries: entries}}
+        else
+          {:error, :unsupported_format}
         end
       end
     end
