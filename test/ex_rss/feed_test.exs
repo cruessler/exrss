@@ -207,6 +207,17 @@ defmodule ExRss.FeedTest do
       test_fixture("1.empty-links.rss")
     end
 
+    test "1.empty-feed.rss" do
+      xml = FeedsFixtures.rss_fixture("1.empty-feed.rss")
+
+      {:ok, feeder_ex_feed} = xml |> Feed.parse()
+      {:ok, sweet_xml_feed} = xml |> Feed.parse_using_sweet_xml()
+
+      assert length(feeder_ex_feed.entries) == 0
+      assert length(sweet_xml_feed.entries) == 0
+      assert feeder_ex_feed.title == sweet_xml_feed.title
+    end
+
     test "unsupported format" do
       assert {:error, :unsupported_format} = Feed.parse_using_sweet_xml("<html />")
     end
