@@ -160,7 +160,7 @@ defmodule ExRss.FeedTest do
       end
     end
 
-    def test_fixture(filename) do
+    defp test_fixture(filename) do
       xml = FeedsFixtures.rss_fixture(filename)
 
       feed = %{id: "", url: "https://example.com/blog/"}
@@ -174,10 +174,12 @@ defmodule ExRss.FeedTest do
       assert feeder_ex_entries == sweet_xml_entries
     end
 
-    test "fixtures" do
-      for filename <- ["1.atom", "1.rss"] do
-        test_fixture(filename)
-      end
+    test "1.atom" do
+      test_fixture("1.atom")
+    end
+
+    test "1.rss" do
+      test_fixture("1.rss")
     end
   end
 end
