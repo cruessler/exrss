@@ -193,5 +193,9 @@ defmodule ExRss.FeedTest do
     test "1.rss" do
       test_fixture("1.rss")
     end
+
+    test "unsupported format" do
+      assert {:error, :unsupported_format} = Feed.parse_using_sweet_xml("<html />")
+    end
   end
 end
