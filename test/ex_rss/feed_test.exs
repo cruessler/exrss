@@ -178,6 +178,10 @@ defmodule ExRss.FeedTest do
       test_fixture("1.atom")
     end
 
+    test "1.using-namespaces.atom" do
+      test_fixture("1.using-namespaces.atom")
+    end
+
     test "1.rss" do
       test_fixture("1.rss")
     end

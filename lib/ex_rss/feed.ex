@@ -139,10 +139,13 @@ defmodule ExRss.Feed do
         if is_atom do
           entries =
             document
-            |> xpath(~x"/feed/entry"l,
-              title: ~x"./title/text()"s,
-              link: ~x"./link[not(@rel) or @rel='alternate'][1]/@href"s,
-              updated: ~x"./updated/text()"s
+            |> xpath(
+              ~x"/atom:feed/atom:entry"l |> add_atom_namespace(),
+              title: ~x"./atom:title/text()"s |> add_atom_namespace(),
+              link:
+                ~x"./atom:link[not(@rel) or @rel='alternate'][1]/@href"s
+                |> add_atom_namespace(),
+              updated: ~x"./atom:updated/text()"s |> add_atom_namespace()
             )
 
           {:ok, %{entries: entries}}
@@ -151,6 +154,10 @@ defmodule ExRss.Feed do
         end
       end
     end
+  end
+
+  defp add_atom_namespace(query) do
+    SweetXml.add_namespace(query, "atom", "http://www.w3.org/2005/Atom")
   end
 
   def mark_as_read(feed) do
