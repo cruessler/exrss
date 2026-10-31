@@ -148,6 +148,39 @@ defmodule ExRss.FeedTest do
     assert {:error, _} = Feed.parse("")
   end
 
+  describe "Feed.parse_entries" do
+    test "skips entries without actual links and resolves links correctly" do
+      entries =
+        for link <- [nil, "", "/blog/1", "https://example.com/blog/feed.xml"] do
+          %{title: "title", link: link, updated: "2021-11-06"}
+        end
+
+      feed = %{id: 1, url: "https://example.com/blog/feed.xml"}
+
+      entries =
+        Feed.parse_entries(feed, %{
+          title: "title",
+          entries: entries
+        })
+        |> Enum.map(&{&1.url, &1.feed_id})
+
+      assert [{"https://example.com/blog/1", 1}, {"https://example.com/blog/feed.xml", 1}] =
+               entries
+    end
+
+    test "returns empty list when feed has no entries" do
+      feed = %{id: 1, url: "https://example.com/blog/feed.xml"}
+
+      entries =
+        Feed.parse_entries(feed, %{
+          title: "title",
+          entries: []
+        })
+
+      assert [] = entries
+    end
+  end
+
   describe "FeederEx and SweetXml yield the same result" do
     defp test_fixture(filename) do
       feed = %{id: 1, url: "https://example.com/blog/feed.xml"}
