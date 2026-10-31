@@ -183,7 +183,7 @@ defmodule ExRss.Feed do
 
   defp parse_document(xml) do
     try do
-      {:ok, SweetXml.parse(xml, namespace_conformant: true)}
+      {:ok, SweetXml.parse(xml, namespace_conformant: true, quiet: true)}
     catch
       :exit, {:fatal, reason} ->
         {:error, {:xml_parsing_failed, reason}}

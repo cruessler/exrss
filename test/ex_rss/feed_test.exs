@@ -207,7 +207,7 @@ defmodule ExRss.FeedTest do
       xml = FeedsFixtures.rss_fixture("1.truncated.rss")
 
       {:error, _} = xml |> Feed.parse()
-      {:error, _} = xml |> Feed.parse_using_sweet_xml()
+      {:error, {:xml_parsing_failed, _reason}} = xml |> Feed.parse_using_sweet_xml()
     end
 
     test "unsupported format" do
