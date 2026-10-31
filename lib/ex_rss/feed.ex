@@ -101,7 +101,7 @@ defmodule ExRss.Feed do
     is_rss_1_0 = xpath(document, query)
 
     is_rss_2_0 =
-      xpath(xml, ~x"""
+      xpath(document, ~x"""
       boolean(
         /rss[@version='2.0']/channel[
           item/link[normalize-space(.) != '']
