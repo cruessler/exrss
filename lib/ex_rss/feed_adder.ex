@@ -92,6 +92,9 @@ defmodule ExRss.FeedAdder do
   end
 
   def extract_candidate(feed) do
+    # TODO:
+    # When migrating `FeedAdder` to `SweetXml`, keep in mind to adapt the
+    # parser in `Feed.parse()` to supply `feed.url`.
     feed
     |> Map.put(:href, feed.url)
     |> Map.put(:frequency, extract_frequency_info(feed))

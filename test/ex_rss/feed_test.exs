@@ -2,7 +2,7 @@ defmodule ExRss.FeedTest do
   use ExRss.DataCase
 
   alias Ecto.Changeset
-  alias ExRss.{Entry, Feed, User}
+  alias ExRss.{Entry, Feed, FeedsFixtures, User}
   alias Timex.Duration
 
   @valid_attrs %{title: "some content", url: "some content"}
@@ -146,5 +146,105 @@ defmodule ExRss.FeedTest do
   test "parses feed" do
     assert {:ok, %{entries: [_]}} = Feed.parse(@xml)
     assert {:error, _} = Feed.parse("")
+  end
+
+  describe "Feed.parse_entries" do
+    test "skips entries without actual links and resolves links correctly" do
+      entries =
+        for link <- [nil, "", "/blog/1", "https://example.com/blog/feed.xml"] do
+          %{title: "title", link: link, updated: "2021-11-06"}
+        end
+
+      feed = %{id: 1, url: "https://example.com/blog/feed.xml"}
+
+      entries =
+        Feed.parse_entries(feed, %{
+          title: "title",
+          entries: entries
+        })
+        |> Enum.map(&{&1.url, &1.feed_id})
+
+      assert [{"https://example.com/blog/1", 1}, {"https://example.com/blog/feed.xml", 1}] =
+               entries
+    end
+
+    test "returns empty list when feed has no entries" do
+      feed = %{id: 1, url: "https://example.com/blog/feed.xml"}
+
+      entries =
+        Feed.parse_entries(feed, %{
+          title: "title",
+          entries: []
+        })
+
+      assert [] = entries
+    end
+  end
+
+  describe "FeederEx and SweetXml yield the same result" do
+    defp test_fixture(filename) do
+      feed = %{id: 1, url: "https://example.com/blog/feed.xml"}
+      xml = FeedsFixtures.rss_fixture(filename)
+
+      {:ok, feeder_ex_feed} = xml |> Feed.parse()
+
+      # We drop timestamps that are not hardcoded. Both `:inserted_at` and
+      # `:updated_at` are taken from `DateTime.utc_now()` in `Entry.parse()`.
+      feeder_ex_entries =
+        Feed.parse_entries(feed, feeder_ex_feed)
+        |> Enum.map(&Map.drop(&1, [:inserted_at, :updated_at]))
+
+      {:ok, sweet_xml_feed} = xml |> Feed.parse_using_sweet_xml()
+
+      sweet_xml_entries =
+        Feed.parse_entries(feed, sweet_xml_feed)
+        |> Enum.map(&Map.drop(&1, [:inserted_at, :updated_at]))
+
+      assert length(feeder_ex_entries) > 0
+      assert feeder_ex_entries == sweet_xml_entries
+      assert feeder_ex_feed.title == sweet_xml_feed.title
+    end
+
+    test "1.atom" do
+      test_fixture("1.atom")
+    end
+
+    test "1.using-namespaces.atom" do
+      test_fixture("1.using-namespaces.atom")
+    end
+
+    test "1.no-links.atom" do
+      test_fixture("1.no-links.atom")
+    end
+
+    test "1.rss" do
+      test_fixture("1.rss")
+    end
+
+    test "1.empty-links.rss" do
+      test_fixture("1.empty-links.rss")
+    end
+
+    test "1.empty-feed.rss" do
+      xml = FeedsFixtures.rss_fixture("1.empty-feed.rss")
+
+      {:ok, feeder_ex_feed} = xml |> Feed.parse()
+      {:ok, sweet_xml_feed} = xml |> Feed.parse_using_sweet_xml()
+
+      assert length(feeder_ex_feed.entries) == 0
+      assert length(sweet_xml_feed.entries) == 0
+      assert feeder_ex_feed.title == sweet_xml_feed.title
+    end
+
+    test "1.truncated.rss" do
+      xml = FeedsFixtures.rss_fixture("1.truncated.rss")
+
+      {:error, _} = xml |> Feed.parse()
+      {:error, {:xml_parsing_failed, _reason}} = xml |> Feed.parse_using_sweet_xml()
+    end
+
+    test "unsupported format" do
+      assert {:error, :unsupported_format} = Feed.parse_using_sweet_xml("<html />")
+    end
   end
 end

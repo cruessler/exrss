@@ -81,6 +81,119 @@ defmodule ExRss.Feed do
     end
   end
 
+  # TODO:
+  # Find a better name for `raw_feed` (applies to `FeedUpdater.update()`, too).
+  def parse_entries(feed, raw_feed) do
+    entries =
+      raw_feed.entries
+      |> Enum.reject(fn entry ->
+        !is_binary(entry.link) or String.trim(entry.link) == ""
+      end)
+
+    for entry <- entries do
+      entry
+      |> Entry.parse()
+      |> Entry.make_url_absolute(feed.url)
+      |> Map.put(:feed_id, feed.id)
+    end
+  end
+
+  def parse_using_sweet_xml(xml) do
+    case parse_document(xml) do
+      {:ok, document} -> extract_feed(document)
+      x -> x
+    end
+  end
+
+  defp extract_feed(document) do
+    import SweetXml
+
+    query =
+      ~x"""
+      boolean(
+        /rdf:RDF[
+          rss:channel
+          and rss:item/rss:link[normalize-space(.) != '']
+        ]
+      )
+      """
+      |> add_namespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+      |> add_namespace("rss", "http://purl.org/rss/1.0/")
+
+    is_rss_1_0 = xpath(document, query)
+
+    is_rss_2_0 =
+      xpath(document, ~x"""
+      boolean(/rss[@version='2.0']/channel)
+      """)
+
+    query =
+      ~x"boolean(/atom:feed)"
+      |> add_namespace("atom", "http://www.w3.org/2005/Atom")
+
+    is_atom = xpath(document, query)
+
+    if is_rss_1_0 do
+      # TODO:
+      # Implement and verify extraction for RSS 1.0.
+      {:error, :not_implemented}
+    else
+      if is_rss_2_0 do
+        feed =
+          document
+          |> xpath(~x"//rss/channel",
+            title: ~x"./title/text()"s,
+            updated: ~x"./pubDate/text()"s,
+            entries: [
+              ~x"./item"l,
+              title: ~x"./title/text()"s,
+              link: ~x"./link/text()"s,
+              updated: ~x"./pubDate/text()"s
+            ]
+          )
+
+        {:ok, feed}
+      else
+        if is_atom do
+          feed =
+            document
+            |> xpath(
+              ~x"/atom:feed" |> add_atom_namespace(),
+              title: ~x"./atom:title/text()"s |> add_atom_namespace()
+            )
+
+          entries =
+            document
+            |> xpath(
+              ~x"/atom:feed/atom:entry"l |> add_atom_namespace(),
+              title: ~x"./atom:title/text()"s |> add_atom_namespace(),
+              link:
+                ~x"./atom:link[not(@rel) or @rel='alternate'][1]/@href"s
+                |> add_atom_namespace(),
+              updated: ~x"./atom:updated/text()"s |> add_atom_namespace()
+            )
+
+          {:ok, %{title: feed.title, entries: entries}}
+        else
+          {:error, :unsupported_format}
+        end
+      end
+    end
+  end
+
+  defp parse_document(xml) do
+    try do
+      {:ok, SweetXml.parse(xml, namespace_conformant: true, quiet: true)}
+    catch
+      :exit, {:fatal, reason} ->
+        {:error, {:xml_parsing_failed, reason}}
+    end
+  end
+
+  defp add_atom_namespace(query) do
+    SweetXml.add_namespace(query, "atom", "http://www.w3.org/2005/Atom")
+  end
+
   def mark_as_read(feed) do
     entries = for e <- feed.entries, do: Changeset.change(e, read: true)
 
