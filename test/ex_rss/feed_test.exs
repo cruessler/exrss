@@ -203,6 +203,13 @@ defmodule ExRss.FeedTest do
       assert feeder_ex_feed.title == sweet_xml_feed.title
     end
 
+    test "1.truncated.rss" do
+      xml = FeedsFixtures.rss_fixture("1.truncated.rss")
+
+      {:error, _} = xml |> Feed.parse()
+      {:error, _} = xml |> Feed.parse_using_sweet_xml()
+    end
+
     test "unsupported format" do
       assert {:error, :unsupported_format} = Feed.parse_using_sweet_xml("<html />")
     end

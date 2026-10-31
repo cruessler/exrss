@@ -99,9 +99,14 @@ defmodule ExRss.Feed do
   end
 
   def parse_using_sweet_xml(xml) do
-    import SweetXml
+    case parse_document(xml) do
+      {:ok, document} -> extract_feed(document)
+      x -> x
+    end
+  end
 
-    document = SweetXml.parse(xml, namespace_conformant: true)
+  defp extract_feed(document) do
+    import SweetXml
 
     query =
       ~x"""
@@ -173,6 +178,15 @@ defmodule ExRss.Feed do
           {:error, :unsupported_format}
         end
       end
+    end
+  end
+
+  defp parse_document(xml) do
+    try do
+      {:ok, SweetXml.parse(xml, namespace_conformant: true)}
+    catch
+      :exit, {:fatal, reason} ->
+        {:error, {:xml_parsing_failed, reason}}
     end
   end
 
