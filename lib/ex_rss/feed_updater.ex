@@ -3,14 +3,11 @@ defmodule ExRss.FeedUpdater do
   alias ExRss.Entry
   alias ExRss.Feed
 
+  # TODO:
+  # Find a better name for `raw_feed` (applies to `Feed.parse_entries()`, too).
   def update(feed, raw_feed) do
     new_entries =
-      for entry <- raw_feed.entries do
-        entry
-        |> Entry.parse()
-        |> Entry.make_url_absolute(feed.url)
-        |> Map.put(:feed_id, feed.id)
-      end
+      Feed.parse_entries(feed, raw_feed)
 
     changeset =
       feed

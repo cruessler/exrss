@@ -81,6 +81,24 @@ defmodule ExRss.Feed do
     end
   end
 
+  # TODO:
+  # Find a better name for `raw_feed` (applies to
+  # `FeedUpdater.parse_entries()`, too).
+  def parse_entries(feed, raw_feed) do
+    entries =
+      raw_feed.entries
+      |> Enum.reject(fn entry ->
+        !is_binary(entry.link) or String.trim(entry.link) == ""
+      end)
+
+    for entry <- entries do
+      entry
+      |> Entry.parse()
+      |> Entry.make_url_absolute(feed.url)
+      |> Map.put(:feed_id, feed.id)
+    end
+  end
+
   def parse_using_sweet_xml(xml) do
     import SweetXml
 

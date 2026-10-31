@@ -149,23 +149,8 @@ defmodule ExRss.FeedTest do
   end
 
   describe "FeederEx and SweetXml yield the same result" do
-    # TODO:
-    # Do we want to move this elsewhere?
-    defp parse_entries(feed) do
-      entries =
-        feed.entries
-        |> Enum.reject(fn entry ->
-          !is_binary(entry.link) or String.trim(entry.link) == ""
-        end)
-
-      for entry <- entries do
-        entry
-        |> Entry.parse()
-        |> Entry.make_url_absolute("https://example.com/blog/feed.xml")
-      end
-    end
-
     defp test_fixture(filename) do
+      feed = %{id: 1, url: "https://example.com/blog/feed.xml"}
       xml = FeedsFixtures.rss_fixture(filename)
 
       {:ok, feeder_ex_feed} = xml |> Feed.parse()
@@ -173,13 +158,13 @@ defmodule ExRss.FeedTest do
       # We drop timestamps that are not hardcoded. Both `:inserted_at` and
       # `:updated_at` are taken from `DateTime.utc_now()` in `Entry.parse()`.
       feeder_ex_entries =
-        parse_entries(feeder_ex_feed)
+        Feed.parse_entries(feed, feeder_ex_feed)
         |> Enum.map(&Map.drop(&1, [:inserted_at, :updated_at]))
 
       {:ok, sweet_xml_feed} = xml |> Feed.parse_using_sweet_xml()
 
       sweet_xml_entries =
-        parse_entries(sweet_xml_feed)
+        Feed.parse_entries(feed, sweet_xml_feed)
         |> Enum.map(&Map.drop(&1, [:inserted_at, :updated_at]))
 
       assert length(feeder_ex_entries) > 0
