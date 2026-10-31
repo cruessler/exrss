@@ -122,7 +122,7 @@ defmodule ExRss.Feed do
     else
       if is_rss_2_0 do
         feed =
-          xml
+          document
           |> xpath(~x"//rss/channel",
             title: ~x"./title/text()"s,
             updated: ~x"./pubDate/text()"s,
@@ -138,7 +138,7 @@ defmodule ExRss.Feed do
       else
         if is_atom do
           entries =
-            xml
+            document
             |> xpath(~x"/feed/entry"l,
               title: ~x"./title/text()"s,
               link: ~x"./link[not(@rel) or @rel='alternate'][1]/@href"s,
