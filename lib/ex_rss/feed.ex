@@ -125,7 +125,6 @@ defmodule ExRss.Feed do
           document
           |> xpath(~x"//rss/channel",
             title: ~x"./title/text()"s,
-            url: ~x"./link/text()"s,
             updated: ~x"./pubDate/text()"s,
             entries: [
               ~x"./item"l,
@@ -142,10 +141,7 @@ defmodule ExRss.Feed do
             document
             |> xpath(
               ~x"/atom:feed" |> add_atom_namespace(),
-              title: ~x"./atom:title/text()"s |> add_atom_namespace(),
-              url:
-                ~x"./atom:link[not(@rel) or @rel='alternate'][1]/@href"s
-                |> add_atom_namespace()
+              title: ~x"./atom:title/text()"s |> add_atom_namespace()
             )
 
           entries =
@@ -159,7 +155,7 @@ defmodule ExRss.Feed do
               updated: ~x"./atom:updated/text()"s |> add_atom_namespace()
             )
 
-          {:ok, %{title: feed.title, url: feed.url, entries: entries}}
+          {:ok, %{title: feed.title, entries: entries}}
         else
           {:error, :unsupported_format}
         end

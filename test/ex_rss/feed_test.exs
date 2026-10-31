@@ -155,7 +155,7 @@ defmodule ExRss.FeedTest do
       for entry <- feed.entries do
         entry
         |> Entry.parse()
-        |> Entry.make_url_absolute(feed.url)
+        |> Entry.make_url_absolute("https://example.com/blog/feed.xml")
       end
     end
 
@@ -163,15 +163,6 @@ defmodule ExRss.FeedTest do
       xml = FeedsFixtures.rss_fixture(filename)
 
       {:ok, feeder_ex_feed} = xml |> Feed.parse()
-
-      url =
-        case feeder_ex_feed do
-          %{id: id} when not is_nil(id) -> id
-          %{link: link} when not is_nil(link) -> link
-        end
-
-      feeder_ex_feed =
-        Map.put(feeder_ex_feed, :url, url)
 
       # We drop timestamps that are not hardcoded. Both `:inserted_at` and
       # `:updated_at` are taken from `DateTime.utc_now()` in `Entry.parse()`.
@@ -188,7 +179,6 @@ defmodule ExRss.FeedTest do
       assert length(feeder_ex_entries) > 0
       assert feeder_ex_entries == sweet_xml_entries
       assert feeder_ex_feed.title == sweet_xml_feed.title
-      assert feeder_ex_feed.url == sweet_xml_feed.url
     end
 
     test "1.atom" do
