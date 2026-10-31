@@ -152,7 +152,13 @@ defmodule ExRss.FeedTest do
     # TODO:
     # Do we want to move this elsewhere?
     defp parse_entries(feed) do
-      for entry <- feed.entries do
+      entries =
+        feed.entries
+        |> Enum.reject(fn entry ->
+          !is_binary(entry.link) or String.trim(entry.link) == ""
+        end)
+
+      for entry <- entries do
         entry
         |> Entry.parse()
         |> Entry.make_url_absolute("https://example.com/blog/feed.xml")
@@ -189,8 +195,16 @@ defmodule ExRss.FeedTest do
       test_fixture("1.using-namespaces.atom")
     end
 
+    test "1.no-links.atom" do
+      test_fixture("1.no-links.atom")
+    end
+
     test "1.rss" do
       test_fixture("1.rss")
+    end
+
+    test "1.empty-links.rss" do
+      test_fixture("1.empty-links.rss")
     end
 
     test "unsupported format" do

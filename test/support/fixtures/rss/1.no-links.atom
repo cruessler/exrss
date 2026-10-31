@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator>
+  <link href="https://example.com/blog/feed.xml" rel="self" type="application/atom+xml"/>
+  <link href="https://example.com/blog/" rel="alternate" type="text/html"/>
+  <updated>2026-08-12T21:20:49+02:00</updated>
+  <id>https://example.com/blog/</id>
+  <title type="html">title</title>
+  <subtitle>subtitle</subtitle>
+  <author>
+    <name>name</name>
+    <email>name@example.com</email>
+  </author>
+  <entry>
+    <title type="html">title</title>
+    <link href="https://example.com/blog/1" rel="alternate" type="text/html" title="title"/>
+    <published>2026-08-12T21:07:00+02:00</published>
+    <updated>2026-08-12T21:07:00+02:00</updated>
+    <id>id</id>
+    <content type="html" xml:base="https://example.com/blog/1"/>
+    <author>
+      <name>name</name>
+      <email>name@example.com</email>
+    </author>
+    <summary type="html"/>
+  </entry>
+  <entry>
+    <title type="html">title</title>
+    <link href="https://example.com/blog/2" rel="alternate" type="text/html" title="title"/>
+    <published>2026-05-09T18:52:00+02:00</published>
+    <updated>2026-05-09T18:52:00+02:00</updated>
+    <id>id</id>
+    <content type="html" xml:base="https://example.com/blog/2"/>
+    <author>
+      <name>name</name>
+      <email>name@example.com</email>
+    </author>
+    <summary type="html"/>
+  </entry>
+  <entry>
+    <title type="html">title</title>
+    <published>2026-03-14T10:45:00+01:00</published>
+    <updated>2026-03-14T10:45:00+01:00</updated>
+    <id>id</id>
+    <content type="html" xml:base="https://example.com/blog/3"/>
+    <author>
+      <name>name</name>
+      <email>name@example.com</email>
+    </author>
+    <summary type="html"/>
+  </entry>
+  <entry>
+    <title type="html">title</title>
+    <link href="https://example.com/blog/4" rel="alternate" type="text/html" title="title"/>
+    <published>2026-01-25T17:44:00+01:00</published>
+    <updated>2026-01-25T17:44:00+01:00</updated>
+    <id>id</id>
+    <content type="html" xml:base="https://example.com/blog/4"/>
+    <author>
+      <name>name</name>
+      <email>name@example.com</email>
+    </author>
+    <summary type="html"></summary>
+  </entry>
+</feed>
