@@ -166,10 +166,18 @@ defmodule ExRss.FeedTest do
       feed = %{id: "", url: "https://example.com/blog/"}
 
       {:ok, feeder_ex_feed} = xml |> Feed.parse()
-      feeder_ex_entries = parse_entries(feeder_ex_feed, feed)
+
+      # We drop timestamps that are not hardcoded. Both `:inserted_at` and
+      # `:updated_at` are taken from `DateTime.utc_now()` in `Entry.parse()`.
+      feeder_ex_entries =
+        parse_entries(feeder_ex_feed, feed)
+        |> Enum.map(&Map.drop(&1, [:inserted_at, :updated_at]))
 
       {:ok, sweet_xml_feed} = xml |> Feed.parse_using_sweet_xml()
-      sweet_xml_entries = parse_entries(sweet_xml_feed, feed)
+
+      sweet_xml_entries =
+        parse_entries(sweet_xml_feed, feed)
+        |> Enum.map(&Map.drop(&1, [:inserted_at, :updated_at]))
 
       assert feeder_ex_entries == sweet_xml_entries
     end
