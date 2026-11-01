@@ -116,5 +116,21 @@ defmodule ExRss.Crawler.UpdaterTest do
                entries: []
              } = feed
     end
+
+    test "returns error when fetch fails" do
+      url = "https://example.com/feed"
+
+      fetch = fn
+        ^url -> {:error, %HTTPoison.Error{reason: :econnrefused, id: nil}}
+      end
+
+      user = AccountsFixtures.user_fixture()
+
+      feed =
+        Feed.changeset(%Feed{user_id: user.id, title: "Original title", url: url})
+        |> Repo.insert!()
+
+      assert {:error, :econnrefused} = Updater.update(feed, fetch)
+    end
   end
 end
