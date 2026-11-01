@@ -42,12 +42,34 @@ defmodule ExRss.EntryTest do
   end
 
   describe "Entry.parse/1" do
-    test "trimms whitespace in title" do
+    test "trims whitespace in title" do
       entry =
         Entry.parse(%{
           title: " title surrounded by whitespace ",
           updated: "2021-11-06",
           link: "https://example.com/blog/1"
+        })
+
+      assert %{title: "title surrounded by whitespace"} = entry
+    end
+
+    test "keeps nil in title" do
+      entry =
+        Entry.parse(%{
+          title: nil,
+          updated: "2021-11-06",
+          link: "https://example.com/blog/1"
+        })
+
+      assert %{title: nil} = entry
+    end
+
+    test "trims whitespace in link" do
+      entry =
+        Entry.parse(%{
+          title: " title surrounded by whitespace ",
+          updated: "2021-11-06",
+          link: "\n https://example.com/blog/1\n  "
         })
 
       assert %{title: "title surrounded by whitespace"} = entry
