@@ -194,6 +194,113 @@ defmodule ExRss.FeedAdderTest do
     end
   end
 
+  describe "FeedAdder.add_discovery_info/2" do
+    defp add_discovery_info_fixture(filename) do
+      url = "https://example.com/feed"
+      uri = URI.parse(url)
+      xml = FeedFixtures.rss_fixture(filename)
+
+      fetch = fn
+        ^url -> {:ok, xml, uri}
+      end
+
+      FeedAdder.add_discovery_info(%{url: url}, fetch)
+    end
+
+    test "1.atom" do
+      feed = add_discovery_info_fixture("1.atom")
+
+      assert %{
+               frequency: %{seconds: 17_202_180, posts: 4},
+               newest_entries: [
+                 %{
+                   link: "https://example.com/blog/1",
+                   title: "title",
+                   updated: "2026-08-12T21:07:00+02:00"
+                 },
+                 %{
+                   link: "https://example.com/blog/2",
+                   title: "title",
+                   updated: "2026-05-09T18:52:00+02:00"
+                 },
+                 %{
+                   link: "https://example.com/blog/3",
+                   title: "title",
+                   updated: "2026-03-14T10:45:00+01:00"
+                 }
+               ],
+               url: "https://example.com/feed"
+             } = feed
+    end
+
+    test "1.no-links.atom" do
+      feed = add_discovery_info_fixture("1.no-links.atom")
+
+      assert %{
+               frequency: %{seconds: 17_202_180, posts: 4},
+               newest_entries: [
+                 %{
+                   link: "https://example.com/blog/1",
+                   title: "title",
+                   updated: "2026-08-12T21:07:00+02:00"
+                 },
+                 %{
+                   link: "https://example.com/blog/2",
+                   title: "title",
+                   updated: "2026-05-09T18:52:00+02:00"
+                 },
+                 %{
+                   link: nil,
+                   title: "title",
+                   updated: "2026-03-14T10:45:00+01:00"
+                 }
+               ],
+               url: "https://example.com/feed"
+             } = feed
+    end
+
+    test "1.rss" do
+      feed = add_discovery_info_fixture("1.rss")
+
+      assert %{
+               frequency: %{seconds: 0, posts: 3},
+               newest_entries: [
+                 %{
+                   link: "https://example.com/blog/1",
+                   title: "title",
+                   updated: "Wed, 28 Oct 2026 10:54:05 +0000"
+                 },
+                 %{
+                   link: "https://example.com/blog/2",
+                   title: "title",
+                   updated: "Wed, 28 Oct 2026 10:54:05 +0000"
+                 },
+                 %{
+                   link: "https://example.com/blog/3",
+                   title: "title",
+                   updated: "Wed, 28 Oct 2026 10:54:05 +0000"
+                 }
+               ],
+               url: "https://example.com/feed"
+             } = feed
+    end
+
+    test "1.empty-feed.rss" do
+      feed = add_discovery_info_fixture("1.empty-feed.rss")
+
+      assert %{
+               frequency: %{seconds: :not_available, posts: 0},
+               newest_entries: [],
+               url: "https://example.com/feed"
+             } = feed
+    end
+
+    test "1.truncated.rss" do
+      assert %{url: "https://example.com/feed", frequency: nil} =
+               add_discovery_info_fixture("1.truncated.rss")
+    end
+  end
+
   test "extracts feeds" do
     html = LazyHTML.from_document(@html)
 
