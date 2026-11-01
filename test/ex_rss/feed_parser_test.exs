@@ -10,4 +10,26 @@ defmodule ExRss.FeedParserTest do
 
     assert %{item_count: 4, element_stack: []} = state
   end
+
+  test "doesn't count items when nesting is incorrect" do
+    {:ok, state, _remaining_input} =
+      FeedParser.parse("""
+      <feed xmlns="http://www.w3.org/2005/Atom">
+        <div>
+          <entry />
+        </div>
+      </feed>
+      """)
+
+    assert %{item_count: 0, element_stack: []} = state
+  end
+
+  test "doesn't count items when feed is empty" do
+    {:ok, state, _remaining_input} =
+      FeedParser.parse("""
+      <feed xmlns="http://www.w3.org/2005/Atom" />
+      """)
+
+    assert %{item_count: 0, element_stack: []} = state
+  end
 end
