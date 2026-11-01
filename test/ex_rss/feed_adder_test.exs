@@ -1,6 +1,8 @@
 defmodule ExRss.FeedAdderTest do
   use ExRss.DataCase
 
+  import ExUnit.CaptureLog, only: [with_log: 1]
+
   alias ExRss.{FeedAdder, FeedFixtures}
 
   @html """
@@ -306,13 +308,18 @@ defmodule ExRss.FeedAdderTest do
     end
 
     test "1.truncated.rss" do
+      {info, log} =
+        with_log(fn -> add_discovery_info_fixture("1.truncated.rss") end)
+
       assert %{
                url: "https://example.com/feed",
                title: "Discovered title",
                href: "/feed",
                frequency: nil
              } =
-               add_discovery_info_fixture("1.truncated.rss")
+               info
+
+      assert log =~ "Could not add frequency info"
     end
 
     test "returns no frequency info when fetch returns error" do
@@ -324,13 +331,18 @@ defmodule ExRss.FeedAdderTest do
 
       feed = %{title: "Discovered title", href: "/feed", url: url}
 
+      {info, log} =
+        with_log(fn -> FeedAdder.add_discovery_info(feed, fetch) end)
+
       assert %{
                url: "https://example.com/feed",
                title: "Discovered title",
                href: "/feed",
                frequency: nil
              } =
-               FeedAdder.add_discovery_info(feed, fetch)
+               info
+
+      assert log =~ "Could not add frequency info"
     end
   end
 
