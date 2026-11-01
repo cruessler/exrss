@@ -45,7 +45,9 @@ defmodule ExRss.Entry do
       # We intentionally normalize titles by trimming leading and trailing
       # whitespace.
       title: String.trim(entry.title),
-      url: entry.link,
+      # We intentionally normalize URLs titles by trimming leading and trailing
+      # whitespace.
+      url: String.trim(entry.link),
       raw_posted_at: entry.updated,
       posted_at: posted_at,
       read: false,
