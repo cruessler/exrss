@@ -49,7 +49,7 @@ defmodule ExRss.Entry do
           title when is_binary(title) -> String.trim(title)
           title -> title
         end,
-      # We intentionally normalize URLs titles by trimming leading and trailing
+      # We intentionally normalize URLs by trimming leading and trailing
       # whitespace.
       url: String.trim(entry.link),
       raw_posted_at: entry.updated,
