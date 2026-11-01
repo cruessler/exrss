@@ -72,7 +72,7 @@ defmodule ExRss.EntryTest do
           link: "\n https://example.com/blog/1\n  "
         })
 
-      assert %{title: "title surrounded by whitespace"} = entry
+      assert %{url: "https://example.com/blog/1"} = entry
     end
   end
 end
