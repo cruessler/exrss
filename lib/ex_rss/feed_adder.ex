@@ -82,7 +82,7 @@ defmodule ExRss.FeedAdder do
       %URI{} ->
         {:error, :uri_not_absolute}
 
-      {:error, error} ->
+      {:error, _} = error ->
         error
     end
   end
