@@ -285,7 +285,7 @@ defmodule ExRss.FeedAdderTest do
                  },
                  %{
                    link: "https://example.com/blog/3",
-                   title: "title",
+                   title: "title with space trimmed",
                    updated: "Wed, 28 Oct 2026 10:54:05 +0000"
                  }
                ],
