@@ -27,12 +27,9 @@ defmodule ExRss.FeedAdder do
     end)
   end
 
-  def discover_feed(url) do
-    with uri = URI.parse(url),
-         %URI{authority: authority} when not is_nil(authority) <- uri,
-         {:ok, response} <- HTTPoison.get(uri, [], follow_redirect: true),
-         200 <- response.status_code,
-         {:ok, raw_feed} <- Feed.parse(response.body) do
+  def discover_feed(url, fetch \\ &fetch_url/1) do
+    with {:ok, body, _uri} <- fetch.(url),
+         {:ok, raw_feed} <- Feed.parse(body) do
       candidate = extract_candidate(raw_feed)
 
       candidate =
@@ -84,6 +81,9 @@ defmodule ExRss.FeedAdder do
 
       %URI{} ->
         {:error, :uri_not_absolute}
+
+      {:error, _} = error ->
+        error
     end
   end
 

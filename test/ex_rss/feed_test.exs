@@ -2,7 +2,7 @@ defmodule ExRss.FeedTest do
   use ExRss.DataCase
 
   alias Ecto.Changeset
-  alias ExRss.{Entry, Feed, FeedsFixtures, User}
+  alias ExRss.{Entry, Feed, FeedFixtures, User}
   alias Timex.Duration
 
   @valid_attrs %{title: "some content", url: "some content"}
@@ -184,7 +184,7 @@ defmodule ExRss.FeedTest do
   describe "FeederEx and SweetXml yield the same result" do
     defp test_fixture(filename) do
       feed = %{id: 1, url: "https://example.com/blog/feed.xml"}
-      xml = FeedsFixtures.rss_fixture(filename)
+      xml = FeedFixtures.rss_fixture(filename)
 
       {:ok, feeder_ex_feed} = xml |> Feed.parse()
 
@@ -226,7 +226,7 @@ defmodule ExRss.FeedTest do
     end
 
     test "1.empty-feed.rss" do
-      xml = FeedsFixtures.rss_fixture("1.empty-feed.rss")
+      xml = FeedFixtures.rss_fixture("1.empty-feed.rss")
 
       {:ok, feeder_ex_feed} = xml |> Feed.parse()
       {:ok, sweet_xml_feed} = xml |> Feed.parse_using_sweet_xml()
@@ -237,7 +237,7 @@ defmodule ExRss.FeedTest do
     end
 
     test "1.truncated.rss" do
-      xml = FeedsFixtures.rss_fixture("1.truncated.rss")
+      xml = FeedFixtures.rss_fixture("1.truncated.rss")
 
       {:error, _} = xml |> Feed.parse()
       {:error, {:xml_parsing_failed, _reason}} = xml |> Feed.parse_using_sweet_xml()
