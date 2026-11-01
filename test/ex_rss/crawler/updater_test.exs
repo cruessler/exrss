@@ -5,9 +5,9 @@ defmodule ExRss.Crawler.UpdaterTest do
   alias ExRss.{AccountsFixtures, Entry, Feed, FeedFixtures, Repo}
 
   describe "Updater.update/2" do
-    test "adds new entries to feed" do
+    defp update_feed(filename) do
       url = "https://example.com/feed"
-      xml = FeedFixtures.rss_fixture("1.rss")
+      xml = FeedFixtures.rss_fixture(filename)
 
       fetch = fn
         ^url -> {:ok, %HTTPoison.Response{body: xml}}
@@ -23,7 +23,26 @@ defmodule ExRss.Crawler.UpdaterTest do
 
       assert updated_feed.id == feed.id
 
-      feed = Repo.get!(Feed, feed.id) |> Repo.preload(entries: from(e in Entry, order_by: :url))
+      Repo.get!(Feed, feed.id) |> Repo.preload(entries: from(e in Entry, order_by: :url))
+    end
+
+    test "1.atom" do
+      feed = update_feed("1.atom")
+
+      assert %{
+               title: "title",
+               url: "https://example.com/feed",
+               entries: [
+                 %{title: "title", url: "https://example.com/blog/1"},
+                 %{title: "title", url: "https://example.com/blog/2"},
+                 %{title: "title", url: "https://example.com/blog/3"},
+                 %{title: "title", url: "https://example.com/blog/4"}
+               ]
+             } = feed
+    end
+
+    test "1.rss" do
+      feed = update_feed("1.rss")
 
       assert %{
                title: "title",
@@ -33,6 +52,16 @@ defmodule ExRss.Crawler.UpdaterTest do
                  %{title: "title", url: "https://example.com/blog/2"},
                  %{title: "title", url: "https://example.com/blog/3"}
                ]
+             } = feed
+    end
+
+    test "1.empty-feed.rss" do
+      feed = update_feed("1.empty-feed.rss")
+
+      assert %{
+               title: "title",
+               url: "https://example.com/feed",
+               entries: []
              } = feed
     end
 
