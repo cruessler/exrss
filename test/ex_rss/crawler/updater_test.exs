@@ -41,6 +41,20 @@ defmodule ExRss.Crawler.UpdaterTest do
              } = feed
     end
 
+    test "1.no-links.atom" do
+      feed = update_feed("1.no-links.atom")
+
+      assert %{
+               title: "title",
+               url: "https://example.com/feed",
+               entries: [
+                 %{title: "title", url: "https://example.com/blog/1"},
+                 %{title: "title", url: "https://example.com/blog/2"},
+                 %{title: "title", url: "https://example.com/blog/4"}
+               ]
+             } = feed
+    end
+
     test "1.rss" do
       feed = update_feed("1.rss")
 
@@ -51,6 +65,19 @@ defmodule ExRss.Crawler.UpdaterTest do
                  %{title: "title", url: "https://example.com/blog/1"},
                  %{title: "title", url: "https://example.com/blog/2"},
                  %{title: "title", url: "https://example.com/blog/3"}
+               ]
+             } = feed
+    end
+
+    test "1.empty-links.rss" do
+      feed = update_feed("1.empty-links.rss")
+
+      assert %{
+               title: "title",
+               url: "https://example.com/feed",
+               entries: [
+                 %{title: "title", url: "https://example.com/blog/1"},
+                 %{title: "title", url: "https://example.com/blog/2"}
                ]
              } = feed
     end
