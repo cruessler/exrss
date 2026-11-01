@@ -314,6 +314,24 @@ defmodule ExRss.FeedAdderTest do
              } =
                add_discovery_info_fixture("1.truncated.rss")
     end
+
+    test "returns no frequency info when fetch returns error" do
+      url = "https://example.com/feed"
+
+      fetch = fn
+        ^url -> {:error, %HTTPoison.Error{reason: :econnrefused, id: nil}}
+      end
+
+      feed = %{title: "Discovered title", href: "/feed", url: url}
+
+      assert %{
+               url: "https://example.com/feed",
+               title: "Discovered title",
+               href: "/feed",
+               frequency: nil
+             } =
+               FeedAdder.add_discovery_info(feed, fetch)
+    end
   end
 
   test "extracts feeds" do
