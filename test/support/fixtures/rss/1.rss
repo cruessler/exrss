@@ -37,7 +37,7 @@
       <slash:comments>0</slash:comments>
     </item>
     <item>
-      <title>title</title>
+      <title><![CDATA[ title with space trimmed ]]></title>
       <link>https://example.com/blog/3</link>
       <comments>https://example.com/blog/3#comments</comments>
       <dc:creator></dc:creator>

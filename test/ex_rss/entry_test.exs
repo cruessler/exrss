@@ -40,4 +40,17 @@ defmodule ExRss.EntryTest do
     assert "http://example.com/2018/12/26/1.html" =
              Entry.url_for("http://example.com/posts", "/2018/12/26/1.html")
   end
+
+  describe "Entry.parse/1" do
+    test "trimms whitespace in title" do
+      entry =
+        Entry.parse(%{
+          title: " title surrounded by whitespace ",
+          updated: "2021-11-06",
+          link: "https://example.com/blog/1"
+        })
+
+      assert %{title: "title surrounded by whitespace"} = entry
+    end
+  end
 end
