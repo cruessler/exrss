@@ -178,6 +178,10 @@ defmodule ExRss.FeedAdderTest do
              } = feed
     end
 
+    test "1.truncated.rss" do
+      assert {:error, _error} = discover_fixture("1.truncated.rss")
+    end
+
     test "propagates HTTPoison error" do
       url = "https://example.com/feed"
 
