@@ -1,14 +1,8 @@
 defmodule ExRss.Crawler.UpdaterTest do
-  use ExUnit.Case, async: true
+  use ExRss.DataCase, async: true
 
   alias ExRss.Crawler.Updater
-  alias ExRss.{AccountsFixtures, Feed, FeedFixtures, Repo}
-
-  setup do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
-
-    :ok
-  end
+  alias ExRss.{AccountsFixtures, Entry, Feed, FeedFixtures, Repo}
 
   describe "Updater.update/2" do
     test "adds new entries to feed" do
@@ -25,9 +19,11 @@ defmodule ExRss.Crawler.UpdaterTest do
         Feed.changeset(%Feed{user_id: user.id, url: url})
         |> Repo.insert!()
 
-      Updater.update(feed, fetch)
+      {:ok, updated_feed} = Updater.update(feed, fetch)
 
-      feed = Repo.get!(Feed, feed.id) |> Repo.preload(:entries)
+      assert updated_feed.id == feed.id
+
+      feed = Repo.get!(Feed, feed.id) |> Repo.preload(entries: from(e in Entry, order_by: :url))
 
       assert %{
                title: "title",
