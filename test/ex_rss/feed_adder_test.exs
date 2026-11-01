@@ -1,7 +1,7 @@
 defmodule ExRss.FeedAdderTest do
   use ExRss.DataCase
 
-  alias ExRss.FeedAdder
+  alias ExRss.{FeedAdder, FeedFixtures}
 
   @html """
   <!DOCTYPE html>
@@ -108,6 +108,75 @@ defmodule ExRss.FeedAdderTest do
                 frequency: %{seconds: 29_736_240, posts: 3}
               }
             ]} = feeds
+  end
+
+  describe "FeedAdder.discover_feed/2" do
+    defp discover_fixture(filename) do
+      url = "https://example.com/feed"
+      uri = URI.parse(url)
+      xml = FeedFixtures.rss_fixture(filename)
+
+      fetch = fn
+        ^url -> {:ok, xml, uri}
+      end
+
+      FeedAdder.discover_feed(url, fetch)
+    end
+
+    test "1.atom" do
+      {:ok, feed} = discover_fixture("1.atom")
+
+      assert %{
+               frequency: %{posts: 4, seconds: 17_202_180},
+               href: nil,
+               title: "title",
+               url: "https://example.com/feed"
+             } = feed
+    end
+
+    test "1.no-links.atom" do
+      {:ok, feed} = discover_fixture("1.no-links.atom")
+
+      assert %{
+               frequency: %{posts: 4, seconds: 17_202_180},
+               href: nil,
+               title: "title",
+               url: "https://example.com/feed"
+             } = feed
+    end
+
+    test "1.rss" do
+      {:ok, feed} = discover_fixture("1.rss")
+
+      assert %{
+               url: "https://example.com/blog/feed/",
+               frequency: %{seconds: 0, posts: 3},
+               href: "https://example.com/blog/feed/",
+               title: "title"
+             } = feed
+    end
+
+    test "1.empty-links.rss" do
+      {:ok, feed} = discover_fixture("1.empty-links.rss")
+
+      assert %{
+               url: "https://example.com/blog/feed/",
+               frequency: %{seconds: 0, posts: 3},
+               href: "https://example.com/blog/feed/",
+               title: "title"
+             } = feed
+    end
+
+    test "1.empty-feed.rss" do
+      {:ok, feed} = discover_fixture("1.empty-feed.rss")
+
+      assert %{
+               url: "https://example.com/blog/feed/",
+               frequency: %{seconds: :not_available, posts: 0},
+               href: "https://example.com/blog/feed/",
+               title: "title"
+             } = feed
+    end
   end
 
   test "extracts feeds" do
