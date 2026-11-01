@@ -8,6 +8,6 @@ defmodule ExRss.FeedParserTest do
 
     {:ok, state, _remaining_input} = FeedParser.parse(feed)
 
-    assert %{item_count: 4} = state
+    assert %{item_count: 4, element_stack: []} = state
   end
 end
