@@ -177,6 +177,17 @@ defmodule ExRss.FeedAdderTest do
                title: "title"
              } = feed
     end
+
+    test "propagates HTTPoison error" do
+      url = "https://example.com/feed"
+
+      fetch = fn
+        ^url -> {:error, %HTTPoison.Error{reason: :econnrefused, id: nil}}
+      end
+
+      assert {:error, %HTTPoison.Error{reason: :econnrefused, id: nil}} =
+               FeedAdder.discover_feed(url, fetch)
+    end
   end
 
   test "extracts feeds" do
