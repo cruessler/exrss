@@ -29,17 +29,20 @@ defmodule ExRss.FeedParser do
   end
 
   defp handle_event(
-         {:endElement, @atom_uri, ~c"feed", _qualified_name},
+         {:startElement, uri, name, _qualified_name, _attributes},
          _location,
-         %{element_stack: [{@atom_uri, ~c"feed"} | rest]} = state
+         state
        ) do
-    %{state | element_stack: rest}
+    %{
+      state
+      | element_stack: [{uri, name} | state.element_stack]
+    }
   end
 
   defp handle_event(
-         {:endElement, @atom_uri, ~c"entry", _qualified_name},
+         {:endElement, uri, name, _qualified_name},
          _location,
-         %{element_stack: [{@atom_uri, ~c"entry"} | rest]} = state
+         %{element_stack: [{uri, name} | rest]} = state
        ) do
     %{state | element_stack: rest}
   end
