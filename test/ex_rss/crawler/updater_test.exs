@@ -35,5 +35,30 @@ defmodule ExRss.Crawler.UpdaterTest do
                ]
              } = feed
     end
+
+    test "does not make changes when feed is malformed" do
+      url = "https://example.com/feed"
+      xml = FeedFixtures.rss_fixture("1.truncated.rss")
+
+      fetch = fn
+        ^url -> {:ok, %HTTPoison.Response{body: xml}}
+      end
+
+      user = AccountsFixtures.user_fixture()
+
+      feed =
+        Feed.changeset(%Feed{user_id: user.id, title: "Original title", url: url})
+        |> Repo.insert!()
+
+      {:error, _} = Updater.update(feed, fetch)
+
+      feed = Repo.get!(Feed, feed.id) |> Repo.preload(entries: from(e in Entry, order_by: :url))
+
+      assert %{
+               title: "Original title",
+               url: "https://example.com/feed",
+               entries: []
+             } = feed
+    end
   end
 end
