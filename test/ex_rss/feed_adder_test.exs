@@ -204,7 +204,9 @@ defmodule ExRss.FeedAdderTest do
         ^url -> {:ok, xml, uri}
       end
 
-      FeedAdder.add_discovery_info(%{url: url}, fetch)
+      feed = %{title: "Discovered title", href: "/feed", url: url}
+
+      FeedAdder.add_discovery_info(feed, fetch)
     end
 
     test "1.atom" do
@@ -229,6 +231,8 @@ defmodule ExRss.FeedAdderTest do
                    updated: "2026-03-14T10:45:00+01:00"
                  }
                ],
+               title: "Discovered title",
+               href: "/feed",
                url: "https://example.com/feed"
              } = feed
     end
@@ -255,6 +259,8 @@ defmodule ExRss.FeedAdderTest do
                    updated: "2026-03-14T10:45:00+01:00"
                  }
                ],
+               title: "Discovered title",
+               href: "/feed",
                url: "https://example.com/feed"
              } = feed
     end
@@ -281,6 +287,8 @@ defmodule ExRss.FeedAdderTest do
                    updated: "Wed, 28 Oct 2026 10:54:05 +0000"
                  }
                ],
+               title: "Discovered title",
+               href: "/feed",
                url: "https://example.com/feed"
              } = feed
     end
@@ -291,12 +299,19 @@ defmodule ExRss.FeedAdderTest do
       assert %{
                frequency: %{seconds: :not_available, posts: 0},
                newest_entries: [],
+               title: "Discovered title",
+               href: "/feed",
                url: "https://example.com/feed"
              } = feed
     end
 
     test "1.truncated.rss" do
-      assert %{url: "https://example.com/feed", frequency: nil} =
+      assert %{
+               url: "https://example.com/feed",
+               title: "Discovered title",
+               href: "/feed",
+               frequency: nil
+             } =
                add_discovery_info_fixture("1.truncated.rss")
     end
   end
