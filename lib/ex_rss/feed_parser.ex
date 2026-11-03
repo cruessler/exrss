@@ -56,7 +56,7 @@ defmodule ExRss.FeedParser do
       state
       | element_stack: [],
         current_title: [],
-        feed: %{title: Enum.join(state.current_title)}
+        feed: %{title: state.current_title |> Enum.reverse() |> Enum.join()}
     }
   end
 
