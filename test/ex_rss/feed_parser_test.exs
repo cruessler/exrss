@@ -22,6 +22,17 @@ defmodule ExRss.FeedParserTest do
       """)
 
     assert %{item_count: 0, element_stack: []} = state
+
+    {:ok, state, _remaining_input} =
+      FeedParser.parse("""
+      <div>
+        <feed xmlns="http://www.w3.org/2005/Atom">
+          <entry />
+        </feed>
+      </div>
+      """)
+
+    assert %{item_count: 0, element_stack: []} = state
   end
 
   test "doesn't count items when feed is empty" do

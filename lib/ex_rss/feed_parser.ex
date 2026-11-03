@@ -19,7 +19,7 @@ defmodule ExRss.FeedParser do
   defp handle_event(
          {:startElement, @atom_uri, ~c"entry", _qualified_name, _attributes},
          _location,
-         %{element_stack: [{@atom_uri, ~c"feed"} | _]} = state
+         %{element_stack: [{@atom_uri, ~c"feed"}]} = state
        ) do
     %{
       state
