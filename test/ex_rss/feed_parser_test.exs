@@ -34,7 +34,11 @@ defmodule ExRss.FeedParserTest do
       </feed>
       """)
 
-    assert %{item_count: 0, element_stack: [], feed: %{title: "multiline\n      cdata in title"}} =
+    assert %{
+             item_count: 0,
+             element_stack: [],
+             feed: %{title: "\n    multiline\n      cdata in title\n  "}
+           } =
              state
   end
 
@@ -47,6 +51,18 @@ defmodule ExRss.FeedParserTest do
       """)
 
     assert %{item_count: 0, element_stack: [], feed: %{title: "ABC"}} =
+             state
+  end
+
+  test "preserves whitespace in feed title" do
+    {:ok, state, _remaining_input} =
+      FeedParser.parse("""
+      <feed xmlns="http://www.w3.org/2005/Atom">
+        <title><![CDATA[A]]> <![CDATA[B]]></title>
+      </feed>
+      """)
+
+    assert %{item_count: 0, element_stack: [], feed: %{title: "A B"}} =
              state
   end
 
