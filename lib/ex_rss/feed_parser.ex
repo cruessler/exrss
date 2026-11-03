@@ -2,7 +2,7 @@ defmodule ExRss.FeedParser do
   def parse(xml) do
     :xmerl_sax_parser.stream(xml,
       event_fun: &handle_event/3,
-      event_state: %{item_count: 0, element_stack: []}
+      event_state: %{item_count: 0, element_stack: [], current_title: [], feed: nil}
     )
   end
 
@@ -36,6 +36,27 @@ defmodule ExRss.FeedParser do
     %{
       state
       | element_stack: [{uri, name} | state.element_stack]
+    }
+  end
+
+  defp handle_event(
+         {:characters, text},
+         _location,
+         %{element_stack: [{@atom_uri, ~c"title"}, {@atom_uri, ~c"feed"}]} = state
+       ) do
+    %{state | current_title: [text | state.current_title]}
+  end
+
+  defp handle_event(
+         {:endElement, @atom_uri, ~c"feed", _qualified_name},
+         _location,
+         %{element_stack: [{@atom_uri, ~c"feed"}]} = state
+       ) do
+    %{
+      state
+      | element_stack: [],
+        current_title: [],
+        feed: %{title: Enum.join(state.current_title)}
     }
   end
 
