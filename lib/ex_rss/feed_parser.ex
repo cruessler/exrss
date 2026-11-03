@@ -48,6 +48,14 @@ defmodule ExRss.FeedParser do
   end
 
   defp handle_event(
+         {:ignorableWhitespace, text},
+         _location,
+         %{element_stack: [{@atom_uri, ~c"title"}, {@atom_uri, ~c"feed"}]} = state
+       ) do
+    %{state | current_title: [text | state.current_title]}
+  end
+
+  defp handle_event(
          {:endElement, @atom_uri, ~c"feed", _qualified_name},
          _location,
          %{element_stack: [{@atom_uri, ~c"feed"}]} = state
