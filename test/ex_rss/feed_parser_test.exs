@@ -38,6 +38,18 @@ defmodule ExRss.FeedParserTest do
              state
   end
 
+  test "preserves order when title has more than one part" do
+    {:ok, state, _remaining_input} =
+      FeedParser.parse("""
+      <feed xmlns="http://www.w3.org/2005/Atom">
+         <title>A<![CDATA[B]]>C</title>
+      </feed>
+      """)
+
+    assert %{item_count: 0, element_stack: [], feed: %{title: "ABC"}} =
+             state
+  end
+
   test "does not parse a nested entry's title as a feed title" do
     {:ok, state, _remaining_input} =
       FeedParser.parse("""
