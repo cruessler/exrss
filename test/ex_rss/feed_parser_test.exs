@@ -76,7 +76,7 @@ defmodule ExRss.FeedParserTest do
       </feed>
       """)
 
-    assert %{item_count: 1, element_stack: [], feed: %{title: ""}} =
+    assert %{item_count: 1, element_stack: [], feed: %{title: nil}} =
              state
   end
 
