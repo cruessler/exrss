@@ -14,7 +14,7 @@ defmodule ExRss.FeedParser do
 
   @atom_uri ~c"http://www.w3.org/2005/Atom"
 
-  @default_entry %{title: nil, href: nil}
+  @default_entry %{title: nil, link: nil}
   @default_feed %{title: nil, entries: []}
 
   defp handle_event(
@@ -66,8 +66,8 @@ defmodule ExRss.FeedParser do
 
     state = %{state | element_stack: [{@atom_uri, ~c"link"} | state.element_stack]}
 
-    if href != nil and (rel == "alternate" or rel == nil) and state.current_entry.href == nil do
-      %{state | current_entry: %{state.current_entry | href: href}}
+    if href != nil and (rel == "alternate" or rel == nil) and state.current_entry.link == nil do
+      %{state | current_entry: %{state.current_entry | link: href}}
     else
       state
     end

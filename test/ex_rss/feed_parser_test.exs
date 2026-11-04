@@ -13,10 +13,10 @@ defmodule ExRss.FeedParserTest do
              feed: %{
                title: "title",
                entries: [
-                 %{title: "title", href: "https://example.com/blog/1"},
-                 %{title: "title", href: "https://example.com/blog/2"},
-                 %{title: "title", href: "https://example.com/blog/3"},
-                 %{title: "title", href: "https://example.com/blog/4"}
+                 %{title: "title", link: "https://example.com/blog/1"},
+                 %{title: "title", link: "https://example.com/blog/2"},
+                 %{title: "title", link: "https://example.com/blog/3"},
+                 %{title: "title", link: "https://example.com/blog/4"}
                ]
              }
            } = state
@@ -47,9 +47,9 @@ defmodule ExRss.FeedParserTest do
              feed: %{
                title: "feed title",
                entries: [
-                 %{title: "entry title 1", href: "https://example.com/1"},
-                 %{title: "entry title 2", href: "https://example.com/2"},
-                 %{title: "entry title 3", href: nil}
+                 %{title: "entry title 1", link: "https://example.com/1"},
+                 %{title: "entry title 2", link: "https://example.com/2"},
+                 %{title: "entry title 3", link: nil}
                ]
              }
            } =
@@ -75,7 +75,7 @@ defmodule ExRss.FeedParserTest do
              feed: %{
                title: "feed title",
                entries: [
-                 %{title: "correct title", href: "https://example.com/1"}
+                 %{title: "correct title", link: "https://example.com/1"}
                ]
              }
            } =
