@@ -53,6 +53,26 @@ defmodule ExRss.FeedParserTest do
              state
   end
 
+  test "only parses feed title if it's a direct child" do
+    {:ok, state, _remaining_input} =
+      FeedParser.parse("""
+      <feed xmlns="http://www.w3.org/2005/Atom">
+        <div>
+          <title>ignored</title>
+        </div>
+      </feed>
+      """)
+
+    assert %{
+             element_stack: [],
+             feed: %{
+               title: nil,
+               entries: []
+             }
+           } =
+             state
+  end
+
   test "parses a feed's atom:title" do
     {:ok, state, _remaining_input} =
       FeedParser.parse("""
