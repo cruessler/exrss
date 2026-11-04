@@ -52,27 +52,27 @@ defmodule ExRss.FeedParser do
     }
   end
 
-  defp handle_event(
-         {:characters, text},
-         _location,
-         %{element_stack: [{@atom_uri, ~c"title"} | _rest]} = state
-       ) do
-    %{state | current_title_parts: [text | state.current_title_parts]}
-  end
+  @title_paths [
+    [{@atom_uri, ~c"title"}, {@atom_uri, ~c"feed"}],
+    [{@atom_uri, ~c"title"}, {@atom_uri, ~c"entry"}, {@atom_uri, ~c"feed"}]
+  ]
 
   defp handle_event(
-         {:ignorableWhitespace, text},
+         {event, text},
          _location,
-         %{element_stack: [{@atom_uri, ~c"title"} | _rest]} = state
-       ) do
+         %{element_stack: element_stack} = state
+       )
+       when event in [:characters, :ignorableWhitespace] and element_stack in @title_paths do
     %{state | current_title_parts: [text | state.current_title_parts]}
   end
 
   defp handle_event(
          {:endElement, @atom_uri, ~c"title", _qualified_name},
          _location,
-         %{element_stack: [{@atom_uri, ~c"title"} | rest]} = state
-       ) do
+         %{element_stack: element_stack} = state
+       )
+       when element_stack in @title_paths do
+    [_ | rest] = element_stack
     title = state.current_title_parts |> Enum.reverse() |> Enum.join()
 
     case rest do
