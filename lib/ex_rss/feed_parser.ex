@@ -14,7 +14,7 @@ defmodule ExRss.FeedParser do
 
   @atom_uri ~c"http://www.w3.org/2005/Atom"
 
-  @default_entry %{title: nil}
+  @default_entry %{title: nil, href: nil}
   @default_feed %{title: nil, entries: []}
 
   defp handle_event(
@@ -39,6 +39,36 @@ defmodule ExRss.FeedParser do
       | element_stack: [{@atom_uri, ~c"entry"} | state.element_stack],
         current_entry: @default_entry
     }
+  end
+
+  defp handle_event(
+         {:startElement, @atom_uri, ~c"link", _qualified_name, attributes},
+         _location,
+         %{element_stack: [{@atom_uri, ~c"entry"}, {@atom_uri, ~c"feed"}]} = state
+       ) do
+    href =
+      Enum.find_value(attributes, fn
+        {[], _prefix, ~c"href", href} ->
+          List.to_string(href)
+
+        _ ->
+          nil
+      end)
+
+    rel =
+      Enum.find_value(attributes, fn
+        {[], _prefix, ~c"rel", rel} ->
+          List.to_string(rel)
+
+        _ ->
+          nil
+      end)
+
+    if href != nil and (rel == "alternate" or rel == nil) and state.current_entry.href == nil do
+      %{state | current_entry: %{state.current_entry | href: href}}
+    else
+      state
+    end
   end
 
   defp handle_event(

@@ -13,13 +13,47 @@ defmodule ExRss.FeedParserTest do
              feed: %{
                title: "title",
                entries: [
-                 %{title: "title"},
-                 %{title: "title"},
-                 %{title: "title"},
-                 %{title: "title"}
+                 %{title: "title", href: "https://example.com/blog/1"},
+                 %{title: "title", href: "https://example.com/blog/2"},
+                 %{title: "title", href: "https://example.com/blog/3"},
+                 %{title: "title", href: "https://example.com/blog/4"}
                ]
              }
            } = state
+  end
+
+  test "parses entry links" do
+    {:ok, state, _remaining_input} =
+      FeedParser.parse("""
+      <feed xmlns="http://www.w3.org/2005/Atom">
+        <title>feed title</title>
+        <entry>
+          <title>entry title 1</title>
+          <link href="https://example.com/1" />
+        </entry>
+        <entry>
+          <title>entry title 2</title>
+          <link href="https://example.com/2" rel="alternate" />
+        </entry>
+        <entry>
+          <title>entry title 3</title>
+          <link href="https://example.com/3" rel="invalid" />
+        </entry>
+      </feed>
+      """)
+
+    assert %{
+             element_stack: [],
+             feed: %{
+               title: "feed title",
+               entries: [
+                 %{title: "entry title 1", href: "https://example.com/1"},
+                 %{title: "entry title 2", href: "https://example.com/2"},
+                 %{title: "entry title 3", href: nil}
+               ]
+             }
+           } =
+             state
   end
 
   test "parses titles at different levels" do
