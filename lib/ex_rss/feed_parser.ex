@@ -91,9 +91,6 @@ defmodule ExRss.FeedParser do
             current_title_parts: [],
             current_entry: %{state.current_entry | title: title}
         }
-
-      _ ->
-        %{state | element_stack: rest, current_title_parts: []}
     end
   end
 
@@ -105,7 +102,7 @@ defmodule ExRss.FeedParser do
     %{
       state
       | element_stack: [{@atom_uri, ~c"feed"}],
-        current_entry: @default_entry,
+        current_entry: nil,
         current_entries: [state.current_entry | state.current_entries]
     }
   end
