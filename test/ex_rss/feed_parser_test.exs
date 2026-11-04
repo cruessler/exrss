@@ -39,6 +39,22 @@ defmodule ExRss.FeedParserTest do
           <title>entry title 3</title>
           <link href="https://example.com/3" rel="invalid" />
         </entry>
+        <entry>
+          <title>entry title 4</title>
+          <link href="https://example.com/self" rel="self" />
+          <link href="https://example.com/alternate" rel="alternate" />
+        </entry>
+        <entry>
+          <title>entry title 5</title>
+          <link href="https://example.com/shorturl" rel="shorturl" />
+          <link href="https://example.com/alternate" rel="alternate" />
+        </entry>
+        <entry>
+          <title>entry title 6</title>
+          <link />
+          <link href="" />
+          <link href="https://example.com/alternate" rel="alternate" />
+        </entry>
       </feed>
       """)
 
@@ -49,7 +65,10 @@ defmodule ExRss.FeedParserTest do
                entries: [
                  %{title: "entry title 1", link: "https://example.com/1"},
                  %{title: "entry title 2", link: "https://example.com/2"},
-                 %{title: "entry title 3", link: nil}
+                 %{title: "entry title 3", link: "https://example.com/3"},
+                 %{title: "entry title 4", link: "https://example.com/self"},
+                 %{title: "entry title 5", link: "https://example.com/alternate"},
+                 %{title: "entry title 6", link: "https://example.com/alternate"}
                ]
              }
            } =
