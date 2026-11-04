@@ -3,7 +3,7 @@ defmodule ExRss.FeedParserTest do
 
   alias ExRss.{FeedFixtures, FeedParser}
 
-  test "counts items" do
+  test "1.atom" do
     feed = FeedFixtures.rss_fixture("1.atom")
 
     {:ok, state, _remaining_input} = FeedParser.parse(feed)
