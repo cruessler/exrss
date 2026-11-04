@@ -64,6 +64,8 @@ defmodule ExRss.FeedParser do
           nil
       end)
 
+    state = %{state | element_stack: [{@atom_uri, ~c"link"} | state.element_stack]}
+
     if href != nil and (rel == "alternate" or rel == nil) and state.current_entry.href == nil do
       %{state | current_entry: %{state.current_entry | href: href}}
     else
