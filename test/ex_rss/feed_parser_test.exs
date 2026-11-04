@@ -1,7 +1,7 @@
 defmodule ExRss.FeedParserTest do
   use ExUnit.Case, async: true
 
-  alias ExRss.{FeedFixtures, FeedParser}
+  alias ExRss.{Feed, FeedFixtures, FeedParser}
 
   test "1.atom" do
     feed = FeedFixtures.rss_fixture("1.atom")
@@ -269,5 +269,41 @@ defmodule ExRss.FeedParserTest do
       """)
 
     assert %{feed: %{title: nil, entries: []}, element_stack: []} = state
+  end
+
+  test "Atom date fiels" do
+    {:ok, feed} =
+      Feed.parse("""
+      <feed xmlns="http://www.w3.org/2005/Atom">
+        <title>feed title</title>
+        <entry>
+          <title>entry title 1</title>
+          <published>2022-08-12T21:07:00+02:00</published>
+          <updated>2026-08-12T21:07:00+02:00</updated>
+        </entry>
+        <entry>
+          <title>entry title 2</title>
+          <updated>2026-08-12T21:07:00+02:00</updated>
+        </entry>
+        <entry>
+          <title>entry title 3</title>
+          <published>2022-08-12T21:07:00+02:00</published>
+        </entry>
+        <entry>
+          <title>entry title 4</title>
+          <updated>2026-08-12T21:07:00+02:00</updated>
+          <published>2022-08-12T21:07:00+02:00</published>
+        </entry>
+      </feed>
+      """)
+
+    assert %{
+             entries: [
+               %{updated: "2026-08-12T21:07:00+02:00"},
+               %{updated: "2026-08-12T21:07:00+02:00"},
+               %{updated: nil},
+               %{updated: "2026-08-12T21:07:00+02:00"}
+             ]
+           } = feed
   end
 end
