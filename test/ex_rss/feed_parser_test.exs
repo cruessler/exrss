@@ -8,7 +8,49 @@ defmodule ExRss.FeedParserTest do
 
     {:ok, state, _remaining_input} = FeedParser.parse(feed)
 
-    assert %{item_count: 4, element_stack: [], feed: %{title: "title"}} = state
+    assert %{
+             element_stack: [],
+             feed: %{
+               title: "title",
+               entries: [
+                 %{title: "title"},
+                 %{title: "title"},
+                 %{title: "title"},
+                 %{title: "title"}
+               ]
+             }
+           } = state
+  end
+
+  test "parses titles at different levels" do
+    {:ok, state, _remaining_input} =
+      FeedParser.parse("""
+      <feed xmlns="http://www.w3.org/2005/Atom">
+        <title>feed title</title>
+        <entry>
+          <title>entry title 1</title>
+        </entry>
+        <entry>
+          <title>entry title 2</title>
+        </entry>
+        <entry>
+          <title>entry title 3</title>
+        </entry>
+      </feed>
+      """)
+
+    assert %{
+             element_stack: [],
+             feed: %{
+               title: "feed title",
+               entries: [
+                 %{title: "entry title 1"},
+                 %{title: "entry title 2"},
+                 %{title: "entry title 3"}
+               ]
+             }
+           } =
+             state
   end
 
   test "parses a feed's atom:title" do
@@ -19,7 +61,7 @@ defmodule ExRss.FeedParserTest do
       </atom:feed>
       """)
 
-    assert %{item_count: 0, element_stack: [], feed: %{title: "title"}} =
+    assert %{element_stack: [], feed: %{title: "title", entries: []}} =
              state
   end
 
@@ -35,9 +77,8 @@ defmodule ExRss.FeedParserTest do
       """)
 
     assert %{
-             item_count: 0,
              element_stack: [],
-             feed: %{title: "\n    multiline\n      cdata in title\n  "}
+             feed: %{title: "\n    multiline\n      cdata in title\n  ", entries: []}
            } =
              state
   end
@@ -50,7 +91,7 @@ defmodule ExRss.FeedParserTest do
       </feed>
       """)
 
-    assert %{item_count: 0, element_stack: [], feed: %{title: "ABC"}} =
+    assert %{element_stack: [], feed: %{title: "ABC", entries: []}} =
              state
   end
 
@@ -62,7 +103,7 @@ defmodule ExRss.FeedParserTest do
       </feed>
       """)
 
-    assert %{item_count: 0, element_stack: [], feed: %{title: "A B"}} =
+    assert %{element_stack: [], feed: %{title: "A B", entries: []}} =
              state
   end
 
@@ -76,7 +117,7 @@ defmodule ExRss.FeedParserTest do
       </feed>
       """)
 
-    assert %{item_count: 1, element_stack: [], feed: %{title: nil}} =
+    assert %{element_stack: [], feed: %{title: nil, entries: [%{title: "title"}]}} =
              state
   end
 
@@ -90,7 +131,7 @@ defmodule ExRss.FeedParserTest do
       </feed>
       """)
 
-    assert %{item_count: 0, element_stack: []} = state
+    assert %{feed: %{title: nil, entries: []}, element_stack: []} = state
 
     {:ok, state, _remaining_input} =
       FeedParser.parse("""
@@ -101,7 +142,7 @@ defmodule ExRss.FeedParserTest do
       </div>
       """)
 
-    assert %{item_count: 0, element_stack: []} = state
+    assert %{feed: nil, element_stack: []} = state
   end
 
   test "doesn't count items when feed is empty" do
@@ -110,6 +151,6 @@ defmodule ExRss.FeedParserTest do
       <feed xmlns="http://www.w3.org/2005/Atom" />
       """)
 
-    assert %{item_count: 0, element_stack: []} = state
+    assert %{feed: %{title: nil, entries: []}, element_stack: []} = state
   end
 end
