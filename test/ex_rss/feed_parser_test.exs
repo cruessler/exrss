@@ -56,6 +56,32 @@ defmodule ExRss.FeedParserTest do
              state
   end
 
+  test "ignores <title> inside <link>" do
+    {:ok, state, _remaining_input} =
+      FeedParser.parse("""
+      <feed xmlns="http://www.w3.org/2005/Atom">
+        <title>feed title</title>
+        <entry>
+          <title>correct title</title>
+          <link href="https://example.com/1">
+            <title>should be ignored</title>
+          </link>
+        </entry>
+      </feed>
+      """)
+
+    assert %{
+             element_stack: [],
+             feed: %{
+               title: "feed title",
+               entries: [
+                 %{title: "correct title", href: "https://example.com/1"}
+               ]
+             }
+           } =
+             state
+  end
+
   test "parses titles at different levels" do
     {:ok, state, _remaining_input} =
       FeedParser.parse("""
