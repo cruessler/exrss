@@ -76,7 +76,7 @@ defmodule ExRss.FeedParser do
     title = state.current_title_parts |> Enum.reverse() |> Enum.join()
 
     case rest do
-      [{@atom_uri, ~c"feed"} | _rest] ->
+      [{@atom_uri, ~c"feed"}] ->
         %{
           state
           | element_stack: rest,
@@ -84,13 +84,16 @@ defmodule ExRss.FeedParser do
             feed: %{state.feed | title: title}
         }
 
-      [{@atom_uri, ~c"entry"} | _rest] ->
+      [{@atom_uri, ~c"entry"}, {@atom_uri, ~c"feed"}] ->
         %{
           state
           | element_stack: rest,
             current_title_parts: [],
             current_entry: %{state.current_entry | title: title}
         }
+
+      _ ->
+        %{state | element_stack: rest, current_title_parts: []}
     end
   end
 
