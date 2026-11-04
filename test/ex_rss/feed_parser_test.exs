@@ -305,5 +305,41 @@ defmodule ExRss.FeedParserTest do
                %{updated: "2026-08-12T21:07:00+02:00"}
              ]
            } = feed
+
+    {:ok, state, _remaining_input} =
+      FeedParser.parse("""
+      <feed xmlns="http://www.w3.org/2005/Atom">
+        <title>feed title</title>
+        <entry>
+          <title>entry title 1</title>
+          <published>2022-08-12T21:07:00+02:00</published>
+          <updated>2026-08-12T21:07:00+02:00</updated>
+        </entry>
+        <entry>
+          <title>entry title 2</title>
+          <updated>2026-08-12T21:07:00+02:00</updated>
+        </entry>
+        <entry>
+          <title>entry title 3</title>
+          <published>2022-08-12T21:07:00+02:00</published>
+        </entry>
+        <entry>
+          <title>entry title 4</title>
+          <updated>2026-08-12T21:07:00+02:00</updated>
+          <published>2022-08-12T21:07:00+02:00</published>
+        </entry>
+      </feed>
+      """)
+
+    assert %{
+             feed: %{
+               entries: [
+                 %{title: "entry title 1", updated: "2026-08-12T21:07:00+02:00"},
+                 %{title: "entry title 2", updated: "2026-08-12T21:07:00+02:00"},
+                 %{title: "entry title 3", updated: nil},
+                 %{title: "entry title 4", updated: "2026-08-12T21:07:00+02:00"}
+               ]
+             }
+           } = state
   end
 end

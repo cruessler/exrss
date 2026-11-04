@@ -5,7 +5,7 @@ defmodule ExRss.FeedParser do
       event_state: %{
         current_entries: [],
         element_stack: [],
-        current_title_parts: [],
+        current_text_parts: [],
         current_entry: nil,
         feed: nil
       }
@@ -14,7 +14,7 @@ defmodule ExRss.FeedParser do
 
   @atom_uri ~c"http://www.w3.org/2005/Atom"
 
-  @default_entry %{title: nil, link: nil}
+  @default_entry %{title: nil, link: nil, updated: nil}
   @default_feed %{title: nil, entries: []}
 
   defp handle_event(
@@ -85,9 +85,10 @@ defmodule ExRss.FeedParser do
     }
   end
 
-  @title_paths [
+  @text_paths [
     [{@atom_uri, ~c"title"}, {@atom_uri, ~c"feed"}],
-    [{@atom_uri, ~c"title"}, {@atom_uri, ~c"entry"}, {@atom_uri, ~c"feed"}]
+    [{@atom_uri, ~c"title"}, {@atom_uri, ~c"entry"}, {@atom_uri, ~c"feed"}],
+    [{@atom_uri, ~c"updated"}, {@atom_uri, ~c"entry"}, {@atom_uri, ~c"feed"}]
   ]
 
   defp handle_event(
@@ -95,9 +96,14 @@ defmodule ExRss.FeedParser do
          _location,
          %{element_stack: element_stack} = state
        )
-       when event in [:characters, :ignorableWhitespace] and element_stack in @title_paths do
-    %{state | current_title_parts: [text | state.current_title_parts]}
+       when event in [:characters, :ignorableWhitespace] and element_stack in @text_paths do
+    %{state | current_text_parts: [text | state.current_text_parts]}
   end
+
+  @title_paths [
+    [{@atom_uri, ~c"title"}, {@atom_uri, ~c"feed"}],
+    [{@atom_uri, ~c"title"}, {@atom_uri, ~c"entry"}, {@atom_uri, ~c"feed"}]
+  ]
 
   defp handle_event(
          {:endElement, @atom_uri, ~c"title", _qualified_name},
@@ -106,14 +112,14 @@ defmodule ExRss.FeedParser do
        )
        when element_stack in @title_paths do
     [_ | rest] = element_stack
-    title = state.current_title_parts |> Enum.reverse() |> Enum.join()
+    title = state.current_text_parts |> Enum.reverse() |> Enum.join()
 
     case rest do
       [{@atom_uri, ~c"feed"}] ->
         %{
           state
           | element_stack: rest,
-            current_title_parts: [],
+            current_text_parts: [],
             feed: %{state.feed | title: title}
         }
 
@@ -121,10 +127,31 @@ defmodule ExRss.FeedParser do
         %{
           state
           | element_stack: rest,
-            current_title_parts: [],
+            current_text_parts: [],
             current_entry: %{state.current_entry | title: title}
         }
     end
+  end
+
+  defp handle_event(
+         {:endElement, @atom_uri, ~c"updated", _qualified_name},
+         _location,
+         %{
+           element_stack: [
+             {@atom_uri, ~c"updated"},
+             {@atom_uri, ~c"entry"},
+             {@atom_uri, ~c"feed"}
+           ]
+         } = state
+       ) do
+    updated = state.current_text_parts |> Enum.reverse() |> Enum.join()
+
+    %{
+      state
+      | element_stack: [{@atom_uri, ~c"entry"}, {@atom_uri, ~c"feed"}],
+        current_text_parts: [],
+        current_entry: %{state.current_entry | updated: updated}
+    }
   end
 
   defp handle_event(
