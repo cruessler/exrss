@@ -73,6 +73,24 @@ defmodule ExRss.FeedParserTest do
              state
   end
 
+  test "only parses toplevel text in title" do
+    {:ok, state, _remaining_input} =
+      FeedParser.parse("""
+      <feed xmlns="http://www.w3.org/2005/Atom">
+        <title>A<div><title>ignored</title></div>C</title>
+      </feed>
+      """)
+
+    assert %{
+             element_stack: [],
+             feed: %{
+               title: "AC",
+               entries: []
+             }
+           } =
+             state
+  end
+
   test "parses a feed's atom:title" do
     {:ok, state, _remaining_input} =
       FeedParser.parse("""
