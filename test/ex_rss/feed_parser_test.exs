@@ -327,4 +327,41 @@ defmodule ExRss.FeedParserTest do
 
     assert {:error, {:xml_parsing_failed, _reason}} = result
   end
+
+  describe "FeederEx and FeedParser yield the same result" do
+    defp test_fixture(filename) do
+      feed = %{id: 1, url: "https://example.com/blog/feed.xml"}
+      xml = FeedFixtures.rss_fixture(filename)
+
+      {:ok, feeder_ex_feed} = xml |> Feed.parse()
+
+      # We drop timestamps that are not hardcoded. Both `:inserted_at` and
+      # `:updated_at` are taken from `DateTime.utc_now()` in `Entry.parse()`.
+      feeder_ex_entries =
+        Feed.parse_entries(feed, feeder_ex_feed)
+        |> Enum.map(&Map.drop(&1, [:inserted_at, :updated_at]))
+
+      {:ok, feed_parser_feed} = xml |> FeedParser.parse()
+
+      feed_parser_entries =
+        Feed.parse_entries(feed, feed_parser_feed)
+        |> Enum.map(&Map.drop(&1, [:inserted_at, :updated_at]))
+
+      assert length(feeder_ex_entries) > 0
+      assert feeder_ex_entries == feed_parser_entries
+      assert feeder_ex_feed.title == feed_parser_feed.title
+    end
+
+    test "1.atom" do
+      test_fixture("1.atom")
+    end
+
+    test "1.using-namespaces.atom" do
+      test_fixture("1.using-namespaces.atom")
+    end
+
+    test "1.no-links.atom" do
+      test_fixture("1.no-links.atom")
+    end
+  end
 end
