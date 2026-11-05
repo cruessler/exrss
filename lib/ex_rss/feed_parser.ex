@@ -8,6 +8,7 @@ defmodule ExRss.FeedParser do
           element_stack: [],
           current_text_parts: [],
           current_entry: nil,
+          rss_format_2: false,
           feed: nil
         }
       )
@@ -100,8 +101,20 @@ defmodule ExRss.FeedParser do
           nil
       end)
 
+    %{
+      state
+      | element_stack: [{[], ~c"rss"} | state.element_stack],
+        rss_format_2: version == "2.0"
+    }
+  end
+
+  defp handle_event(
+         {:startElement, [], ~c"channel", _qualified_name, _attributes},
+         _location,
+         %{element_stack: [{[], ~c"rss"}]} = state
+       ) do
     feed =
-      if version == "2.0" do
+      if state.rss_format_2 do
         @default_feed
       else
         nil
@@ -109,7 +122,7 @@ defmodule ExRss.FeedParser do
 
     %{
       state
-      | element_stack: [{[], ~c"rss"} | state.element_stack],
+      | element_stack: [{[], ~c"channel"} | state.element_stack],
         feed: feed
     }
   end
