@@ -141,7 +141,8 @@ defmodule ExRss.FeedParser do
   @text_paths [
     [{@atom_uri, ~c"title"}, {@atom_uri, ~c"feed"}],
     [{@atom_uri, ~c"title"}, {@atom_uri, ~c"entry"}, {@atom_uri, ~c"feed"}],
-    [{@atom_uri, ~c"updated"}, {@atom_uri, ~c"entry"}, {@atom_uri, ~c"feed"}]
+    [{@atom_uri, ~c"updated"}, {@atom_uri, ~c"entry"}, {@atom_uri, ~c"feed"}],
+    [{[], ~c"title"}, {[], ~c"channel"}, {[], ~c"rss"}]
   ]
 
   defp handle_event(
@@ -153,7 +154,7 @@ defmodule ExRss.FeedParser do
     %{state | current_text_parts: [text | state.current_text_parts]}
   end
 
-  @title_paths [
+  @atom_title_paths [
     [{@atom_uri, ~c"title"}, {@atom_uri, ~c"feed"}],
     [{@atom_uri, ~c"title"}, {@atom_uri, ~c"entry"}, {@atom_uri, ~c"feed"}]
   ]
@@ -163,7 +164,7 @@ defmodule ExRss.FeedParser do
          _location,
          %{element_stack: element_stack} = state
        )
-       when element_stack in @title_paths do
+       when element_stack in @atom_title_paths do
     [_ | rest] = element_stack
     title = state.current_text_parts |> Enum.reverse() |> Enum.join()
 
@@ -183,6 +184,33 @@ defmodule ExRss.FeedParser do
             current_text_parts: [],
             current_entry: %{state.current_entry | title: title}
         }
+    end
+  end
+
+  @rss_title_paths [
+    [{[], ~c"title"}, {[], ~c"channel"}, {[], ~c"rss"}]
+  ]
+
+  defp handle_event(
+         {:endElement, [], ~c"title", _qualified_name},
+         _location,
+         %{element_stack: element_stack} = state
+       )
+       when element_stack in @rss_title_paths do
+    [_ | rest] = element_stack
+    title = state.current_text_parts |> Enum.reverse() |> Enum.join()
+
+    case {state.rss_format_2, rest} do
+      {true, [{[], ~c"channel"}, {[], ~c"rss"}]} ->
+        %{
+          state
+          | element_stack: rest,
+            current_text_parts: [],
+            feed: %{state.feed | title: title}
+        }
+
+      _ ->
+        %{state | element_stack: rest, current_text_parts: []}
     end
   end
 
