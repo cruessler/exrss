@@ -315,4 +315,16 @@ defmodule ExRss.FeedParserTest do
              ]
            } = feed
   end
+
+  test "returns error for truncated input" do
+    result =
+      FeedParser.parse("""
+            <feed xmlns="http://www.w3.org/2005/Atom">
+              <title>feed title</title>
+              <entry>
+                <title>entry title 1</title>
+      """)
+
+    assert {:error, {:xml_parsing_failed, _reason}} = result
+  end
 end

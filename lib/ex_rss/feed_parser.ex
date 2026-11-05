@@ -13,8 +13,14 @@ defmodule ExRss.FeedParser do
       )
 
     case result do
-      {:ok, %{element_stack: [], feed: %{} = feed}, _remaining_input} -> {:ok, feed}
-      _ -> {:error, :no_feed_found}
+      {:ok, %{element_stack: [], feed: %{} = feed}, _remaining_input} ->
+        {:ok, feed}
+
+      {:ok, %{feed: nil}, _remaining_input} ->
+        {:error, :no_feed_found}
+
+      {:fatal_error, _location, reason, _end_tags, _state} ->
+        {:error, {:xml_parsing_failed, reason}}
     end
   end
 
