@@ -330,6 +330,21 @@ defmodule ExRss.FeedParserTest do
     end
   end
 
+  describe "RSS 2.0 feeds" do
+    test "detects a feed" do
+      {:ok, feed} =
+        FeedParser.parse("""
+        <rss version="2.0">
+          <channel>
+            <title>title</title>
+          </channel>
+        </rss>
+        """)
+
+      assert %{title: nil, entries: []} = feed
+    end
+  end
+
   describe "FeederEx and FeedParser yield the same result" do
     defp test_fixture(filename) do
       feed = %{id: 1, url: "https://example.com/blog/feed.xml"}
