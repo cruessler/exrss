@@ -6,24 +6,22 @@ defmodule ExRss.FeedParserTest do
   test "1.atom" do
     feed = FeedFixtures.rss_fixture("1.atom")
 
-    {:ok, state, _remaining_input} = FeedParser.parse(feed)
+    {:ok, feed} = FeedParser.parse(feed)
 
     assert %{
-             element_stack: [],
-             feed: %{
-               title: "title",
-               entries: [
-                 %{title: "title", link: "https://example.com/blog/1"},
-                 %{title: "title", link: "https://example.com/blog/2"},
-                 %{title: "title", link: "https://example.com/blog/3"},
-                 %{title: "title", link: "https://example.com/blog/4"}
-               ]
-             }
-           } = state
+             title: "title",
+             entries: [
+               %{title: "title", link: "https://example.com/blog/1"},
+               %{title: "title", link: "https://example.com/blog/2"},
+               %{title: "title", link: "https://example.com/blog/3"},
+               %{title: "title", link: "https://example.com/blog/4"}
+             ]
+           } =
+             feed
   end
 
   test "parses entry links" do
-    {:ok, state, _remaining_input} =
+    {:ok, feed} =
       FeedParser.parse("""
       <feed xmlns="http://www.w3.org/2005/Atom">
         <title>feed title</title>
@@ -59,24 +57,21 @@ defmodule ExRss.FeedParserTest do
       """)
 
     assert %{
-             element_stack: [],
-             feed: %{
-               title: "feed title",
-               entries: [
-                 %{title: "entry title 1", link: "https://example.com/1"},
-                 %{title: "entry title 2", link: "https://example.com/2"},
-                 %{title: "entry title 3", link: "https://example.com/3"},
-                 %{title: "entry title 4", link: "https://example.com/self"},
-                 %{title: "entry title 5", link: "https://example.com/alternate"},
-                 %{title: "entry title 6", link: "https://example.com/alternate"}
-               ]
-             }
+             title: "feed title",
+             entries: [
+               %{title: "entry title 1", link: "https://example.com/1"},
+               %{title: "entry title 2", link: "https://example.com/2"},
+               %{title: "entry title 3", link: "https://example.com/3"},
+               %{title: "entry title 4", link: "https://example.com/self"},
+               %{title: "entry title 5", link: "https://example.com/alternate"},
+               %{title: "entry title 6", link: "https://example.com/alternate"}
+             ]
            } =
-             state
+             feed
   end
 
   test "ignores <title> inside <link>" do
-    {:ok, state, _remaining_input} =
+    {:ok, feed} =
       FeedParser.parse("""
       <feed xmlns="http://www.w3.org/2005/Atom">
         <title>feed title</title>
@@ -90,19 +85,16 @@ defmodule ExRss.FeedParserTest do
       """)
 
     assert %{
-             element_stack: [],
-             feed: %{
-               title: "feed title",
-               entries: [
-                 %{title: "correct title", link: "https://example.com/1"}
-               ]
-             }
+             title: "feed title",
+             entries: [
+               %{title: "correct title", link: "https://example.com/1"}
+             ]
            } =
-             state
+             feed
   end
 
   test "parses titles at different levels" do
-    {:ok, state, _remaining_input} =
+    {:ok, feed} =
       FeedParser.parse("""
       <feed xmlns="http://www.w3.org/2005/Atom">
         <title>feed title</title>
@@ -119,21 +111,18 @@ defmodule ExRss.FeedParserTest do
       """)
 
     assert %{
-             element_stack: [],
-             feed: %{
-               title: "feed title",
-               entries: [
-                 %{title: "entry title 1"},
-                 %{title: "entry title 2"},
-                 %{title: "entry title 3"}
-               ]
-             }
+             title: "feed title",
+             entries: [
+               %{title: "entry title 1"},
+               %{title: "entry title 2"},
+               %{title: "entry title 3"}
+             ]
            } =
-             state
+             feed
   end
 
   test "only parses feed title if it's a direct child" do
-    {:ok, state, _remaining_input} =
+    {:ok, feed} =
       FeedParser.parse("""
       <feed xmlns="http://www.w3.org/2005/Atom">
         <div>
@@ -143,17 +132,14 @@ defmodule ExRss.FeedParserTest do
       """)
 
     assert %{
-             element_stack: [],
-             feed: %{
-               title: nil,
-               entries: []
-             }
+             title: nil,
+             entries: []
            } =
-             state
+             feed
   end
 
   test "only parses toplevel text in title" do
-    {:ok, state, _remaining_input} =
+    {:ok, feed} =
       FeedParser.parse("""
       <feed xmlns="http://www.w3.org/2005/Atom">
         <title>A<div><title>ignored</title></div>C</title>
@@ -161,29 +147,25 @@ defmodule ExRss.FeedParserTest do
       """)
 
     assert %{
-             element_stack: [],
-             feed: %{
-               title: "AC",
-               entries: []
-             }
+             title: "AC",
+             entries: []
            } =
-             state
+             feed
   end
 
   test "parses a feed's atom:title" do
-    {:ok, state, _remaining_input} =
+    {:ok, feed} =
       FeedParser.parse("""
       <atom:feed xmlns:atom="http://www.w3.org/2005/Atom">
         <atom:title>title</atom:title>
       </atom:feed>
       """)
 
-    assert %{element_stack: [], feed: %{title: "title", entries: []}} =
-             state
+    assert %{title: "title", entries: []} = feed
   end
 
   test "parses a feed's title containing multiline CDATA" do
-    {:ok, state, _remaining_input} =
+    {:ok, feed} =
       FeedParser.parse("""
       <feed xmlns="http://www.w3.org/2005/Atom">
         <title>
@@ -193,39 +175,33 @@ defmodule ExRss.FeedParserTest do
       </feed>
       """)
 
-    assert %{
-             element_stack: [],
-             feed: %{title: "\n    multiline\n      cdata in title\n  ", entries: []}
-           } =
-             state
+    assert %{title: "\n    multiline\n      cdata in title\n  ", entries: []} = feed
   end
 
   test "preserves order when title has more than one part" do
-    {:ok, state, _remaining_input} =
+    {:ok, feed} =
       FeedParser.parse("""
       <feed xmlns="http://www.w3.org/2005/Atom">
          <title>A<![CDATA[B]]>C</title>
       </feed>
       """)
 
-    assert %{element_stack: [], feed: %{title: "ABC", entries: []}} =
-             state
+    assert %{title: "ABC", entries: []} = feed
   end
 
   test "preserves whitespace in feed title" do
-    {:ok, state, _remaining_input} =
+    {:ok, feed} =
       FeedParser.parse("""
       <feed xmlns="http://www.w3.org/2005/Atom">
         <title><![CDATA[A]]> <![CDATA[B]]></title>
       </feed>
       """)
 
-    assert %{element_stack: [], feed: %{title: "A B", entries: []}} =
-             state
+    assert %{title: "A B", entries: []} = feed
   end
 
   test "does not parse a nested entry's title as a feed title" do
-    {:ok, state, _remaining_input} =
+    {:ok, feed} =
       FeedParser.parse("""
       <feed xmlns="http://www.w3.org/2005/Atom">
         <entry>
@@ -234,12 +210,11 @@ defmodule ExRss.FeedParserTest do
       </feed>
       """)
 
-    assert %{element_stack: [], feed: %{title: nil, entries: [%{title: "title"}]}} =
-             state
+    assert %{title: nil, entries: [%{title: "title"}]} = feed
   end
 
-  test "doesn't count items when nesting is incorrect" do
-    {:ok, state, _remaining_input} =
+  test "returns no items when nesting is incorrect" do
+    {:ok, feed} =
       FeedParser.parse("""
       <feed xmlns="http://www.w3.org/2005/Atom">
         <div>
@@ -248,9 +223,9 @@ defmodule ExRss.FeedParserTest do
       </feed>
       """)
 
-    assert %{feed: %{title: nil, entries: []}, element_stack: []} = state
+    assert %{title: nil, entries: []} = feed
 
-    {:ok, state, _remaining_input} =
+    result =
       FeedParser.parse("""
       <div>
         <feed xmlns="http://www.w3.org/2005/Atom">
@@ -259,19 +234,19 @@ defmodule ExRss.FeedParserTest do
       </div>
       """)
 
-    assert %{feed: nil, element_stack: []} = state
+    assert {:error, :no_feed_found} = result
   end
 
-  test "doesn't count items when feed is empty" do
-    {:ok, state, _remaining_input} =
+  test "returns no items when feed is empty" do
+    {:ok, feed} =
       FeedParser.parse("""
       <feed xmlns="http://www.w3.org/2005/Atom" />
       """)
 
-    assert %{feed: %{title: nil, entries: []}, element_stack: []} = state
+    assert %{title: nil, entries: []} = feed
   end
 
-  test "Atom date fiels" do
+  test "Atom date fields" do
     {:ok, feed} =
       Feed.parse("""
       <feed xmlns="http://www.w3.org/2005/Atom">
@@ -306,7 +281,7 @@ defmodule ExRss.FeedParserTest do
              ]
            } = feed
 
-    {:ok, state, _remaining_input} =
+    {:ok, feed} =
       FeedParser.parse("""
       <feed xmlns="http://www.w3.org/2005/Atom">
         <title>feed title</title>
@@ -332,14 +307,12 @@ defmodule ExRss.FeedParserTest do
       """)
 
     assert %{
-             feed: %{
-               entries: [
-                 %{title: "entry title 1", updated: "2026-08-12T21:07:00+02:00"},
-                 %{title: "entry title 2", updated: "2026-08-12T21:07:00+02:00"},
-                 %{title: "entry title 3", updated: nil},
-                 %{title: "entry title 4", updated: "2026-08-12T21:07:00+02:00"}
-               ]
-             }
-           } = state
+             entries: [
+               %{title: "entry title 1", updated: "2026-08-12T21:07:00+02:00"},
+               %{title: "entry title 2", updated: "2026-08-12T21:07:00+02:00"},
+               %{title: "entry title 3", updated: nil},
+               %{title: "entry title 4", updated: "2026-08-12T21:07:00+02:00"}
+             ]
+           } = feed
   end
 end

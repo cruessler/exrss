@@ -1,15 +1,21 @@
 defmodule ExRss.FeedParser do
   def parse(xml) do
-    :xmerl_sax_parser.stream(xml,
-      event_fun: &handle_event/3,
-      event_state: %{
-        current_entries: [],
-        element_stack: [],
-        current_text_parts: [],
-        current_entry: nil,
-        feed: nil
-      }
-    )
+    result =
+      :xmerl_sax_parser.stream(xml,
+        event_fun: &handle_event/3,
+        event_state: %{
+          current_entries: [],
+          element_stack: [],
+          current_text_parts: [],
+          current_entry: nil,
+          feed: nil
+        }
+      )
+
+    case result do
+      {:ok, %{element_stack: [], feed: %{} = feed}, _remaining_input} -> {:ok, feed}
+      _ -> {:error, :no_feed_found}
+    end
   end
 
   @atom_uri ~c"http://www.w3.org/2005/Atom"
