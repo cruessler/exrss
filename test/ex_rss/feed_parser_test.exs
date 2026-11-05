@@ -331,7 +331,7 @@ defmodule ExRss.FeedParserTest do
   end
 
   describe "RSS 2.0 feeds" do
-    test "detects a feed" do
+    test "extracts the feed's title" do
       {:ok, feed} =
         FeedParser.parse("""
         <rss version="2.0">
@@ -341,7 +341,7 @@ defmodule ExRss.FeedParserTest do
         </rss>
         """)
 
-      assert %{title: nil, entries: []} = feed
+      assert %{title: "title", entries: []} = feed
     end
 
     test "does not detect a feed that has version '1.0'" do
@@ -361,7 +361,7 @@ defmodule ExRss.FeedParserTest do
                result
     end
 
-    test "only parses feed title if it's a direct child" do
+    test "only accepts <channel> as direct child of <rss>" do
       result =
         FeedParser.parse("""
         <rss version="2.0">
