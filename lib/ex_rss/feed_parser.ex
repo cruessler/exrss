@@ -87,7 +87,7 @@ defmodule ExRss.FeedParser do
   end
 
   defp handle_event(
-         {:startElement, _namespace_uri, ~c"rss", _qualified_name, attributes},
+         {:startElement, [], ~c"rss", _qualified_name, attributes},
          _location,
          %{element_stack: []} = state
        ) do
@@ -221,7 +221,7 @@ defmodule ExRss.FeedParser do
   end
 
   defp handle_event(
-         {:endElement, _namespace_uri, ~c"rss", _qualified_name},
+         {:endElement, [], ~c"rss", _qualified_name},
          _location,
          %{element_stack: [{[], ~c"rss"}], feed: feed} = state
        ) do
