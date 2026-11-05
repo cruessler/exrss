@@ -87,6 +87,34 @@ defmodule ExRss.FeedParser do
   end
 
   defp handle_event(
+         {:startElement, _namespace_uri, ~c"rss", _qualified_name, attributes},
+         _location,
+         %{element_stack: []} = state
+       ) do
+    version =
+      Enum.find_value(attributes, fn
+        {[], _prefix, ~c"version", version} ->
+          List.to_string(version)
+
+        _ ->
+          nil
+      end)
+
+    feed =
+      if version == "2.0" do
+        @default_feed
+      else
+        nil
+      end
+
+    %{
+      state
+      | element_stack: [{[], ~c"rss"} | state.element_stack],
+        feed: feed
+    }
+  end
+
+  defp handle_event(
          {:startElement, uri, name, _qualified_name, _attributes},
          _location,
          state
@@ -189,6 +217,26 @@ defmodule ExRss.FeedParser do
       | element_stack: [],
         current_entries: [],
         feed: %{state.feed | entries: state.current_entries |> Enum.reverse()}
+    }
+  end
+
+  defp handle_event(
+         {:endElement, _namespace_uri, ~c"rss", _qualified_name},
+         _location,
+         %{element_stack: [{[], ~c"rss"}], feed: feed} = state
+       ) do
+    feed =
+      if feed == nil do
+        nil
+      else
+        %{feed | entries: state.current_entries |> Enum.reverse()}
+      end
+
+    %{
+      state
+      | element_stack: [],
+        current_entries: [],
+        feed: feed
     }
   end
 
