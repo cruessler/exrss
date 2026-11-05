@@ -343,6 +343,42 @@ defmodule ExRss.FeedParserTest do
 
       assert %{title: nil, entries: []} = feed
     end
+
+    test "does not detect a feed that has version '1.0'" do
+      result =
+        FeedParser.parse("""
+        <rss version="1.0">
+          <channel>
+            <title>title</title>
+          </channel>
+        </rss>
+        """)
+
+      assert {
+               :error,
+               :no_feed_found
+             } =
+               result
+    end
+
+    test "only parses feed title if it's a direct child" do
+      result =
+        FeedParser.parse("""
+        <rss version="2.0">
+          <div>
+            <channel>
+              <title>title</title>
+            </channel>
+          </div>
+        </rss>
+        """)
+
+      assert {
+               :error,
+               :no_feed_found
+             } =
+               result
+    end
   end
 
   describe "FeederEx and FeedParser yield the same result" do
