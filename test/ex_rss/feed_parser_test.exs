@@ -379,6 +379,42 @@ defmodule ExRss.FeedParserTest do
              } =
                result
     end
+
+    test "parses items" do
+      {:ok, feed} =
+        FeedParser.parse("""
+        <rss version="2.0">
+          <channel>
+            <title>title</title>
+            <item>
+              <title>item title 1</title>
+              <link>https://example.com/1</link>
+              <pubDate>2022-11-11</pubDate>
+            </item>
+            <item>
+              <title>item title 2</title>
+              <link>https://example.com/2</link>
+              <pubDate>2022-11-12</pubDate>
+            </item>
+            <item>
+              <title>item title 3</title>
+              <link>https://example.com/3</link>
+              <pubDate>2022-11-13</pubDate>
+            </item>
+          </channel>
+        </rss>
+        """)
+
+      assert %{
+               title: "title",
+               entries: [
+                 %{title: "item title 1", link: "https://example.com/1", updated: "2022-11-11"},
+                 %{title: "item title 2", link: "https://example.com/2", updated: "2022-11-12"},
+                 %{title: "item title 3", link: "https://example.com/3", updated: "2022-11-13"}
+               ]
+             } =
+               feed
+    end
   end
 
   describe "FeederEx and FeedParser yield the same result" do
@@ -415,6 +451,32 @@ defmodule ExRss.FeedParserTest do
 
     test "1.no-links.atom" do
       test_fixture("1.no-links.atom")
+    end
+
+    test "1.rss" do
+      test_fixture("1.rss")
+    end
+
+    test "1.empty-links.rss" do
+      test_fixture("1.empty-links.rss")
+    end
+
+    test "1.empty-feed.rss" do
+      xml = FeedFixtures.rss_fixture("1.empty-feed.rss")
+
+      {:ok, feeder_ex_feed} = xml |> Feed.parse()
+      {:ok, feed_parser_feed} = xml |> FeedParser.parse()
+
+      assert length(feeder_ex_feed.entries) == 0
+      assert length(feed_parser_feed.entries) == 0
+      assert feeder_ex_feed.title == feed_parser_feed.title
+    end
+
+    test "1.truncated.rss" do
+      xml = FeedFixtures.rss_fixture("1.truncated.rss")
+
+      {:error, _} = xml |> Feed.parse()
+      {:error, {:xml_parsing_failed, _reason}} = xml |> FeedParser.parse()
     end
   end
 end

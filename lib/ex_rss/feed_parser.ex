@@ -128,6 +128,25 @@ defmodule ExRss.FeedParser do
   end
 
   defp handle_event(
+         {:startElement, [], ~c"item", _qualified_name, _attributes},
+         _location,
+         %{element_stack: [{[], ~c"channel"}, {[], ~c"rss"}]} = state
+       ) do
+    entry =
+      if state.rss_format_2 do
+        @default_entry
+      else
+        nil
+      end
+
+    %{
+      state
+      | element_stack: [{[], ~c"item"} | state.element_stack],
+        current_entry: entry
+    }
+  end
+
+  defp handle_event(
          {:startElement, uri, name, _qualified_name, _attributes},
          _location,
          state
@@ -142,7 +161,10 @@ defmodule ExRss.FeedParser do
     [{@atom_uri, ~c"title"}, {@atom_uri, ~c"feed"}],
     [{@atom_uri, ~c"title"}, {@atom_uri, ~c"entry"}, {@atom_uri, ~c"feed"}],
     [{@atom_uri, ~c"updated"}, {@atom_uri, ~c"entry"}, {@atom_uri, ~c"feed"}],
-    [{[], ~c"title"}, {[], ~c"channel"}, {[], ~c"rss"}]
+    [{[], ~c"title"}, {[], ~c"channel"}, {[], ~c"rss"}],
+    [{[], ~c"title"}, {[], ~c"item"}, {[], ~c"channel"}, {[], ~c"rss"}],
+    [{[], ~c"link"}, {[], ~c"item"}, {[], ~c"channel"}, {[], ~c"rss"}],
+    [{[], ~c"pubDate"}, {[], ~c"item"}, {[], ~c"channel"}, {[], ~c"rss"}]
   ]
 
   defp handle_event(
@@ -188,7 +210,8 @@ defmodule ExRss.FeedParser do
   end
 
   @rss_title_paths [
-    [{[], ~c"title"}, {[], ~c"channel"}, {[], ~c"rss"}]
+    [{[], ~c"title"}, {[], ~c"channel"}, {[], ~c"rss"}],
+    [{[], ~c"title"}, {[], ~c"item"}, {[], ~c"channel"}, {[], ~c"rss"}]
   ]
 
   defp handle_event(
@@ -209,8 +232,58 @@ defmodule ExRss.FeedParser do
             feed: %{state.feed | title: title}
         }
 
+      {true, [{[], ~c"item"}, {[], ~c"channel"}, {[], ~c"rss"}]} ->
+        %{
+          state
+          | element_stack: rest,
+            current_text_parts: [],
+            current_entry: %{state.current_entry | title: title}
+        }
+
       _ ->
         %{state | element_stack: rest, current_text_parts: []}
+    end
+  end
+
+  defp handle_event(
+         {:endElement, [], ~c"link", _qualified_name},
+         _location,
+         %{element_stack: [{[], ~c"link"}, {[], ~c"item"}, {[], ~c"channel"}, {[], ~c"rss"}]} =
+           state
+       ) do
+    [_ | rest] = state.element_stack
+    link = state.current_text_parts |> Enum.reverse() |> Enum.join()
+
+    if state.rss_format_2 do
+      %{
+        state
+        | element_stack: rest,
+          current_text_parts: [],
+          current_entry: %{state.current_entry | link: link}
+      }
+    else
+      %{state | element_stack: rest, current_text_parts: []}
+    end
+  end
+
+  defp handle_event(
+         {:endElement, [], ~c"pubDate", _qualified_name},
+         _location,
+         %{element_stack: [{[], ~c"pubDate"}, {[], ~c"item"}, {[], ~c"channel"}, {[], ~c"rss"}]} =
+           state
+       ) do
+    [_ | rest] = state.element_stack
+    updated = state.current_text_parts |> Enum.reverse() |> Enum.join()
+
+    if state.rss_format_2 do
+      %{
+        state
+        | element_stack: rest,
+          current_text_parts: [],
+          current_entry: %{state.current_entry | updated: updated}
+      }
+    else
+      %{state | element_stack: rest, current_text_parts: []}
     end
   end
 
@@ -245,6 +318,26 @@ defmodule ExRss.FeedParser do
       | element_stack: [{@atom_uri, ~c"feed"}],
         current_entry: nil,
         current_entries: [state.current_entry | state.current_entries]
+    }
+  end
+
+  defp handle_event(
+         {:endElement, [], ~c"item", _qualified_name},
+         _location,
+         %{element_stack: [{[], ~c"item"}, {[], ~c"channel"}, {[], ~c"rss"}]} = state
+       ) do
+    current_entries =
+      if state.current_entry == nil do
+        state.current_entries
+      else
+        [state.current_entry | state.current_entries]
+      end
+
+    %{
+      state
+      | element_stack: [{[], ~c"channel"}, {[], ~c"rss"}],
+        current_entry: nil,
+        current_entries: current_entries
     }
   end
 
