@@ -355,19 +355,10 @@ defmodule ExRss.FeedParserTest do
     end
 
     test "rejects external entity declaration" do
-      path =
-        Path.join(
-          System.tmp_dir!(),
-          "ex_rss_entity_#{System.unique_integer([:positive])}.txt"
-        )
-
-      File.write!(path, "external entity")
-      on_exit(fn -> File.rm(path) end)
-
       result =
         FeedParser.parse("""
         <!DOCTYPE feed [
-          <!ENTITY entity SYSTEM "file://#{path}">
+          <!ENTITY entity SYSTEM "file://actual-path-not-relevant.txt">
         ]>
         <feed xmlns="http://www.w3.org/2005/Atom">
           <title>title</title>
