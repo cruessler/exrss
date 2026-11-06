@@ -1,16 +1,22 @@
 defmodule ExRss.FeedParser do
   def parse(xml) do
     result =
-      :xmerl_sax_parser.stream(xml,
-        event_fun: &handle_event/3,
-        event_state: %{
-          current_entries: [],
-          element_stack: [],
-          current_text_parts: [],
-          current_entry: nil,
-          rss_format_2: false,
-          feed: nil
-        }
+      :xmerl_sax_parser.stream(
+        xml,
+        [
+          :skip_external_dtd,
+          :disallow_entities,
+          external_entities: :none,
+          event_fun: &handle_event/3,
+          event_state: %{
+            current_entries: [],
+            element_stack: [],
+            current_text_parts: [],
+            current_entry: nil,
+            rss_format_2: false,
+            feed: nil
+          }
+        ]
       )
 
     case result do
