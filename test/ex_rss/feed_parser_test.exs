@@ -328,6 +328,54 @@ defmodule ExRss.FeedParserTest do
 
       assert {:error, {:xml_parsing_failed, _reason}} = result
     end
+
+    test "decodes predefined entities and numeric references" do
+      {:ok, feed} =
+        FeedParser.parse("""
+        <feed xmlns="http://www.w3.org/2005/Atom">
+          <title>A &amp; B &lt; C &#65; &#x42;</title>
+        </feed>
+        """)
+
+      assert %{title: "A & B < C A B", entries: []} = feed
+    end
+
+    test "rejects internal entity reference" do
+      result =
+        FeedParser.parse("""
+        <!DOCTYPE feed [
+          <!ENTITY entity "entity content">
+        ]>
+        <feed xmlns="http://www.w3.org/2005/Atom">
+          <title>&entity;</title>
+        </feed>
+        """)
+
+      assert {:error, {:xml_parsing_failed, _reason}} = result
+    end
+
+    test "rejects external entity reference" do
+      path =
+        Path.join(
+          System.tmp_dir!(),
+          "ex_rss_entity_#{System.unique_integer([:positive])}.txt"
+        )
+
+      File.write!(path, "external entity")
+      on_exit(fn -> File.rm(path) end)
+
+      result =
+        FeedParser.parse("""
+        <!DOCTYPE feed [
+          <!ENTITY entity SYSTEM "file://#{path}">
+        ]>
+        <feed xmlns="http://www.w3.org/2005/Atom">
+          <title>&entity;</title>
+        </feed>
+        """)
+
+      assert {:error, {:xml_parsing_failed, _reason}} = result
+    end
   end
 
   describe "RSS 2.0 feeds" do
