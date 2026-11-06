@@ -340,21 +340,21 @@ defmodule ExRss.FeedParserTest do
       assert %{title: "A & B < C A B", entries: []} = feed
     end
 
-    test "rejects internal entity reference" do
+    test "rejects internal entity declaration" do
       result =
         FeedParser.parse("""
         <!DOCTYPE feed [
           <!ENTITY entity "entity content">
         ]>
         <feed xmlns="http://www.w3.org/2005/Atom">
-          <title>&entity;</title>
+          <title>title</title>
         </feed>
         """)
 
       assert {:error, {:xml_parsing_failed, _reason}} = result
     end
 
-    test "rejects external entity reference" do
+    test "rejects external entity declaration" do
       path =
         Path.join(
           System.tmp_dir!(),
@@ -370,7 +370,7 @@ defmodule ExRss.FeedParserTest do
           <!ENTITY entity SYSTEM "file://#{path}">
         ]>
         <feed xmlns="http://www.w3.org/2005/Atom">
-          <title>&entity;</title>
+          <title>title</title>
         </feed>
         """)
 
