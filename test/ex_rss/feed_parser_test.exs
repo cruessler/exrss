@@ -344,6 +344,51 @@ defmodule ExRss.FeedParserTest do
       assert %{title: "title", entries: []} = feed
     end
 
+    test "handles empty title" do
+      {:ok, feed} =
+        FeedParser.parse("""
+        <rss version="2.0">
+          <channel>
+            <title></title>
+          </channel>
+        </rss>
+        """)
+
+      assert %{title: nil, entries: []} = feed
+
+      {:ok, feed} =
+        FeedParser.parse("""
+        <rss version="2.0">
+          <channel>
+            <title />
+          </channel>
+        </rss>
+        """)
+
+      assert %{title: nil, entries: []} = feed
+
+      {:ok, feed} =
+        FeedParser.parse("""
+        <rss version="2.0">
+          <channel>
+          </channel>
+        </rss>
+        """)
+
+      assert %{title: nil, entries: []} = feed
+
+      {:ok, feed} =
+        FeedParser.parse("""
+        <rss version="2.0">
+          <channel>
+            <title> </title>
+          </channel>
+        </rss>
+        """)
+
+      assert %{title: " ", entries: []} = feed
+    end
+
     test "does not detect a feed that has version '1.0'" do
       result =
         FeedParser.parse("""
