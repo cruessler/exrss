@@ -188,7 +188,7 @@ defmodule ExRss.FeedParser do
        )
        when element_stack in @atom_title_paths do
     [_ | rest] = element_stack
-    title = state.current_text_parts |> Enum.reverse() |> Enum.join()
+    title = join_text_parts(state.current_text_parts)
 
     case rest do
       [{@atom_uri, ~c"feed"}] ->
@@ -221,7 +221,7 @@ defmodule ExRss.FeedParser do
        )
        when element_stack in @rss_title_paths do
     [_ | rest] = element_stack
-    title = state.current_text_parts |> Enum.reverse() |> Enum.join()
+    title = join_text_parts(state.current_text_parts)
 
     case {state.rss_format_2, rest} do
       {true, [{[], ~c"channel"}, {[], ~c"rss"}]} ->
@@ -252,7 +252,7 @@ defmodule ExRss.FeedParser do
            state
        ) do
     [_ | rest] = state.element_stack
-    link = state.current_text_parts |> Enum.reverse() |> Enum.join()
+    link = join_text_parts(state.current_text_parts)
 
     if state.rss_format_2 do
       %{
@@ -273,7 +273,7 @@ defmodule ExRss.FeedParser do
            state
        ) do
     [_ | rest] = state.element_stack
-    updated = state.current_text_parts |> Enum.reverse() |> Enum.join()
+    updated = join_text_parts(state.current_text_parts)
 
     if state.rss_format_2 do
       %{
@@ -298,7 +298,7 @@ defmodule ExRss.FeedParser do
            ]
          } = state
        ) do
-    updated = state.current_text_parts |> Enum.reverse() |> Enum.join()
+    updated = join_text_parts(state.current_text_parts)
 
     %{
       state
@@ -383,4 +383,11 @@ defmodule ExRss.FeedParser do
   end
 
   defp handle_event(_event, _location, state), do: state
+
+  defp join_text_parts(parts) do
+    case parts do
+      [] -> nil
+      _ -> parts |> Enum.reverse() |> Enum.join()
+    end
+  end
 end
