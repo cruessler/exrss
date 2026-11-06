@@ -478,5 +478,20 @@ defmodule ExRss.FeedParserTest do
       {:error, _} = xml |> Feed.parse()
       {:error, {:xml_parsing_failed, _reason}} = xml |> FeedParser.parse()
     end
+
+    test "unescaped & in attribute yields error" do
+      xml = """
+        <feed xmlns="http://www.w3.org/2005/Atom">
+          <title>feed title</title>
+          <entry>
+            <title>entry title 1</title>
+            <link href="https://example.com/1" title="A & B" />
+          </entry>
+        </feed>
+      """
+
+      assert {:error, _} = xml |> Feed.parse()
+      assert {:error, {:xml_parsing_failed, _reason}} = xml |> FeedParser.parse()
+    end
   end
 end
