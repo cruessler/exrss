@@ -366,6 +366,16 @@ defmodule ExRss.FeedAdderTest do
              href: "https://example.com/blog",
              frequency: _
            } = candidate
+
+    candidate =
+      FeedAdder.extract_candidate(%{title: "title", entries: []}, "https://example.com/blog")
+
+    assert %{
+             url: "https://example.com/blog",
+             title: _,
+             href: "https://example.com/blog",
+             frequency: _
+           } = candidate
   end
 
   test "fails when URI not absolute" do
