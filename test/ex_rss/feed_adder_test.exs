@@ -129,10 +129,10 @@ defmodule ExRss.FeedAdderTest do
       {:ok, feed} = discover_fixture("1.atom")
 
       assert %{
+               url: "https://example.com/feed",
                frequency: %{posts: 4, seconds: 17_202_180},
-               href: nil,
-               title: "title",
-               url: "https://example.com/feed"
+               href: "https://example.com/feed",
+               title: "title"
              } = feed
     end
 
@@ -140,10 +140,10 @@ defmodule ExRss.FeedAdderTest do
       {:ok, feed} = discover_fixture("1.no-links.atom")
 
       assert %{
+               url: "https://example.com/feed",
                frequency: %{posts: 4, seconds: 17_202_180},
-               href: nil,
                title: "title",
-               url: "https://example.com/feed"
+               href: "https://example.com/feed"
              } = feed
     end
 
@@ -151,9 +151,9 @@ defmodule ExRss.FeedAdderTest do
       {:ok, feed} = discover_fixture("1.rss")
 
       assert %{
-               url: "https://example.com/blog/feed/",
+               url: "https://example.com/feed",
                frequency: %{seconds: 0, posts: 4},
-               href: "https://example.com/blog/feed/",
+               href: "https://example.com/feed",
                title: "title"
              } = feed
     end
@@ -162,9 +162,9 @@ defmodule ExRss.FeedAdderTest do
       {:ok, feed} = discover_fixture("1.empty-links.rss")
 
       assert %{
-               url: "https://example.com/blog/feed/",
+               url: "https://example.com/feed",
                frequency: %{seconds: 0, posts: 3},
-               href: "https://example.com/blog/feed/",
+               href: "https://example.com/feed",
                title: "title"
              } = feed
     end
@@ -173,9 +173,9 @@ defmodule ExRss.FeedAdderTest do
       {:ok, feed} = discover_fixture("1.empty-feed.rss")
 
       assert %{
-               url: "https://example.com/blog/feed/",
+               url: "https://example.com/feed",
                frequency: %{seconds: :not_available, posts: 0},
-               href: "https://example.com/blog/feed/",
+               href: "https://example.com/feed",
                title: "title"
              } = feed
     end
@@ -358,9 +358,24 @@ defmodule ExRss.FeedAdderTest do
   test "extracts feed metadata" do
     {:ok, raw_feed, _} = FeederEx.parse(@rss)
 
-    candidate = FeedAdder.extract_candidate(raw_feed)
+    candidate = FeedAdder.extract_candidate(raw_feed, "https://example.com/blog")
 
-    assert %{url: _, title: _, href: _, frequency: _} = candidate
+    assert %{
+             url: "https://example.com/blog",
+             title: _,
+             href: "https://example.com/blog",
+             frequency: _
+           } = candidate
+
+    candidate =
+      FeedAdder.extract_candidate(%{title: "title", entries: []}, "https://example.com/blog")
+
+    assert %{
+             url: "https://example.com/blog",
+             title: _,
+             href: "https://example.com/blog",
+             frequency: _
+           } = candidate
   end
 
   test "fails when URI not absolute" do

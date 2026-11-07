@@ -30,16 +30,7 @@ defmodule ExRss.FeedAdder do
   def discover_feed(url, fetch \\ &fetch_url/1) do
     with {:ok, body, _uri} <- fetch.(url),
          {:ok, raw_feed} <- Feed.parse(body) do
-      candidate = extract_candidate(raw_feed)
-
-      candidate =
-        if is_nil(candidate.url) do
-          Map.put(candidate, :url, url)
-        else
-          candidate
-        end
-
-      {:ok, candidate}
+      {:ok, extract_candidate(raw_feed, url)}
     else
       i when is_integer(i) ->
         {:error, :wrong_status_code}
@@ -91,12 +82,12 @@ defmodule ExRss.FeedAdder do
     rss_feeds(html) ++ atom_feeds(html)
   end
 
-  def extract_candidate(feed) do
+  def extract_candidate(feed, url) do
     # TODO:
-    # When migrating `FeedAdder` to `SweetXml`, keep in mind to adapt the
-    # parser in `Feed.parse()` to supply `feed.url`.
+    # `url` and `href` are now the same. Update consumers to only use one.
     feed
-    |> Map.put(:href, feed.url)
+    |> Map.put(:href, url)
+    |> Map.put(:url, url)
     |> Map.put(:frequency, extract_frequency_info(feed))
     |> Map.take([:url, :title, :href, :frequency])
   end
