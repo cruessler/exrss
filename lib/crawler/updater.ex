@@ -6,11 +6,22 @@ defmodule ExRss.Crawler.Updater do
 
   @max_feed_parser_bytes 10 * 1024 * 1024
 
-  def update(feed, fetch \\ &fetch_url/1) do
+  def update(feed, fetch \\ &fetch_url/1, opts \\ []) do
     with {:ok, %Response{body: body}} <- fetch.(feed.url),
          {:ok, raw_feed} <- Feed.parse(body),
          {:ok, %{feed: new_feed}} <- FeedUpdater.update(feed, raw_feed) |> Repo.transaction() do
-      compare_feeder_ex_and_feed_parser(feed, raw_feed, body)
+      compare_with_candidate_parser? =
+        Keyword.get(
+          opts,
+          :compare_with_candidate_parser?,
+          Application.get_env(:ex_rss, :compare_with_candidate_parser?, false)
+        )
+
+      if compare_with_candidate_parser? do
+        candidate_parser = Keyword.get(opts, :candidate_parser, &FeedParser.parse/1)
+
+        compare_feeder_ex_and_feed_parser(feed, raw_feed, body, candidate_parser)
+      end
 
       {:ok, new_feed}
     else
@@ -29,15 +40,14 @@ defmodule ExRss.Crawler.Updater do
     HTTPoison.get(url, [], follow_redirect: true)
   end
 
-  defp compare_feeder_ex_and_feed_parser(feed, feeder_ex_feed, xml) do
-    if System.get_env("EXRSS_COMPARE_WITH_FEED_PARSER") == "1" and
-         byte_size(xml) <= @max_feed_parser_bytes do
+  defp compare_feeder_ex_and_feed_parser(feed, feeder_ex_feed, xml, candidate_parser) do
+    if byte_size(xml) <= @max_feed_parser_bytes do
       Logger.info("Comparing FeederEx and FeedParser",
         title: feed.title,
         url: feed.url
       )
 
-      case FeedParser.parse(xml) do
+      case candidate_parser.(xml) do
         {:ok, feed_parser_feed} ->
           feed_parser_entries =
             Feed.parse_entries(feed, feed_parser_feed)
@@ -65,6 +75,11 @@ defmodule ExRss.Crawler.Updater do
             url: feed.url
           )
       end
+    else
+      Logger.info("Feed was larger than 10 MiB, not comparing parsers",
+        title: feed.title,
+        url: feed.url
+      )
     end
   end
 end
