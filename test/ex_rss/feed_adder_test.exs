@@ -152,7 +152,7 @@ defmodule ExRss.FeedAdderTest do
 
       assert %{
                url: "https://example.com/blog/feed/",
-               frequency: %{seconds: 0, posts: 3},
+               frequency: %{seconds: 0, posts: 4},
                href: "https://example.com/blog/feed/",
                title: "title"
              } = feed
@@ -271,7 +271,7 @@ defmodule ExRss.FeedAdderTest do
       feed = add_discovery_info_fixture("1.rss")
 
       assert %{
-               frequency: %{seconds: 0, posts: 3},
+               frequency: %{seconds: 0, posts: 4},
                newest_entries: [
                  %{
                    link: "https://example.com/blog/1",
@@ -285,7 +285,7 @@ defmodule ExRss.FeedAdderTest do
                  },
                  %{
                    link: "https://example.com/blog/3",
-                   title: "title",
+                   title: "title with space trimmed",
                    updated: "Wed, 28 Oct 2026 10:54:05 +0000"
                  }
                ],

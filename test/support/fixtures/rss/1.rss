@@ -37,7 +37,7 @@
       <slash:comments>0</slash:comments>
     </item>
     <item>
-      <title>title</title>
+      <title><![CDATA[ title with space trimmed ]]></title>
       <link>https://example.com/blog/3</link>
       <comments>https://example.com/blog/3#comments</comments>
       <dc:creator></dc:creator>
@@ -47,6 +47,21 @@
       <description>description</description>
       <content:encoded/>
       <wfw:commentRss>https://example.com/blog/3#comments</wfw:commentRss>
+      <slash:comments>0</slash:comments>
+    </item>
+    <item>
+      <title>title</title>
+      <link>
+          /blog/4
+      </link>
+      <comments>https://example.com/blog/4#comments</comments>
+      <dc:creator></dc:creator>
+      <pubDate>Wed, 28 Oct 2026 10:54:05 +0000</pubDate>
+      <category>category</category>
+      <guid isPermaLink="false">https://example.com/blog/4</guid>
+      <description>description</description>
+      <content:encoded/>
+      <wfw:commentRss>https://example.com/blog/4#comments</wfw:commentRss>
       <slash:comments>0</slash:comments>
     </item>
   </channel>

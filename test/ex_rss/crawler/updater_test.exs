@@ -64,7 +64,8 @@ defmodule ExRss.Crawler.UpdaterTest do
                entries: [
                  %{title: "title", url: "https://example.com/blog/1"},
                  %{title: "title", url: "https://example.com/blog/2"},
-                 %{title: "title", url: "https://example.com/blog/3"}
+                 %{title: "title with space trimmed", url: "https://example.com/blog/3"},
+                 %{title: "title", url: "https://example.com/blog/4"}
                ]
              } = feed
     end

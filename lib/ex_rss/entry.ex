@@ -42,8 +42,16 @@ defmodule ExRss.Entry do
       end
 
     %{
-      title: entry.title,
-      url: entry.link,
+      # We intentionally normalize titles by trimming leading and trailing
+      # whitespace.
+      title:
+        case entry.title do
+          title when is_binary(title) -> String.trim(title)
+          title -> title
+        end,
+      # We intentionally normalize URLs by trimming leading and trailing
+      # whitespace.
+      url: String.trim(entry.link),
       raw_posted_at: entry.updated,
       posted_at: posted_at,
       read: false,
