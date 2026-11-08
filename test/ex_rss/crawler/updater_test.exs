@@ -162,7 +162,13 @@ defmodule ExRss.Crawler.UpdaterTest do
 
       assert %{
                title: "title",
-               url: "https://example.com/feed"
+               url: "https://example.com/feed",
+               entries: [
+                 %{title: "title", url: "https://example.com/blog/1"},
+                 %{title: "title", url: "https://example.com/blog/2"},
+                 %{title: "title with space trimmed", url: "https://example.com/blog/3"},
+                 %{title: "title", url: "https://example.com/blog/4"}
+               ]
              } = feed
     end
 
@@ -232,7 +238,12 @@ defmodule ExRss.Crawler.UpdaterTest do
 
           assert %{
                    title: nil,
-                   url: "https://example.com/feed"
+                   url: "https://example.com/feed",
+                   entries: [
+                     %{title: "item title 1", url: "https://example.com/1"},
+                     %{title: "item title 2", url: "https://example.com/2"},
+                     %{title: "item title 3", url: "https://example.com/3"}
+                   ]
                  } = feed
         end)
 
