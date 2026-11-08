@@ -1,8 +1,10 @@
 defmodule ExRss.Crawler.UpdaterTest do
   use ExRss.DataCase, async: true
 
+  import ExUnit.CaptureLog, only: [with_log: 1]
+
   alias ExRss.Crawler.Updater
-  alias ExRss.{AccountsFixtures, Entry, Feed, FeedFixtures, Repo}
+  alias ExRss.{AccountsFixtures, Entry, Feed, FeedFixtures, FeedParser, Repo}
 
   describe "Updater.update/2" do
     defp update_feed(filename) do
@@ -134,7 +136,7 @@ defmodule ExRss.Crawler.UpdaterTest do
       assert {:error, :econnrefused} = Updater.update(feed, fetch)
     end
 
-    defp test_failing_candidate_parser(candidate_parser) do
+    defp test_candidate_parser(candidate_parser) do
       url = "https://example.com/feed"
       xml = FeedFixtures.rss_fixture("1.rss")
 
@@ -165,8 +167,58 @@ defmodule ExRss.Crawler.UpdaterTest do
     end
 
     test "doesn't fail when candidate_parser fails" do
-      test_failing_candidate_parser(fn _ -> raise "parser failed " end)
-      test_failing_candidate_parser(fn _ -> throw(:parser_failed) end)
+      test_candidate_parser(fn _ -> raise "parser failed " end)
+      test_candidate_parser(fn _ -> throw(:parser_failed) end)
+    end
+
+    test "detects when parsers agree" do
+      previous_level = Logger.level()
+      Logger.configure(level: :info)
+
+      {_, log} =
+        with_log(fn ->
+          test_candidate_parser(&FeedParser.parse/1)
+        end)
+
+      on_exit(fn -> Logger.configure(level: previous_level) end)
+
+      assert log =~ "FeederEx and FeedParser agree"
+    end
+
+    test "detects mismatch in title" do
+      previous_level = Logger.level()
+      Logger.configure(level: :info)
+
+      {_, log} =
+        with_log(fn ->
+          test_candidate_parser(fn xml ->
+            {:ok, feed} = FeedParser.parse(xml)
+
+            {:ok, %{feed | title: "title does not match"}}
+          end)
+        end)
+
+      on_exit(fn -> Logger.configure(level: previous_level) end)
+
+      assert log =~ "Mismatch between FeederEx and FeedParser detected"
+    end
+
+    test "detects mismatch in entries" do
+      previous_level = Logger.level()
+      Logger.configure(level: :info)
+
+      {_, log} =
+        with_log(fn ->
+          test_candidate_parser(fn xml ->
+            {:ok, feed} = FeedParser.parse(xml)
+
+            {:ok, %{feed | entries: []}}
+          end)
+        end)
+
+      on_exit(fn -> Logger.configure(level: previous_level) end)
+
+      assert log =~ "Mismatch between FeederEx and FeedParser detected"
     end
   end
 end

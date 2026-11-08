@@ -71,7 +71,11 @@ defmodule ExRss.Crawler.Updater do
             Feed.parse_entries(feed, feeder_ex_feed)
             |> Enum.map(&Map.drop(&1, [:inserted_at, :updated_at]))
 
-          if feed_parser_entries != feeder_ex_entries do
+          normalized_feed_parser_title = String.trim(feed_parser_feed.title)
+          normalized_feeder_ex_title = String.trim(feeder_ex_feed.title)
+
+          if normalized_feed_parser_title != normalized_feeder_ex_title or
+               feed_parser_entries != feeder_ex_entries do
             Logger.info("Mismatch between FeederEx and FeedParser detected",
               title: feed.title,
               url: feed.url
