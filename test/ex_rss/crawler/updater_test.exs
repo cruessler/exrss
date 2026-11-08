@@ -185,10 +185,24 @@ defmodule ExRss.Crawler.UpdaterTest do
       assert log =~ "FeederEx and FeedParser agree"
     end
 
-    test "detects mismatch in title" do
-      previous_level = Logger.level()
-      Logger.configure(level: :info)
+    test "does not treat mismatch in updated as parser mismatch" do
+      {_, log} =
+        with_log(fn ->
+          test_candidate_parser(fn xml ->
+            {:ok, feed} = FeedParser.parse(xml)
 
+            entries =
+              feed.entries
+              |> Enum.map(fn entry -> %{entry | updated: "   #{entry.updated}   "} end)
+
+            {:ok, %{feed | entries: entries}}
+          end)
+        end)
+
+      assert log =~ "FeederEx and FeedParser agree"
+    end
+
+    test "detects mismatch in title" do
       {_, log} =
         with_log(fn ->
           test_candidate_parser(fn xml ->
@@ -198,15 +212,10 @@ defmodule ExRss.Crawler.UpdaterTest do
           end)
         end)
 
-      on_exit(fn -> Logger.configure(level: previous_level) end)
-
       assert log =~ "Mismatch between FeederEx and FeedParser detected"
     end
 
     test "detects mismatch in entries" do
-      previous_level = Logger.level()
-      Logger.configure(level: :info)
-
       {_, log} =
         with_log(fn ->
           test_candidate_parser(fn xml ->
@@ -215,8 +224,6 @@ defmodule ExRss.Crawler.UpdaterTest do
             {:ok, %{feed | entries: []}}
           end)
         end)
-
-      on_exit(fn -> Logger.configure(level: previous_level) end)
 
       assert log =~ "Mismatch between FeederEx and FeedParser detected"
     end

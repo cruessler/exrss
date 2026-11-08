@@ -65,11 +65,11 @@ defmodule ExRss.Crawler.Updater do
         {:ok, feed_parser_feed} ->
           feed_parser_entries =
             Feed.parse_entries(feed, feed_parser_feed)
-            |> Enum.map(&Map.drop(&1, [:inserted_at, :updated_at]))
+            |> Enum.map(&Map.drop(&1, [:raw_posted_at, :inserted_at, :updated_at]))
 
           feeder_ex_entries =
             Feed.parse_entries(feed, feeder_ex_feed)
-            |> Enum.map(&Map.drop(&1, [:inserted_at, :updated_at]))
+            |> Enum.map(&Map.drop(&1, [:raw_posted_at, :inserted_at, :updated_at]))
 
           normalized_feed_parser_title = String.trim(feed_parser_feed.title)
           normalized_feeder_ex_title = String.trim(feeder_ex_feed.title)

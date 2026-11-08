@@ -16,8 +16,10 @@ config :ex_rss, ExRss.Mailer, adapter: Swoosh.Adapters.Test
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
 
-# Print only warnings and errors during test
-config :logger, level: :warning
+# Print only warnings and errors during test, but keep info logs, so they're
+# available to `with_log/1`.
+config :logger, level: :info
+config :logger, :default_handler, level: :warning
 
 # Configure your database
 config :ex_rss, ExRss.Repo,
