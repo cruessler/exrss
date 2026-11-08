@@ -23,18 +23,19 @@ defmodule ExRss.Crawler.Updater do
         try do
           compare_feeder_ex_and_feed_parser(feed, raw_feed, body, candidate_parser)
         rescue
-          _ ->
-            Logger.info("FeedParser failed because an exception was raised",
+          exception ->
+            Logger.info("Shadow comparison failed",
               title: feed.title,
-              url: feed.url
+              url: feed.url,
+              error: Exception.format(:error, exception, __STACKTRACE__)
             )
         catch
           kind, reason ->
-            Logger.info("FeedParser failed because a something was thrown",
+            Logger.info("Shadow comparison failed",
               title: feed.title,
               url: feed.url,
               kind: kind,
-              reason: reason
+              error: Exception.format(kind, reason, __STACKTRACE__)
             )
         end
       end
@@ -93,7 +94,7 @@ defmodule ExRss.Crawler.Updater do
           Logger.info("Feed could not be parsed with FeedParser",
             title: feed.title,
             url: feed.url,
-            reason: reason
+            error: inspect(reason)
           )
       end
     else
