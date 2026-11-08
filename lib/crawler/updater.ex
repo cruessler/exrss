@@ -83,10 +83,11 @@ defmodule ExRss.Crawler.Updater do
             )
           end
 
-        _ ->
+        {:error, reason} ->
           Logger.info("Feed could not be parsed with FeedParser",
             title: feed.title,
-            url: feed.url
+            url: feed.url,
+            reason: reason
           )
       end
     else
