@@ -29,10 +29,12 @@ defmodule ExRss.Crawler.Updater do
               url: feed.url
             )
         catch
-          _ ->
+          kind, reason ->
             Logger.info("FeedParser failed because a something was thrown",
               title: feed.title,
-              url: feed.url
+              url: feed.url,
+              kind: kind,
+              reason: reason
             )
         end
       end

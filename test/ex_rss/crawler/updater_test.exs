@@ -169,6 +169,7 @@ defmodule ExRss.Crawler.UpdaterTest do
     test "doesn't fail when candidate_parser fails" do
       test_candidate_parser(fn _ -> raise "parser failed " end)
       test_candidate_parser(fn _ -> throw(:parser_failed) end)
+      test_candidate_parser(fn _ -> exit(:process_exited) end)
     end
 
     test "detects when parsers agree" do
