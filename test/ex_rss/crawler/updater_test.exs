@@ -136,9 +136,8 @@ defmodule ExRss.Crawler.UpdaterTest do
       assert {:error, :econnrefused} = Updater.update(feed, fetch)
     end
 
-    defp test_candidate_parser(candidate_parser) do
+    defp test_candidate_parser(candidate_parser, xml \\ FeedFixtures.rss_fixture("1.rss")) do
       url = "https://example.com/feed"
-      xml = FeedFixtures.rss_fixture("1.rss")
 
       fetch = fn
         ^url -> {:ok, %HTTPoison.Response{body: xml}}
@@ -176,6 +175,22 @@ defmodule ExRss.Crawler.UpdaterTest do
       test_candidate_parser(fn _ -> raise "parser failed " end)
       test_candidate_parser(fn _ -> throw(:parser_failed) end)
       test_candidate_parser(fn _ -> exit(:process_exited) end)
+    end
+
+    test "does not run candidate parser when input is larger than 10 MiB" do
+      xml = FeedFixtures.rss_fixture("1.rss")
+      max_bytes = 10 * 1024 * 1024
+
+      xml = xml <> String.duplicate(" ", max_bytes + 1 - byte_size(xml))
+
+      assert byte_size(xml) == max_bytes + 1
+
+      {_, log} =
+        with_log(fn ->
+          test_candidate_parser(&FeedParser.parse/1, xml)
+        end)
+
+      assert log =~ "Feed was larger than 10 MiB, not comparing parsers"
     end
 
     test "detects when parsers agree" do
