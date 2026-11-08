@@ -173,15 +173,68 @@ defmodule ExRss.Crawler.UpdaterTest do
     end
 
     test "detects when parsers agree" do
-      previous_level = Logger.level()
-      Logger.configure(level: :info)
-
       {_, log} =
         with_log(fn ->
           test_candidate_parser(&FeedParser.parse/1)
         end)
 
-      on_exit(fn -> Logger.configure(level: previous_level) end)
+      assert log =~ "FeederEx and FeedParser agree"
+    end
+
+    test "treats two empty titles as agreement" do
+      {_, log} =
+        with_log(fn ->
+          url = "https://example.com/feed"
+
+          xml = """
+          <rss version="2.0">
+            <channel>
+              <title></title>
+              <item>
+                <title>item title 1</title>
+                <link>https://example.com/1</link>
+                <pubDate>2022-11-11</pubDate>
+              </item>
+              <item>
+                <title>item title 2</title>
+                <link>https://example.com/2</link>
+                <pubDate>2022-11-12</pubDate>
+              </item>
+              <item>
+                <title>item title 3</title>
+                <link>https://example.com/3</link>
+                <pubDate>2022-11-13</pubDate>
+              </item>
+            </channel>
+          </rss>
+          """
+
+          fetch = fn
+            ^url -> {:ok, %HTTPoison.Response{body: xml}}
+          end
+
+          user = AccountsFixtures.user_fixture()
+
+          feed =
+            Feed.changeset(%Feed{user_id: user.id, url: url})
+            |> Repo.insert!()
+
+          {:ok, updated_feed} =
+            Updater.update(feed, fetch,
+              compare_with_candidate_parser?: true,
+              candidate_parser: &FeedParser.parse/1
+            )
+
+          assert updated_feed.id == feed.id
+
+          feed =
+            Repo.get!(Feed, feed.id) |> Repo.preload(entries: from(e in Entry, order_by: :url))
+
+          assert %{
+                   title: nil,
+                   url: "https://example.com/feed"
+                 } = feed
+        end)
 
       assert log =~ "FeederEx and FeedParser agree"
     end
@@ -210,6 +263,19 @@ defmodule ExRss.Crawler.UpdaterTest do
             {:ok, feed} = FeedParser.parse(xml)
 
             {:ok, %{feed | title: "title does not match"}}
+          end)
+        end)
+
+      assert log =~ "Mismatch between FeederEx and FeedParser detected"
+    end
+
+    test "detects mismatch when title is empty" do
+      {_, log} =
+        with_log(fn ->
+          test_candidate_parser(fn xml ->
+            {:ok, feed} = FeedParser.parse(xml)
+
+            {:ok, %{feed | title: nil}}
           end)
         end)
 

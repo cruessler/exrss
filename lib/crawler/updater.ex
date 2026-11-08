@@ -73,8 +73,8 @@ defmodule ExRss.Crawler.Updater do
             Feed.parse_entries(feed, feeder_ex_feed)
             |> Enum.map(&Map.drop(&1, [:raw_posted_at, :inserted_at, :updated_at]))
 
-          normalized_feed_parser_title = String.trim(feed_parser_feed.title)
-          normalized_feeder_ex_title = String.trim(feeder_ex_feed.title)
+          normalized_feed_parser_title = normalize_title(feed_parser_feed.title)
+          normalized_feeder_ex_title = normalize_title(feeder_ex_feed.title)
 
           if normalized_feed_parser_title != normalized_feeder_ex_title or
                feed_parser_entries != feeder_ex_entries do
@@ -103,4 +103,7 @@ defmodule ExRss.Crawler.Updater do
       )
     end
   end
+
+  defp normalize_title(title) when is_binary(title), do: String.trim(title)
+  defp normalize_title(nil), do: nil
 end
