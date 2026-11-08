@@ -94,8 +94,12 @@ defmodule ExRss.Entry do
     "%Y-%m-%d"
   ]
 
-  def parse_time(time) do
-    parse_time(time, @time_formats)
+  def parse_time(time) when is_binary(time) do
+    time |> String.trim() |> parse_time(@time_formats)
+  end
+
+  def parse_time(nil) do
+    {:error, :cant_parse_nil}
   end
 
   def parse_time(time, formats) do

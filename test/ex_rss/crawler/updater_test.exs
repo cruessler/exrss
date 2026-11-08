@@ -1,8 +1,10 @@
 defmodule ExRss.Crawler.UpdaterTest do
   use ExRss.DataCase, async: true
 
+  import ExUnit.CaptureLog, only: [with_log: 1]
+
   alias ExRss.Crawler.Updater
-  alias ExRss.{AccountsFixtures, Entry, Feed, FeedFixtures, Repo}
+  alias ExRss.{AccountsFixtures, Entry, Feed, FeedFixtures, FeedParser, Repo}
 
   describe "Updater.update/2" do
     defp update_feed(filename) do
@@ -132,6 +134,191 @@ defmodule ExRss.Crawler.UpdaterTest do
         |> Repo.insert!()
 
       assert {:error, :econnrefused} = Updater.update(feed, fetch)
+    end
+
+    defp test_candidate_parser(candidate_parser, xml \\ FeedFixtures.rss_fixture("1.rss")) do
+      url = "https://example.com/feed"
+
+      fetch = fn
+        ^url -> {:ok, %HTTPoison.Response{body: xml}}
+      end
+
+      user = AccountsFixtures.user_fixture()
+
+      feed =
+        Feed.changeset(%Feed{user_id: user.id, url: url})
+        |> Repo.insert!()
+
+      {:ok, updated_feed} =
+        Updater.update(feed, fetch,
+          compare_with_candidate_parser?: true,
+          candidate_parser: candidate_parser
+        )
+
+      assert updated_feed.id == feed.id
+
+      feed = Repo.get!(Feed, feed.id) |> Repo.preload(entries: from(e in Entry, order_by: :url))
+
+      assert %{
+               title: "title",
+               url: "https://example.com/feed",
+               entries: [
+                 %{title: "title", url: "https://example.com/blog/1"},
+                 %{title: "title", url: "https://example.com/blog/2"},
+                 %{title: "title with space trimmed", url: "https://example.com/blog/3"},
+                 %{title: "title", url: "https://example.com/blog/4"}
+               ]
+             } = feed
+    end
+
+    test "doesn't fail when candidate_parser fails" do
+      test_candidate_parser(fn _ -> raise "parser failed " end)
+      test_candidate_parser(fn _ -> throw(:parser_failed) end)
+      test_candidate_parser(fn _ -> exit(:process_exited) end)
+    end
+
+    test "does not run candidate parser when input is larger than 10 MiB" do
+      xml = FeedFixtures.rss_fixture("1.rss")
+      max_bytes = 10 * 1024 * 1024
+
+      xml = xml <> String.duplicate(" ", max_bytes + 1 - byte_size(xml))
+
+      assert byte_size(xml) == max_bytes + 1
+
+      {_, log} =
+        with_log(fn ->
+          test_candidate_parser(&FeedParser.parse/1, xml)
+        end)
+
+      assert log =~ "Feed was larger than 10 MiB, not comparing parsers"
+    end
+
+    test "detects when parsers agree" do
+      {_, log} =
+        with_log(fn ->
+          test_candidate_parser(&FeedParser.parse/1)
+        end)
+
+      assert log =~ "FeederEx and FeedParser agree"
+    end
+
+    test "treats two empty titles as agreement" do
+      {_, log} =
+        with_log(fn ->
+          url = "https://example.com/feed"
+
+          xml = """
+          <rss version="2.0">
+            <channel>
+              <title></title>
+              <item>
+                <title>item title 1</title>
+                <link>https://example.com/1</link>
+                <pubDate>2022-11-11</pubDate>
+              </item>
+              <item>
+                <title>item title 2</title>
+                <link>https://example.com/2</link>
+                <pubDate>2022-11-12</pubDate>
+              </item>
+              <item>
+                <title>item title 3</title>
+                <link>https://example.com/3</link>
+                <pubDate>2022-11-13</pubDate>
+              </item>
+            </channel>
+          </rss>
+          """
+
+          fetch = fn
+            ^url -> {:ok, %HTTPoison.Response{body: xml}}
+          end
+
+          user = AccountsFixtures.user_fixture()
+
+          feed =
+            Feed.changeset(%Feed{user_id: user.id, url: url})
+            |> Repo.insert!()
+
+          {:ok, updated_feed} =
+            Updater.update(feed, fetch,
+              compare_with_candidate_parser?: true,
+              candidate_parser: &FeedParser.parse/1
+            )
+
+          assert updated_feed.id == feed.id
+
+          feed =
+            Repo.get!(Feed, feed.id) |> Repo.preload(entries: from(e in Entry, order_by: :url))
+
+          assert %{
+                   title: nil,
+                   url: "https://example.com/feed",
+                   entries: [
+                     %{title: "item title 1", url: "https://example.com/1"},
+                     %{title: "item title 2", url: "https://example.com/2"},
+                     %{title: "item title 3", url: "https://example.com/3"}
+                   ]
+                 } = feed
+        end)
+
+      assert log =~ "FeederEx and FeedParser agree"
+    end
+
+    test "does not treat mismatch in updated as parser mismatch" do
+      {_, log} =
+        with_log(fn ->
+          test_candidate_parser(fn xml ->
+            {:ok, feed} = FeedParser.parse(xml)
+
+            entries =
+              feed.entries
+              |> Enum.map(fn entry -> %{entry | updated: "   #{entry.updated}   "} end)
+
+            {:ok, %{feed | entries: entries}}
+          end)
+        end)
+
+      assert log =~ "FeederEx and FeedParser agree"
+    end
+
+    test "detects mismatch in title" do
+      {_, log} =
+        with_log(fn ->
+          test_candidate_parser(fn xml ->
+            {:ok, feed} = FeedParser.parse(xml)
+
+            {:ok, %{feed | title: "title does not match"}}
+          end)
+        end)
+
+      assert log =~ "Mismatch between FeederEx and FeedParser detected"
+    end
+
+    test "detects mismatch when title is empty" do
+      {_, log} =
+        with_log(fn ->
+          test_candidate_parser(fn xml ->
+            {:ok, feed} = FeedParser.parse(xml)
+
+            {:ok, %{feed | title: nil}}
+          end)
+        end)
+
+      assert log =~ "Mismatch between FeederEx and FeedParser detected"
+    end
+
+    test "detects mismatch in entries" do
+      {_, log} =
+        with_log(fn ->
+          test_candidate_parser(fn xml ->
+            {:ok, feed} = FeedParser.parse(xml)
+
+            {:ok, %{feed | entries: []}}
+          end)
+        end)
+
+      assert log =~ "Mismatch between FeederEx and FeedParser detected"
     end
   end
 end

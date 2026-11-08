@@ -61,3 +61,7 @@ if config_env() == :prod do
     ],
     secret_key_base: secret_key_base
 end
+
+config :ex_rss,
+       :compare_with_candidate_parser?,
+       System.get_env("EXRSS_COMPARE_WITH_FEED_PARSER") == "1"

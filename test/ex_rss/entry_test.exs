@@ -17,6 +17,10 @@ defmodule ExRss.EntryTest do
     assert {:ok, _} = Entry.parse_time("2021-11-06")
   end
 
+  test "errors when parsing nil" do
+    assert {:error, :cant_parse_nil} = Entry.parse_time(nil)
+  end
+
   test "parses time, truncating microseconds" do
     {:ok, %{microsecond: {microsecond, precision}}} = Entry.parse_time("2018-08-22T10:07:06.121Z")
 
