@@ -133,5 +133,40 @@ defmodule ExRss.Crawler.UpdaterTest do
 
       assert {:error, :econnrefused} = Updater.update(feed, fetch)
     end
+
+    defp test_failing_candidate_parser(candidate_parser) do
+      url = "https://example.com/feed"
+      xml = FeedFixtures.rss_fixture("1.rss")
+
+      fetch = fn
+        ^url -> {:ok, %HTTPoison.Response{body: xml}}
+      end
+
+      user = AccountsFixtures.user_fixture()
+
+      feed =
+        Feed.changeset(%Feed{user_id: user.id, url: url})
+        |> Repo.insert!()
+
+      {:ok, updated_feed} =
+        Updater.update(feed, fetch,
+          compare_with_candidate_parser?: true,
+          candidate_parser: candidate_parser
+        )
+
+      assert updated_feed.id == feed.id
+
+      feed = Repo.get!(Feed, feed.id) |> Repo.preload(entries: from(e in Entry, order_by: :url))
+
+      assert %{
+               title: "title",
+               url: "https://example.com/feed"
+             } = feed
+    end
+
+    test "doesn't fail when candidate_parser fails" do
+      test_failing_candidate_parser(fn _ -> raise "parser failed " end)
+      test_failing_candidate_parser(fn _ -> throw(:parser_failed) end)
+    end
   end
 end

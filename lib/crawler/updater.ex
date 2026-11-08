@@ -20,7 +20,21 @@ defmodule ExRss.Crawler.Updater do
       if compare_with_candidate_parser? do
         candidate_parser = Keyword.get(opts, :candidate_parser, &FeedParser.parse/1)
 
-        compare_feeder_ex_and_feed_parser(feed, raw_feed, body, candidate_parser)
+        try do
+          compare_feeder_ex_and_feed_parser(feed, raw_feed, body, candidate_parser)
+        rescue
+          _ ->
+            Logger.info("FeedParser failed because an exception was raised",
+              title: feed.title,
+              url: feed.url
+            )
+        catch
+          _ ->
+            Logger.info("FeedParser failed because a something was thrown",
+              title: feed.title,
+              url: feed.url
+            )
+        end
       end
 
       {:ok, new_feed}
