@@ -499,6 +499,8 @@ defmodule ExRss.FeedParserTest do
                raw_posted_at: "2026-01-25T17:44:00+01:00"
              }
            ] = feed_parser_entries
+
+    assert %{title: "title"} = feed_parser_feed
   end
 
   test "1.truncated.rss" do
