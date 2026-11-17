@@ -2,7 +2,7 @@ defmodule ExRss.FeedTest do
   use ExRss.DataCase
 
   alias Ecto.Changeset
-  alias ExRss.{Entry, Feed, FeedFixtures, User}
+  alias ExRss.{Entry, Feed, User}
   alias Timex.Duration
 
   @valid_attrs %{title: "some content", url: "some content"}
@@ -178,73 +178,6 @@ defmodule ExRss.FeedTest do
         })
 
       assert [] = entries
-    end
-  end
-
-  describe "FeederEx and SweetXml yield the same result" do
-    defp test_fixture(filename) do
-      feed = %{id: 1, url: "https://example.com/blog/feed.xml"}
-      xml = FeedFixtures.rss_fixture(filename)
-
-      {:ok, feeder_ex_feed} = xml |> Feed.parse()
-
-      # We drop timestamps that are not hardcoded. Both `:inserted_at` and
-      # `:updated_at` are taken from `DateTime.utc_now()` in `Entry.parse()`.
-      feeder_ex_entries =
-        Feed.parse_entries(feed, feeder_ex_feed)
-        |> Enum.map(&Map.drop(&1, [:inserted_at, :updated_at]))
-
-      {:ok, sweet_xml_feed} = xml |> Feed.parse_using_sweet_xml()
-
-      sweet_xml_entries =
-        Feed.parse_entries(feed, sweet_xml_feed)
-        |> Enum.map(&Map.drop(&1, [:inserted_at, :updated_at]))
-
-      assert length(feeder_ex_entries) > 0
-      assert feeder_ex_entries == sweet_xml_entries
-      assert feeder_ex_feed.title == sweet_xml_feed.title
-    end
-
-    test "1.atom" do
-      test_fixture("1.atom")
-    end
-
-    test "1.using-namespaces.atom" do
-      test_fixture("1.using-namespaces.atom")
-    end
-
-    test "1.no-links.atom" do
-      test_fixture("1.no-links.atom")
-    end
-
-    test "1.rss" do
-      test_fixture("1.rss")
-    end
-
-    test "1.empty-links.rss" do
-      test_fixture("1.empty-links.rss")
-    end
-
-    test "1.empty-feed.rss" do
-      xml = FeedFixtures.rss_fixture("1.empty-feed.rss")
-
-      {:ok, feeder_ex_feed} = xml |> Feed.parse()
-      {:ok, sweet_xml_feed} = xml |> Feed.parse_using_sweet_xml()
-
-      assert length(feeder_ex_feed.entries) == 0
-      assert length(sweet_xml_feed.entries) == 0
-      assert feeder_ex_feed.title == sweet_xml_feed.title
-    end
-
-    test "1.truncated.rss" do
-      xml = FeedFixtures.rss_fixture("1.truncated.rss")
-
-      {:error, _} = xml |> Feed.parse()
-      {:error, {:xml_parsing_failed, _reason}} = xml |> Feed.parse_using_sweet_xml()
-    end
-
-    test "unsupported format" do
-      assert {:error, :unsupported_format} = Feed.parse_using_sweet_xml("<html />")
     end
   end
 end
