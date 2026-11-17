@@ -323,7 +323,11 @@ defmodule ExRss.FeedAdderTest do
                    title: nil,
                    updated: "Wed, 28 Oct 2026 10:54:05 +0000"
                  },
-                 %{link: nil, title: "title", updated: "Wed, 28 Oct 2026 10:54:05 +0000"}
+                 %{
+                   link: "https://example.com/blog/3",
+                   title: "title",
+                   updated: "Wed, 28 Oct 2026 10:54:05 +0000"
+                 }
                ],
                title: "Discovered title",
                href: "/feed",

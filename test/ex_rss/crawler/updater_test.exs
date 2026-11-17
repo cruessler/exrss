@@ -93,6 +93,29 @@ defmodule ExRss.Crawler.UpdaterTest do
              } = feed
     end
 
+    test "1.empty-titles.rss" do
+      feed = update_feed("1.empty-titles.rss")
+
+      assert %{
+               title: nil,
+               url: "https://example.com/feed",
+               entries: [
+                 %{
+                   url: "https://example.com/blog/1",
+                   title: nil
+                 },
+                 %{
+                   url: "https://example.com/blog/2",
+                   title: nil
+                 },
+                 %{
+                   url: "https://example.com/blog/3",
+                   title: "title"
+                 }
+               ]
+             } = feed
+    end
+
     test "does not make changes when feed is malformed" do
       url = "https://example.com/feed"
       xml = FeedFixtures.rss_fixture("1.truncated.rss")

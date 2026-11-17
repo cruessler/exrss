@@ -38,7 +38,7 @@
     </item>
     <item>
       <title>title</title>
-      <link></link>
+      <link>https://example.com/blog/3</link>
       <comments>https://example.com/blog/3#comments</comments>
       <dc:creator></dc:creator>
       <pubDate>Wed, 28 Oct 2026 10:54:05 +0000</pubDate>
