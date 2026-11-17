@@ -3,7 +3,7 @@ defmodule ExRss.FeedAdderTest do
 
   import ExUnit.CaptureLog, only: [with_log: 1]
 
-  alias ExRss.{FeedAdder, FeedFixtures}
+  alias ExRss.{Feed, FeedAdder, FeedFixtures}
 
   @html """
   <!DOCTYPE html>
@@ -384,7 +384,7 @@ defmodule ExRss.FeedAdderTest do
   end
 
   test "extracts feed metadata" do
-    {:ok, raw_feed, _} = FeederEx.parse(@rss)
+    {:ok, raw_feed} = Feed.parse(@rss)
 
     candidate = FeedAdder.extract_candidate(raw_feed, "https://example.com/blog")
 
@@ -411,7 +411,7 @@ defmodule ExRss.FeedAdderTest do
   end
 
   test "extracts frequency info" do
-    {:ok, raw_feed, _} = FeederEx.parse(@rss)
+    {:ok, raw_feed} = Feed.parse(@rss)
 
     frequency_info = FeedAdder.extract_frequency_info(raw_feed)
 
@@ -419,7 +419,7 @@ defmodule ExRss.FeedAdderTest do
   end
 
   test "doesn’t extract frequency info when no publication dates are given" do
-    {:ok, raw_feed, _} = FeederEx.parse(@rss_whithout_pubdate)
+    {:ok, raw_feed} = Feed.parse(@rss_whithout_pubdate)
 
     frequency_info = FeedAdder.extract_frequency_info(raw_feed)
 
