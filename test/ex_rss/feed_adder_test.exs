@@ -307,6 +307,30 @@ defmodule ExRss.FeedAdderTest do
              } = feed
     end
 
+    test "1.empty-titles.rss" do
+      feed = add_discovery_info_fixture("1.empty-titles.rss")
+
+      assert %{
+               frequency: %{seconds: 0, posts: 3},
+               newest_entries: [
+                 %{
+                   link: "https://example.com/blog/1",
+                   title: nil,
+                   updated: "Wed, 28 Oct 2026 10:54:05 +0000"
+                 },
+                 %{
+                   link: "https://example.com/blog/2",
+                   title: nil,
+                   updated: "Wed, 28 Oct 2026 10:54:05 +0000"
+                 },
+                 %{link: nil, title: "title", updated: "Wed, 28 Oct 2026 10:54:05 +0000"}
+               ],
+               title: "Discovered title",
+               href: "/feed",
+               url: "https://example.com/feed"
+             } = feed
+    end
+
     test "1.truncated.rss" do
       {info, log} =
         with_log(fn -> add_discovery_info_fixture("1.truncated.rss") end)
