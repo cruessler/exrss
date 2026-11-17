@@ -249,40 +249,6 @@ defmodule ExRss.FeedParserTest do
 
     test "Atom date fields" do
       {:ok, feed} =
-        Feed.parse("""
-        <feed xmlns="http://www.w3.org/2005/Atom">
-          <title>feed title</title>
-          <entry>
-            <title>entry title 1</title>
-            <published>2022-08-12T21:07:00+02:00</published>
-            <updated>2026-08-12T21:07:00+02:00</updated>
-          </entry>
-          <entry>
-            <title>entry title 2</title>
-            <updated>2026-08-12T21:07:00+02:00</updated>
-          </entry>
-          <entry>
-            <title>entry title 3</title>
-            <published>2022-08-12T21:07:00+02:00</published>
-          </entry>
-          <entry>
-            <title>entry title 4</title>
-            <updated>2026-08-12T21:07:00+02:00</updated>
-            <published>2022-08-12T21:07:00+02:00</published>
-          </entry>
-        </feed>
-        """)
-
-      assert %{
-               entries: [
-                 %{updated: "2026-08-12T21:07:00+02:00"},
-                 %{updated: "2026-08-12T21:07:00+02:00"},
-                 %{updated: nil},
-                 %{updated: "2026-08-12T21:07:00+02:00"}
-               ]
-             } = feed
-
-      {:ok, feed} =
         FeedParser.parse("""
         <feed xmlns="http://www.w3.org/2005/Atom">
           <title>feed title</title>
@@ -501,81 +467,59 @@ defmodule ExRss.FeedParserTest do
     end
   end
 
-  describe "FeederEx and FeedParser yield the same result" do
-    defp test_fixture(filename) do
-      feed = %{id: 1, url: "https://example.com/blog/feed.xml"}
-      xml = FeedFixtures.rss_fixture(filename)
+  test "1.using-namespaces.atom" do
+    feed = %{id: 1, url: "https://example.com/blog/feed.xml"}
+    xml = FeedFixtures.rss_fixture("1.using-namespaces.atom")
 
-      {:ok, feeder_ex_feed} = xml |> Feed.parse()
+    {:ok, feed_parser_feed} = xml |> FeedParser.parse()
 
-      # We drop timestamps that are not hardcoded. Both `:inserted_at` and
-      # `:updated_at` are taken from `DateTime.utc_now()` in `Entry.parse()`.
-      feeder_ex_entries =
-        Feed.parse_entries(feed, feeder_ex_feed)
-        |> Enum.map(&Map.drop(&1, [:inserted_at, :updated_at]))
+    feed_parser_entries =
+      Feed.parse_entries(feed, feed_parser_feed)
+      |> Enum.map(&Map.drop(&1, [:inserted_at, :updated_at]))
 
-      {:ok, feed_parser_feed} = xml |> FeedParser.parse()
+    assert [
+             %{
+               title: "title",
+               url: "https://example.com/blog/1",
+               raw_posted_at: "2026-08-12T21:07:00+02:00"
+             },
+             %{
+               title: "title",
+               url: "https://example.com/blog/2",
+               raw_posted_at: "2026-05-09T18:52:00+02:00"
+             },
+             %{
+               title: "title",
+               url: "https://example.com/blog/3",
+               raw_posted_at: "2026-03-14T10:45:00+01:00"
+             },
+             %{
+               title: "title",
+               url: "https://example.com/blog/4",
+               raw_posted_at: "2026-01-25T17:44:00+01:00"
+             }
+           ] = feed_parser_entries
 
-      feed_parser_entries =
-        Feed.parse_entries(feed, feed_parser_feed)
-        |> Enum.map(&Map.drop(&1, [:inserted_at, :updated_at]))
+    assert %{title: "title"} = feed_parser_feed
+  end
 
-      assert length(feeder_ex_entries) > 0
-      assert feeder_ex_entries == feed_parser_entries
-      assert feeder_ex_feed.title == feed_parser_feed.title
-    end
+  test "1.truncated.rss" do
+    xml = FeedFixtures.rss_fixture("1.truncated.rss")
 
-    test "1.atom" do
-      test_fixture("1.atom")
-    end
+    {:error, {:xml_parsing_failed, _reason}} = xml |> FeedParser.parse()
+  end
 
-    test "1.using-namespaces.atom" do
-      test_fixture("1.using-namespaces.atom")
-    end
+  test "unescaped & in attribute yields error" do
+    xml = """
+      <feed xmlns="http://www.w3.org/2005/Atom">
+        <title>feed title</title>
+        <entry>
+          <title>entry title 1</title>
+          <link href="https://example.com/1" title="A & B" />
+        </entry>
+      </feed>
+    """
 
-    test "1.no-links.atom" do
-      test_fixture("1.no-links.atom")
-    end
-
-    test "1.rss" do
-      test_fixture("1.rss")
-    end
-
-    test "1.empty-links.rss" do
-      test_fixture("1.empty-links.rss")
-    end
-
-    test "1.empty-feed.rss" do
-      xml = FeedFixtures.rss_fixture("1.empty-feed.rss")
-
-      {:ok, feeder_ex_feed} = xml |> Feed.parse()
-      {:ok, feed_parser_feed} = xml |> FeedParser.parse()
-
-      assert length(feeder_ex_feed.entries) == 0
-      assert length(feed_parser_feed.entries) == 0
-      assert feeder_ex_feed.title == feed_parser_feed.title
-    end
-
-    test "1.truncated.rss" do
-      xml = FeedFixtures.rss_fixture("1.truncated.rss")
-
-      {:error, _} = xml |> Feed.parse()
-      {:error, {:xml_parsing_failed, _reason}} = xml |> FeedParser.parse()
-    end
-
-    test "unescaped & in attribute yields error" do
-      xml = """
-        <feed xmlns="http://www.w3.org/2005/Atom">
-          <title>feed title</title>
-          <entry>
-            <title>entry title 1</title>
-            <link href="https://example.com/1" title="A & B" />
-          </entry>
-        </feed>
-      """
-
-      assert {:error, _} = xml |> Feed.parse()
-      assert {:error, {:xml_parsing_failed, _reason}} = xml |> FeedParser.parse()
-    end
+    assert {:error, {:xml_parsing_failed, _reason}} = xml |> FeedParser.parse()
   end
 end

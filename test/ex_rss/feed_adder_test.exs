@@ -3,7 +3,7 @@ defmodule ExRss.FeedAdderTest do
 
   import ExUnit.CaptureLog, only: [with_log: 1]
 
-  alias ExRss.{FeedAdder, FeedFixtures}
+  alias ExRss.{Feed, FeedAdder, FeedFixtures}
 
   @html """
   <!DOCTYPE html>
@@ -307,6 +307,34 @@ defmodule ExRss.FeedAdderTest do
              } = feed
     end
 
+    test "1.empty-titles.rss" do
+      feed = add_discovery_info_fixture("1.empty-titles.rss")
+
+      assert %{
+               frequency: %{seconds: 0, posts: 3},
+               newest_entries: [
+                 %{
+                   link: "https://example.com/blog/1",
+                   title: nil,
+                   updated: "Wed, 28 Oct 2026 10:54:05 +0000"
+                 },
+                 %{
+                   link: "https://example.com/blog/2",
+                   title: nil,
+                   updated: "Wed, 28 Oct 2026 10:54:05 +0000"
+                 },
+                 %{
+                   link: "https://example.com/blog/3",
+                   title: "title",
+                   updated: "Wed, 28 Oct 2026 10:54:05 +0000"
+                 }
+               ],
+               title: "Discovered title",
+               href: "/feed",
+               url: "https://example.com/feed"
+             } = feed
+    end
+
     test "1.truncated.rss" do
       {info, log} =
         with_log(fn -> add_discovery_info_fixture("1.truncated.rss") end)
@@ -356,7 +384,7 @@ defmodule ExRss.FeedAdderTest do
   end
 
   test "extracts feed metadata" do
-    {:ok, raw_feed, _} = FeederEx.parse(@rss)
+    {:ok, raw_feed} = Feed.parse(@rss)
 
     candidate = FeedAdder.extract_candidate(raw_feed, "https://example.com/blog")
 
@@ -383,7 +411,7 @@ defmodule ExRss.FeedAdderTest do
   end
 
   test "extracts frequency info" do
-    {:ok, raw_feed, _} = FeederEx.parse(@rss)
+    {:ok, raw_feed} = Feed.parse(@rss)
 
     frequency_info = FeedAdder.extract_frequency_info(raw_feed)
 
@@ -391,7 +419,7 @@ defmodule ExRss.FeedAdderTest do
   end
 
   test "doesn’t extract frequency info when no publication dates are given" do
-    {:ok, raw_feed, _} = FeederEx.parse(@rss_whithout_pubdate)
+    {:ok, raw_feed} = Feed.parse(@rss_whithout_pubdate)
 
     frequency_info = FeedAdder.extract_frequency_info(raw_feed)
 

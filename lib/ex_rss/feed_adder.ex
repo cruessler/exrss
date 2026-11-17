@@ -172,5 +172,9 @@ defmodule ExRss.FeedAdder do
   def extract_newest_entries(raw_feed) do
     raw_feed.entries
     |> Enum.take(3)
+    |> Enum.map(fn
+      %{title: nil} = entry -> entry
+      entry -> %{entry | title: String.trim(entry.title)}
+    end)
   end
 end

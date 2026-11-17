@@ -17,6 +17,12 @@ defmodule ExRss.EntryTest do
     assert {:ok, _} = Entry.parse_time("2021-11-06")
   end
 
+  test "ignores surrounding whitespace when parsing time" do
+    time = "2021-11-06"
+
+    assert Entry.parse_time(" #{time}  ") == Entry.parse_time(time)
+  end
+
   test "errors when parsing nil" do
     assert {:error, :cant_parse_nil} = Entry.parse_time(nil)
   end

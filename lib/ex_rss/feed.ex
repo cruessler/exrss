@@ -2,8 +2,7 @@ defmodule ExRss.Feed do
   use ExRssWeb, :model
 
   alias Ecto.Changeset
-  alias ExRss.Entry
-  alias ExRss.User
+  alias ExRss.{Entry, FeedParser, User}
   alias Timex.Duration
 
   @base_timeout Duration.from_minutes(60) |> Duration.to_seconds()
@@ -63,23 +62,7 @@ defmodule ExRss.Feed do
     |> unique_constraint(:url)
   end
 
-  def parse(xml) do
-    try do
-      FeederEx.parse(xml)
-    catch
-      :throw, value ->
-        {:error, value}
-    else
-      {:ok, raw_feed, _} ->
-        {:ok, raw_feed}
-
-      {:fatal_error, _, error, _, _} ->
-        {:error, error}
-
-      error ->
-        {:error, error}
-    end
-  end
+  defdelegate parse(xml), to: FeedParser
 
   # TODO:
   # Find a better name for `raw_feed` (applies to `FeedUpdater.update()`, too).
