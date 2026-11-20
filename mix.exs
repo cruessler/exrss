@@ -55,7 +55,6 @@ defmodule ExRss.Mixfile do
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 0.11"},
-      {:feeder_ex, "~> 1.1"},
       {:jason, "~> 1.0"},
       {:httpoison, "~> 2.3.0"},
       {:timex, "~> 3.1"},
