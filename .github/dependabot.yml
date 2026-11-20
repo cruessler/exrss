@@ -9,11 +9,6 @@ updates:
     assignees:
       - "cruessler"
 
-    ignore:
-      # `dependency-name` is required.
-      - dependency-name: "*"
-        update-types: ["version-update:semver-patch"]
-
     groups:
       misc:
         patterns:
@@ -31,11 +26,6 @@ updates:
 
     assignees:
       - "cruessler"
-
-    ignore:
-      # `dependency-name` is required.
-      - dependency-name: "*"
-        update-types: ["version-update:semver-patch"]
 
     groups:
       tailwind:
