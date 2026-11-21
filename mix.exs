@@ -50,7 +50,7 @@ defmodule ExRss.Mixfile do
       {:phoenix_live_dashboard, "~> 0.8"},
       {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
-      {:swoosh, "~> 1.4"},
+      {:swoosh, "~> 1.30"},
       {:finch, "~> 0.19"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
