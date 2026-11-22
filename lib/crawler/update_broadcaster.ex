@@ -11,10 +11,10 @@ defmodule ExRss.Crawler.UpdateBroadcaster do
         where: e.read == false
       )
 
-    feed_with_unread_entries =
+    feed_with_entry_counts =
       from(
         f in Feed,
-        join: e in Entry,
+        left_join: e in Entry,
         on: f.id == e.feed_id,
         group_by: f.id,
         select: %{
@@ -28,11 +28,9 @@ defmodule ExRss.Crawler.UpdateBroadcaster do
       |> ExRss.Repo.preload(entries: unread_entries)
       |> Map.put(:last_successful_update_at, feed.last_successful_update_at)
 
-    if feed_with_unread_entries.unread_entries_count > 0 do
-      ExRssWeb.Endpoint.broadcast!("user:#{feed.user_id}", "unread_entries", %{
-        feed: feed_with_unread_entries
-      })
-    end
+    ExRssWeb.Endpoint.broadcast!("user:#{feed.user_id}", "unread_entries", %{
+      feed: feed_with_entry_counts
+    })
 
     {:ok, nil}
   end
