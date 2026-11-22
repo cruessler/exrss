@@ -1,7 +1,22 @@
+# Commands for updating `mise.lock`. These should select precompiled Erlang
+# versions for the Ubuntu 24.04 runner used by Github Actions.
+#
+# Update all versions:
+# mise lock --bump
+#
+# Update only Erlang versions:
+# mise lock --bump erlang
+#
+# Update only Elixir versions:
+# mise lock --bump elixir
+
 [tools]
-elixir = "1.17"
-erlang = "27.3"
+elixir = "1.20"
+erlang = "29"
 node = "26"
 
 [settings]
 lockfile = true
+
+[settings.erlang]
+precompiled_os = "ubuntu-24.04"
