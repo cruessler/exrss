@@ -3,7 +3,7 @@
 # ImageOS=ubuntu24 mise lock --bump elixir
 
 [tools]
-elixir = "1.18"
+elixir = "1.19"
 erlang = "29"
 node = "26"
 
