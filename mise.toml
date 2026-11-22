@@ -1,6 +1,6 @@
 [tools]
 elixir = "1.17"
-erlang = "27.3"
+erlang = "28.5"
 node = "26"
 
 [settings]
