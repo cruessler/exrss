@@ -31,6 +31,31 @@ defmodule ExRssWeb.FeedLiveTest do
     refute has_element?(lv1, "#feed-#{feed.id}")
   end
 
+  test "broadcasts updates when feed is marked as read", %{conn: conn} do
+    user = user_fixture()
+    feed = empty_feed_fixture(%{user_id: user.id})
+    entry = entry_fixture(%{feed_id: feed.id})
+    conn = log_in_user(conn, user)
+
+    {:ok, lv1, _html1} = live(conn, ~p"/feeds?filter=unread")
+    {:ok, lv2, _html2} = live(conn, ~p"/entries")
+
+    selector = "#entry-#{entry.id}"
+
+    assert has_element?(lv1, "#feed-#{feed.id}")
+    assert has_element?(lv1, selector)
+    assert has_element?(lv2, selector)
+
+    lv1
+    |> element("button[aria-label='Mark as read'][phx-value-feed-id='#{feed.id}']")
+    |> render_click()
+
+    refute has_element?(lv1, selector)
+    refute has_element?(lv2, selector)
+
+    refute has_element?(lv1, "#feed-#{feed.id}")
+  end
+
   defp empty_feed_fixture(%{user_id: user_id}) do
     Feed.changeset(%Feed{user_id: user_id, url: "https://example.com/blog"})
     |> Repo.insert!()

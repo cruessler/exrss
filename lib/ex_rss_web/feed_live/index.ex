@@ -152,6 +152,8 @@ defmodule ExRssWeb.FeedLive.Index do
     socket =
       case Repo.update(changeset) do
         {:ok, feed} ->
+          ExRss.Crawler.UpdateBroadcaster.broadcast_update(feed)
+
           socket
           |> assign_feeds()
           # TODO
