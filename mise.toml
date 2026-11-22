@@ -1,5 +1,9 @@
+# ImageOS=ubuntu24 MISE_ERLANG_COMPILE=false mise lock --bump erlang --platform linux-x64
+# ImageOS=ubuntu24 mise lock --bump erlang
+# ImageOS=ubuntu24 mise lock --bump elixir
+
 [tools]
-elixir = "1.17"
+elixir = "1.18"
 erlang = "28.5"
 node = "26"
 
