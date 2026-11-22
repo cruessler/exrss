@@ -1,5 +1,5 @@
 # Commands for updating `mise.lock`. These should select precompiled Erlang
-# versions for the Ubuntu 24.04 runner used by the Github Actions.
+# versions for the Ubuntu 24.04 runner used by Github Actions.
 #
 # Update all versions:
 # mise lock --bump
