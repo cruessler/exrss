@@ -59,25 +59,12 @@ defmodule ExRssWeb.EntryLive.Index do
 
   @impl true
   def handle_event("mark_as_read", %{"entry-id" => entry_id}, socket) do
-    # TODO:
-    # There's some duplication with `feed_live/index.ex`. Potentially extract
-    # `Entry.mark_as_read!`.
     current_user =
       Repo.get!(User, socket.assigns.current_user.id)
 
-    changeset =
-      current_user
-      |> Ecto.assoc(:entries)
-      |> Repo.get!(entry_id)
-      |> Entry.changeset(%{"read" => true})
-
     socket =
-      case Repo.update(changeset) do
+      case Entry.mark_as_read(current_user, entry_id) do
         {:ok, entry} ->
-          feed = entry |> Ecto.assoc(:feed) |> Repo.get!(entry.feed_id)
-
-          ExRss.Crawler.UpdateBroadcaster.broadcast_update(feed)
-
           socket
           |> assign_entries()
           |> put_flash(:info, "Entry “#{entry.title}” marked as read")

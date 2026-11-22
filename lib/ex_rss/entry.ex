@@ -1,7 +1,7 @@
 defmodule ExRss.Entry do
   use ExRssWeb, :model
 
-  alias ExRss.Feed
+  alias ExRss.{Entry, Feed, Repo}
 
   @derive {Jason.Encoder, only: [:id, :url, :title, :read, :posted_at]}
 
@@ -30,6 +30,24 @@ defmodule ExRss.Entry do
     |> validate_required([:url])
     |> assoc_constraint(:feed)
     |> unique_constraint(:url, name: :entries_feed_id_url_index)
+  end
+
+  def mark_as_read(user, entry_id) do
+    entry =
+      user
+      |> Ecto.assoc(:entries)
+      |> Repo.get!(entry_id)
+
+    with {:ok, entry} <-
+           entry
+           |> Entry.changeset(%{"read" => true})
+           |> Repo.update() do
+      feed = entry |> Ecto.assoc(:feed) |> Repo.get!(entry.feed_id)
+
+      ExRss.Crawler.UpdateBroadcaster.broadcast_update(feed)
+
+      {:ok, entry}
+    end
   end
 
   def parse(entry) do
