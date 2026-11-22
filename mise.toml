@@ -1,6 +1,6 @@
-# ImageOS=ubuntu24 MISE_ERLANG_COMPILE=false mise lock --bump erlang --platform linux-x64
-# ImageOS=ubuntu24 mise lock --bump erlang
-# ImageOS=ubuntu24 mise lock --bump elixir
+# MISE_ERLANG_COMPILE=false mise lock --bump erlang --platform linux-x64
+# mise lock --bump erlang
+# mise lock --bump elixir
 
 [tools]
 elixir = "1.20"
@@ -9,3 +9,6 @@ node = "26"
 
 [settings]
 lockfile = true
+
+[settings.erlang]
+precompiled_os = "ubuntu-24.04"
