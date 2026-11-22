@@ -34,24 +34,30 @@ defmodule ExRssWeb.FeedLiveTest do
   test "broadcasts updates when feed is marked as read", %{conn: conn} do
     user = user_fixture()
     feed = empty_feed_fixture(%{user_id: user.id})
-    entry = entry_fixture(%{feed_id: feed.id})
+    entry1 = entry_fixture(%{feed_id: feed.id})
+    entry2 = entry_fixture(%{feed_id: feed.id})
     conn = log_in_user(conn, user)
 
     {:ok, lv1, _html1} = live(conn, ~p"/feeds?filter=unread")
     {:ok, lv2, _html2} = live(conn, ~p"/entries")
 
-    selector = "#entry-#{entry.id}"
+    selector1 = "#entry-#{entry1.id}"
+    selector2 = "#entry-#{entry2.id}"
 
     assert has_element?(lv1, "#feed-#{feed.id}")
-    assert has_element?(lv1, selector)
-    assert has_element?(lv2, selector)
+    assert has_element?(lv1, selector1)
+    assert has_element?(lv1, selector2)
+    assert has_element?(lv2, selector1)
+    assert has_element?(lv2, selector2)
 
     lv1
     |> element("button[aria-label='Mark as read'][phx-value-feed-id='#{feed.id}']")
     |> render_click()
 
-    refute has_element?(lv1, selector)
-    refute has_element?(lv2, selector)
+    refute has_element?(lv1, selector1)
+    refute has_element?(lv1, selector2)
+    refute has_element?(lv2, selector1)
+    refute has_element?(lv2, selector2)
 
     refute has_element?(lv1, "#feed-#{feed.id}")
   end
