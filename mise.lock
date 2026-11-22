@@ -3,37 +3,37 @@
 lockfile_version = 4
 
 [[tools.elixir]]
-version = "1.19.7-otp-28"
+version = "1.20.5-otp-29"
 backend = "core:elixir"
-specifiers = ["1.19"]
+specifiers = ["1.20"]
 
 [tools.elixir."platforms.linux-arm64"]
-checksum = "sha256:3e76be45d819bc65f238c308ad29bcc91e06effeb6508a92f57dd65f48371e5c"
-url = "https://builds.hex.pm/builds/elixir/v1.19.7-otp-28.zip"
+checksum = "sha256:f424d6f0bb710a1d4898f2645d8ad6cab3f5eab8d71848c0dda2579d3a8e8a06"
+url = "https://builds.hex.pm/builds/elixir/v1.20.5-otp-29.zip"
 
 [tools.elixir."platforms.linux-arm64-musl"]
-checksum = "sha256:3e76be45d819bc65f238c308ad29bcc91e06effeb6508a92f57dd65f48371e5c"
-url = "https://builds.hex.pm/builds/elixir/v1.19.7-otp-28.zip"
+checksum = "sha256:f424d6f0bb710a1d4898f2645d8ad6cab3f5eab8d71848c0dda2579d3a8e8a06"
+url = "https://builds.hex.pm/builds/elixir/v1.20.5-otp-29.zip"
 
 [tools.elixir."platforms.linux-x64"]
-checksum = "sha256:3e76be45d819bc65f238c308ad29bcc91e06effeb6508a92f57dd65f48371e5c"
-url = "https://builds.hex.pm/builds/elixir/v1.19.7-otp-28.zip"
+checksum = "sha256:f424d6f0bb710a1d4898f2645d8ad6cab3f5eab8d71848c0dda2579d3a8e8a06"
+url = "https://builds.hex.pm/builds/elixir/v1.20.5-otp-29.zip"
 
 [tools.elixir."platforms.linux-x64-musl"]
-checksum = "sha256:3e76be45d819bc65f238c308ad29bcc91e06effeb6508a92f57dd65f48371e5c"
-url = "https://builds.hex.pm/builds/elixir/v1.19.7-otp-28.zip"
+checksum = "sha256:f424d6f0bb710a1d4898f2645d8ad6cab3f5eab8d71848c0dda2579d3a8e8a06"
+url = "https://builds.hex.pm/builds/elixir/v1.20.5-otp-29.zip"
 
 [tools.elixir."platforms.macos-arm64"]
-checksum = "sha256:3e76be45d819bc65f238c308ad29bcc91e06effeb6508a92f57dd65f48371e5c"
-url = "https://builds.hex.pm/builds/elixir/v1.19.7-otp-28.zip"
+checksum = "sha256:f424d6f0bb710a1d4898f2645d8ad6cab3f5eab8d71848c0dda2579d3a8e8a06"
+url = "https://builds.hex.pm/builds/elixir/v1.20.5-otp-29.zip"
 
 [tools.elixir."platforms.macos-x64"]
-checksum = "sha256:3e76be45d819bc65f238c308ad29bcc91e06effeb6508a92f57dd65f48371e5c"
-url = "https://builds.hex.pm/builds/elixir/v1.19.7-otp-28.zip"
+checksum = "sha256:f424d6f0bb710a1d4898f2645d8ad6cab3f5eab8d71848c0dda2579d3a8e8a06"
+url = "https://builds.hex.pm/builds/elixir/v1.20.5-otp-29.zip"
 
 [tools.elixir."platforms.windows-x64"]
-checksum = "sha256:3e76be45d819bc65f238c308ad29bcc91e06effeb6508a92f57dd65f48371e5c"
-url = "https://builds.hex.pm/builds/elixir/v1.19.7-otp-28.zip"
+checksum = "sha256:f424d6f0bb710a1d4898f2645d8ad6cab3f5eab8d71848c0dda2579d3a8e8a06"
+url = "https://builds.hex.pm/builds/elixir/v1.20.5-otp-29.zip"
 
 [[tools.erlang]]
 version = "29.1.2"
