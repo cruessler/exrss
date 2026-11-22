@@ -1,4 +1,4 @@
-# MISE_ERLANG_COMPILE=false mise lock --bump erlang --platform linux-x64
+# mise lock --bump erlang --platform linux-x64
 # mise lock --bump erlang
 # mise lock --bump elixir
 

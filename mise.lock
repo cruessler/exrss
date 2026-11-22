@@ -40,11 +40,21 @@ version = "29.1.2"
 backend = "core:erlang"
 specifiers = ["29"]
 
+[tools.erlang.options]
+precompiled_os = "ubuntu-24.04"
+
 [tools.erlang."platforms.linux-arm64"]
-checksum = "sha256:c79966661e35fe4aff8ec003db63682e3b33b10b672220d51bf93c0a9244b049"
-url = "https://github.com/erlang/otp/releases/download/OTP-29.1.2/otp_src_29.1.2.tar.gz"
-url_api = "https://api.github.com/repos/erlang/otp/releases/assets/640997755"
-install = "source"
+checksum = "sha256:5d344f2ef455cfa15ad3112ce3aaecc8fa0d97532b2f106df46bc1701bc02c27"
+url = "https://builds.hex.pm/builds/otp/arm64/ubuntu-24.04/OTP-29.1.2.tar.gz"
+
+[tools.erlang."platforms.linux-x64"]
+checksum = "sha256:2cfca446976fc61962585a1c77e5d11ddb6f5fed83e84668a2c4acfaad60d22e"
+url = "https://builds.hex.pm/builds/otp/amd64/ubuntu-24.04/OTP-29.1.2.tar.gz"
+
+[[tools.erlang]]
+version = "29.1.2"
+backend = "core:erlang"
+specifiers = ["29"]
 
 [tools.erlang."platforms.linux-arm64-musl"]
 checksum = "sha256:c79966661e35fe4aff8ec003db63682e3b33b10b672220d51bf93c0a9244b049"
@@ -72,19 +82,6 @@ url_api = "https://api.github.com/repos/erlef/otp_builds/releases/assets/6407268
 checksum = "sha256:4efe9772a84c6c1ef75377e9326815584958776c905f2bf687b62509e2d809c0"
 url = "https://github.com/erlang/otp/releases/download/OTP-29.1.2/otp_win64_29.1.2.zip"
 url_api = "https://api.github.com/repos/erlang/otp/releases/assets/641103480"
-
-[[tools.erlang]]
-version = "29.1.2"
-backend = "core:erlang"
-specifiers = ["29"]
-
-[tools.erlang.options]
-compile = "false"
-precompiled_os = "ubuntu-24.04"
-
-[tools.erlang."platforms.linux-x64"]
-checksum = "sha256:2cfca446976fc61962585a1c77e5d11ddb6f5fed83e84668a2c4acfaad60d22e"
-url = "https://builds.hex.pm/builds/otp/amd64/ubuntu-24.04/OTP-29.1.2.tar.gz"
 
 [[tools.node]]
 version = "26.13.1"
