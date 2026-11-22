@@ -32,6 +32,9 @@ defmodule ExRss.Entry do
     |> unique_constraint(:url, name: :entries_feed_id_url_index)
   end
 
+  @doc """
+  Marks an entry as read and broadcasts the updated feed this entry belongs to.
+  """
   def mark_as_read(user, entry_id) do
     entry =
       user
