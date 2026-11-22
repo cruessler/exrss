@@ -123,6 +123,10 @@ defmodule ExRssWeb.FeedLive.Index do
     socket =
       case Repo.update(changeset) do
         {:ok, entry} ->
+          feed = entry |> Ecto.assoc(:feed) |> Repo.get!(entry.feed_id)
+
+          ExRss.Crawler.UpdateBroadcaster.broadcast_update(feed)
+
           socket
           |> assign_feeds()
           |> put_flash(:info, "Entry “#{entry.title}” marked as read")
