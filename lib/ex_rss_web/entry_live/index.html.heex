@@ -15,15 +15,9 @@
     :for={entry <- @entries}
     :key={entry.id}
     id={"entry-#{entry.id}"}
-    class="flex flex-col md:flex-row"
+    class="flex flex-row"
   >
-    <div class="flex flex-col">
-      <span class="text-gray-400">{entry.feed.title}</span>
-      {entry.title}
-      <span>{format_timestamp_relative_to_now(entry.posted_at)}</span>
-    </div>
-
-    <div class="md:shrink-0 flex self-start mt-1 ml-auto space-x-4">
+    <div class="flex flex-col mt-1 mr-4 space-y-2">
       <a
         href={entry.url}
         target="_blank"
@@ -41,6 +35,12 @@
       >
         <.icon name="hero-check-circle-solid" />
       </button>
+    </div>
+
+    <div class="flex flex-col">
+      <span class="text-gray-400">{entry.feed.title}</span>
+      {entry.title}
+      <span>{format_timestamp_relative_to_now(entry.posted_at)}</span>
     </div>
   </li>
 </ul>
