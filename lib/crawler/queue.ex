@@ -1,7 +1,6 @@
 defmodule ExRss.Crawler.Queue do
   use GenServer
 
-  require Ecto.Query
   require Logger
 
   @store ExRss.Crawler.Store
