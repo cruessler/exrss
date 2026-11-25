@@ -6,7 +6,7 @@ defmodule ExRssWeb.UserLoginLive do
     <div class="mx-auto max-w-sm">
       <.header class="text-center">
         Log in to account
-        <:subtitle>
+        <:subtitle :if={Application.get_env(:ex_rss, :user_registration_enabled?, false)}>
           Don't have an account?
           <.link navigate={~p"/users/register"} class="font-semibold text-brand hover:underline">
             Sign up
