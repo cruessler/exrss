@@ -1,5 +1,5 @@
 defmodule ExRssWeb.UserRegistrationLiveTest do
-  use ExRssWeb.ConnCase, async: true
+  use ExRssWeb.ConnCase
 
   import Phoenix.LiveViewTest
   import ExRss.AccountsFixtures
@@ -33,6 +33,13 @@ defmodule ExRssWeb.UserRegistrationLiveTest do
       assert result =~ "Register"
       assert result =~ "must have the @ sign and no spaces"
       assert result =~ "should be at least 12 character"
+    end
+
+    test "redirects to /users/log_in if registration is disabled", %{conn: conn} do
+      Application.put_env(:ex_rss, :user_registration_enabled?, false)
+      on_exit(fn -> Application.put_env(:ex_rss, :user_registration_enabled?, true) end)
+
+      assert {:error, {:redirect, %{to: "/users/log_in"}}} = live(conn, ~p"/users/register")
     end
   end
 

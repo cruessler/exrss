@@ -10,7 +10,10 @@
   </p>
 <% else %>
   <p>
-    Right now, there is not much you can do. Maybe you want to <a href={~p"/users/register"}>register</a>?
+    Right now, there is not much you can do.
+    <%= if Application.get_env(:ex_rss, :user_registration_enabled?, false) do %>
+      Maybe you want to <a href={~p"/users/register"}>register</a>?
+    <% end %>
     If you are already registered you can of course <a href={~p"/users/log_in"}>log in</a>.
   </p>
 <% end %>

@@ -1,6 +1,4 @@
 defmodule ExRss.Crawler.Updater do
-  require Logger
-
   alias ExRss.{Feed, FeedUpdater, Repo}
   alias HTTPoison.{Error, Response}
 
