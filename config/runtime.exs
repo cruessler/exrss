@@ -61,3 +61,14 @@ if config_env() == :prod do
     ],
     secret_key_base: secret_key_base
 end
+
+# If `true`, allow new users to register
+config(
+  :ex_rss,
+  :user_registration_enabled?,
+  if(config_env() == :prod) do
+    System.get_env("EXRSS_USER_REGISTRATION_ENABLED") in ~w(true 1)
+  else
+    true
+  end
+)

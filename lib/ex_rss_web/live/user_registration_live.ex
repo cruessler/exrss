@@ -43,14 +43,18 @@ defmodule ExRssWeb.UserRegistrationLive do
   end
 
   def mount(_params, _session, socket) do
-    changeset = Accounts.change_user_registration(%User{})
+    if Application.get_env(:ex_rss, :user_registration_enabled?, false) do
+      changeset = Accounts.change_user_registration(%User{})
 
-    socket =
-      socket
-      |> assign(trigger_submit: false, check_errors: false)
-      |> assign_form(changeset)
+      socket =
+        socket
+        |> assign(trigger_submit: false, check_errors: false)
+        |> assign_form(changeset)
 
-    {:ok, socket, temporary_assigns: [form: nil]}
+      {:ok, socket, temporary_assigns: [form: nil]}
+    else
+      {:ok, redirect(socket, to: ~p"/users/log_in")}
+    end
   end
 
   def handle_event("save", %{"user" => user_params}, socket) do
